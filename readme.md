@@ -1,5 +1,7 @@
 # Project Structure
 
+
+```bash
 frontend/
 │
 ├── public/
@@ -17,6 +19,7 @@ frontend/
 ├── postcss.config.cjs
 ├── tailwind.config.js
 └── package.json
+```
 
 ## Prettier usage
 
