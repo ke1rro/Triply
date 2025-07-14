@@ -1,6 +1,5 @@
 # Project Structure
 
-
 ```bash
 frontend/
 │
