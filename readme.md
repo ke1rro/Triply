@@ -6,7 +6,7 @@ frontend/
 ├── src/
 │   ├── components/     # UI-elements, reusable components
 │   ├── pages/          # Page-based routing
-│   ├── lib/            # firebase.js and other libraries
+│   ├── lib/            # firebase.js and other libraries`
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
