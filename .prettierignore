@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.env
+*.log
+*.png
+*.jpg
+*.svg
+public/*
+package-lock.json
