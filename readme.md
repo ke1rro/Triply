@@ -20,7 +20,26 @@ frontend/
 └── package.json
 ```
 
-## Prettier usage
+## Project Setup
+
+1. Get Firebase credentials and create a `.env` file in the root directory based on `.env_example`.
+
+    1.1. Project overview -> project settings -> General -> Your apps -> Firebase SDK snippet -> Config
+
+2. Install dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+3. Start the development server:
+
+```bash
+npm run dev
+```
+
+### Prettier usage
 
 ```bash
 npm run format
