@@ -90,9 +90,12 @@ const Homepage = () => {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="flex min-h-[500px] w-full max-w-md flex-col rounded-2xl bg-white/80 p-8 shadow-lg backdrop-blur-lg">
         {/* Header */}
-        <h1 className="mb-6 text-center text-3xl font-bold text-indigo-900">
-          Triply
-        </h1>
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl">✈️</div>
+            <h1 className="text-3xl font-bold text-indigo-900">Triply</h1>
+          </div>
+        </div>
 
         {/* Search Bar Section */}
         <div className="mb-6">
