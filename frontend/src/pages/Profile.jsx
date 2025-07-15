@@ -90,16 +90,14 @@ const Profile = () => {
       <div className="relative z-10 w-full max-w-md">
         {/* Header with back button */}
         <div className="mb-6 flex items-center justify-between">
-          <button
+          <FiArrowLeft
+            className="h-8 w-8 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
             onClick={handleBack}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20"
-          >
-            <FiArrowLeft className="h-5 w-5" />
-          </button>
+          />
           <h1 className="text-2xl font-bold text-white drop-shadow-lg">
             Profile
           </h1>
-          <div className="h-10 w-10"></div> {/* Spacer for centering */}
+          <div className="h-8 w-8"></div> {/* Spacer for centering */}
         </div>
         <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
           <div className="mb-8 text-center">

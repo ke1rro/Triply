@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
+import { FiSearch, FiUser, FiNavigation } from 'react-icons/fi'
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
@@ -102,7 +103,9 @@ const Homepage = () => {
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="text-3xl">✈️</div>
+              <div className="text-3xl text-white">
+                <FiNavigation className="h-8 w-8" />
+              </div>
               <h1 className="text-3xl font-bold text-white drop-shadow-lg">
                 Triply
               </h1>
@@ -119,18 +122,14 @@ const Homepage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full flex-1 rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
-              <button
-                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600/60 text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-600/80 active:scale-95"
+              <FiSearch
+                className="h-6 w-6 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
                 onClick={handleFilterClick}
-              >
-                🔍
-              </button>
-              <button
+              />
+              <FiUser
+                className="h-6 w-6 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
                 onClick={handleProfileClick}
-                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-600/60 text-white backdrop-blur-sm transition-all duration-200 hover:bg-blue-600/80"
-              >
-                👤
-              </button>
+              />
             </div>
           </div>
 
