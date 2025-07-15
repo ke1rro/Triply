@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import { logout } from '../lib/auth'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
 
@@ -63,13 +62,8 @@ const Homepage = () => {
     console.log('Filter clicked')
   }
 
-  const handleProfileClick = async () => {
-    try {
-      await logout()
-      navigate('/login')
-    } catch (error) {
-      console.error('Error logging out:', error)
-    }
+  const handleProfileClick = () => {
+    navigate('/profile')
   }
 
   const handleAddClick = () => {
