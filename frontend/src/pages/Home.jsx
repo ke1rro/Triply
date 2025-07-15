@@ -5,25 +5,6 @@ import { logout } from '../lib/auth'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
 
-// Example travel card data
-const exampleTrip = {
-  id: 'example-1',
-  start: 'New York',
-  end: 'Paris',
-  title: 'European Adventure',
-  distance: 5850,
-  duration: '8h 30m',
-  likes: 127,
-  image: 'https://picsum.photos/400/300?random=1',
-  description:
-    'A wonderful journey from the Big Apple to the City of Light. Experience the culture, cuisine, and history.',
-  comments: [
-    'Amazing flight experience!',
-    'Great views over the Atlantic',
-    'Perfect timing for arrival',
-  ],
-}
-
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -33,12 +14,42 @@ const Homepage = () => {
   useEffect(() => {
     const fetchTravelData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'travels'))
-        const travels = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        setTravelData(travels)
+        const querySnapshot = await getDocs(collection(db, 'trips'))
+        const trips = querySnapshot.docs.map((doc) => {
+          const data = doc.data()
+
+          // Calculate average rating from comments
+          const averageRating =
+            data.comments && data.comments.length > 0
+              ? data.comments.reduce(
+                  (sum, comment) => sum + (comment.rating || 0),
+                  0
+                ) / data.comments.length
+              : 0
+
+          // Get location names (limit to 5)
+          const locationNames = data.Locations
+            ? data.Locations.map((loc) => loc.name).slice(0, 5)
+            : []
+
+          return {
+            id: doc.id,
+            dataName: doc.id, // Use document ID as data name
+            name: data.name || 'Untitled Trip',
+            description: data.description || '',
+            days: data.days || 0,
+            likes: data.likes || 0,
+            fileName: data.fileName || null,
+            locations: locationNames,
+            events: data.Events || [],
+            comments: data.comments || [],
+            averageRating: averageRating,
+            createdAt: data.createdAt,
+            userId: data.userId,
+          }
+        })
+
+        setTravelData(trips)
       } catch (error) {
         console.error('Error fetching travel data:', error)
       } finally {
@@ -49,15 +60,13 @@ const Homepage = () => {
     fetchTravelData()
   }, [])
 
-  // Combine example trip with Firebase data
-  const allTravels = [exampleTrip, ...travelData]
-
-  const filteredTravels = allTravels.filter(
+  const filteredTravels = travelData.filter(
     (travel) =>
-      travel.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.destination?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.start?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.end?.toLowerCase().includes(searchQuery.toLowerCase())
+      travel.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      travel.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      travel.locations?.some((location) =>
+        location.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   )
 
   const handleFilterClick = () => {
@@ -79,34 +88,31 @@ const Homepage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white/80 p-8 shadow-lg backdrop-blur-lg">
+      <div className="flex min-h-[500px] w-full max-w-md flex-col rounded-2xl bg-white/80 p-8 shadow-lg backdrop-blur-lg">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-3xl">✈️</div>
-            <h1 className="text-3xl font-bold text-indigo-900">Tripply</h1>
-          </div>
-        </div>
+        <h1 className="mb-6 text-center text-3xl font-bold text-indigo-900">
+          Triply
+        </h1>
 
         {/* Search Bar Section */}
         <div className="mb-6">
           <div className="flex items-center gap-2">
             <input
               type="text"
-              placeholder="Search destinations..."
+              placeholder="Search trips..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 active:scale-95"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 active:scale-95"
               onClick={handleFilterClick}
             >
               🔍
             </button>
             <button
               onClick={handleProfileClick}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-600 text-white transition-all duration-200 hover:bg-indigo-700"
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white transition-all duration-200 hover:bg-indigo-700"
             >
               👤
             </button>
@@ -114,10 +120,10 @@ const Homepage = () => {
         </div>
 
         {/* Travel Cards */}
-        <div className="space-y-4">
+        <div className="mb-6 flex-1 space-y-4 overflow-hidden">
           {loading ? (
             <div className="py-8 text-center text-gray-600">
-              Loading travels...
+              Loading trips...
             </div>
           ) : (
             <>
@@ -128,8 +134,8 @@ const Homepage = () => {
               ) : (
                 <div className="py-8 text-center text-gray-600">
                   {searchQuery
-                    ? 'No travels found matching your search.'
-                    : 'No travels available.'}
+                    ? 'No trips found matching your search.'
+                    : 'No trips available.'}
                 </div>
               )}
             </>
@@ -138,10 +144,10 @@ const Homepage = () => {
 
         {/* Add Travel Button */}
         <button
-          className="mt-6 w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition duration-200 ease-in-out hover:bg-indigo-700"
+          className="w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition duration-200 ease-in-out hover:bg-indigo-700"
           onClick={handleAddClick}
         >
-          Add New Travel
+          Add New Trip
         </button>
       </div>
     </div>

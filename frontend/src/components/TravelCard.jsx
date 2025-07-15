@@ -1,54 +1,91 @@
 import { useState } from 'react'
+import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import TravelModal from './TravelModal.jsx'
 
 export default function TravelCard({ trip }) {
   const [showModal, setShowModal] = useState(false)
+  const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
 
-  const handleImageError = () => {
-    setImageError(true)
+  // Load image from Firebase Storage when component mounts
+  useState(() => {
+    const loadImage = async () => {
+      if (trip.fileName) {
+        try {
+          const storage = getStorage()
+          const imageRef = ref(storage, trip.fileName)
+          const url = await getDownloadURL(imageRef)
+          setImageUrl(url)
+        } catch (error) {
+          console.error('Error loading image:', error)
+          setImageError(true)
+        }
+      } else {
+        setImageError(true)
+      }
+    }
+
+    loadImage()
+  }, [trip.fileName])
+
+  // Format locations display
+  const formatLocations = (locations) => {
+    if (!locations || locations.length === 0) return 'No locations'
+
+    if (locations.length <= 5) {
+      return locations.join(' → ')
+    } else {
+      return locations.slice(0, 5).join(' → ') + ' ...'
+    }
   }
+
+  // Format rating display
+  const formatRating = (rating) => {
+    if (rating === 0) return 'No ratings'
+    return `★ ${rating.toFixed(1)}`
+  }
+
+  const backgroundImage =
+    imageUrl && !imageError
+      ? `url(${imageUrl})`
+      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
 
   return (
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="w-full cursor-pointer overflow-hidden rounded-lg border border-gray-300 bg-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+        className="relative h-32 w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+        style={{
+          backgroundImage: backgroundImage,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
       >
-        {/* Title at the top */}
-        <div className="p-3 pb-2">
-          <h2 className="text-left text-sm font-semibold text-gray-800">
-            {trip.title || `${trip.start} → ${trip.end}`}
-          </h2>
-        </div>
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 rounded-lg bg-black/30" />
 
-        {/* Horizontal layout for image and info */}
-        <div className="flex gap-2 px-3 pb-3">
-          {/* Image on the left */}
+        {/* Content */}
+        <div className="relative flex h-full flex-col justify-between p-3 text-white">
+          {/* Title - top left */}
           <div className="flex-shrink-0">
-            {!imageError ? (
-              <img
-                src={trip.image}
-                alt={trip.title}
-                className="h-16 w-20 rounded-lg object-cover"
-                onError={handleImageError}
-              />
-            ) : (
-              <div className="flex h-16 w-20 items-center justify-center rounded-lg bg-gradient-to-r from-indigo-400 to-purple-500">
-                <span className="text-sm text-white">🏞️</span>
-              </div>
-            )}
+            <h2 className="line-clamp-1 text-lg font-bold drop-shadow-lg">
+              {trip.name}
+            </h2>
           </div>
 
-          {/* Info on the right */}
-          <div className="min-w-0 flex-1 space-y-0.5">
-            <p className="text-xs font-medium text-gray-800">
-              {trip.start} → {trip.end}
+          {/* Locations - middle */}
+          <div className="flex flex-1 items-center">
+            <p className="line-clamp-2 text-sm leading-tight drop-shadow-md">
+              {formatLocations(trip.locations)}
             </p>
-            <p className="text-xs text-gray-600">
-              {trip.distance} km • {trip.duration}
-            </p>
-            <p className="text-xs text-gray-500">❤️ {trip.likes} likes</p>
+          </div>
+
+          {/* Duration and Rating - bottom right */}
+          <div className="flex items-end justify-end gap-3 text-sm font-medium drop-shadow-md">
+            <span>
+              {trip.days} day{trip.days !== 1 ? 's' : ''}
+            </span>
+            <span>{formatRating(trip.averageRating)}</span>
           </div>
         </div>
       </div>
