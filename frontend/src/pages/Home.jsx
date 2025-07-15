@@ -1,41 +1,54 @@
 import React, { useState, useEffect } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
-
-// Example travel card data
-const exampleTrip = {
-  id: 'example-1',
-  start: 'New York',
-  end: 'Paris',
-  title: 'European Adventure',
-  distance: 5850,
-  duration: '8h 30m',
-  likes: 127,
-  image: 'https://picsum.photos/400/300?random=1',
-  description:
-    'A wonderful journey from the Big Apple to the City of Light. Experience the culture, cuisine, and history.',
-  comments: [
-    'Amazing flight experience!',
-    'Great views over the Atlantic',
-    'Perfect timing for arrival',
-  ],
-}
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchTravelData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'travels'))
-        const travels = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        setTravelData(travels)
+        const querySnapshot = await getDocs(collection(db, 'trips'))
+        const trips = querySnapshot.docs.map((doc) => {
+          const data = doc.data()
+
+          // Calculate average rating from comments
+          const averageRating =
+            data.comments && data.comments.length > 0
+              ? data.comments.reduce(
+                  (sum, comment) => sum + (comment.rating || 0),
+                  0
+                ) / data.comments.length
+              : 0
+
+          // Get location names (limit to 5)
+          const locationNames = data.Locations
+            ? data.Locations.map((loc) => loc.name).slice(0, 5)
+            : []
+
+          return {
+            id: doc.id,
+            dataName: doc.id, // Use document ID as data name
+            name: data.name || 'Untitled Trip',
+            description: data.description || '',
+            days: data.days || 0,
+            likes: data.likes || 0,
+            fileName: data.fileName || null,
+            locations: locationNames,
+            events: data.Events || [],
+            comments: data.comments || [],
+            averageRating: averageRating,
+            createdAt: data.createdAt,
+            userId: data.userId,
+          }
+        })
+
+        setTravelData(trips)
       } catch (error) {
         console.error('Error fetching travel data:', error)
       } finally {
@@ -46,108 +59,113 @@ const Homepage = () => {
     fetchTravelData()
   }, [])
 
-  // Combine example trip with Firebase data
-  const allTravels = [exampleTrip, ...travelData]
-
-  const filteredTravels = allTravels.filter(
+  const filteredTravels = travelData.filter(
     (travel) =>
-      travel.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.destination?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.start?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.end?.toLowerCase().includes(searchQuery.toLowerCase())
+      travel.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      travel.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      travel.locations?.some((location) =>
+        location.toLowerCase().includes(searchQuery.toLowerCase())
+      )
   )
 
   const handleFilterClick = () => {
-    // TODO: Implement filter functionality
     console.log('Filter clicked')
   }
 
   const handleProfileClick = () => {
-    // TODO: Implement profile navigation
-    console.log('Profile clicked')
+    navigate('/profile')
   }
 
   const handleAddClick = () => {
-    // TODO: Implement add new travel functionality
     console.log('Add travel clicked')
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <header className="bg-gradient-to-br from-indigo-500 to-purple-600 p-4 text-white shadow-lg">
-        <div className="flex items-center justify-center gap-2">
-          <div className="text-3xl">✈️</div>
-          <h1 className="m-0 font-sans text-2xl font-bold md:text-3xl">
-            Tripply
-          </h1>
-        </div>
-      </header>
-
-      {/* Search Bar Section */}
-      <div className="flex items-center gap-2 bg-white p-4 shadow-md md:p-3">
-        <div className="flex flex-1 items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search destinations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 rounded-full border-2 border-gray-300 p-3 text-base outline-none transition-colors duration-300 focus:border-indigo-500 md:p-2.5"
-          />
-          <button
-            className="flex h-11 w-11 cursor-pointer touch-manipulation items-center justify-center rounded-full border-none bg-indigo-500 text-xl text-white transition-all duration-300 hover:bg-indigo-600 active:scale-95 md:h-10 md:w-10 md:text-base"
-            onClick={handleFilterClick}
-          >
-            🔍
-          </button>
-        </div>
-        <button
-          className="flex h-11 w-11 cursor-pointer touch-manipulation items-center justify-center rounded-full border-none bg-indigo-500 text-xl text-white transition-all duration-300 hover:bg-indigo-600 active:scale-95 md:h-10 md:w-10 md:text-base"
-          onClick={handleProfileClick}
-        >
-          👤
-        </button>
-      </div>
-
-      {/* Travel Cards */}
-      <main className="p-4 md:p-3">
-        {loading ? (
-          <div className="py-8 text-center text-base text-gray-600">
-            Loading travels...
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-4">
-            {filteredTravels.length > 0 ? (
-              filteredTravels.map((travel) => (
-                <TravelCard key={travel.id} trip={travel} />
-              ))
-            ) : (
-              <div className="py-8 text-center text-base text-gray-600">
-                {searchQuery
-                  ? 'No travels found matching your search.'
-                  : 'No travels available.'}
-              </div>
-            )}
-          </div>
-        )}
-      </main>
-
-      {/* Floating Action Button */}
-      <button
-        className="md:w-13 md:h-13 fixed bottom-5 right-5 z-50 h-14 w-14 cursor-pointer touch-manipulation rounded-2xl border-none bg-indigo-500 text-3xl font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-xl active:translate-y-0 active:scale-95 md:bottom-4 md:right-4 md:text-2xl"
-        onClick={handleAddClick}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+      {/* Background image with overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.5)'
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)'
+          backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
         }}
       >
-        +
-      </button>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20"></div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-md">
+        {/* Main Card */}
+        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">✈️</div>
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                Triply
+              </h1>
+            </div>
+          </div>
+
+          {/* Search Bar Section */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search trips..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full flex-1 rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600/60 text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-600/80 active:scale-95"
+                onClick={handleFilterClick}
+              >
+                🔍
+              </button>
+              <button
+                onClick={handleProfileClick}
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-600/60 text-white backdrop-blur-sm transition-all duration-200 hover:bg-blue-600/80"
+              >
+                👤
+              </button>
+            </div>
+          </div>
+
+          {/* Travel Cards */}
+          <div className="mb-6 max-h-80 flex-1 space-y-4 overflow-hidden overflow-y-auto">
+            {loading ? (
+              <div className="py-8 text-center text-gray-300">
+                Loading trips...
+              </div>
+            ) : (
+              <>
+                {filteredTravels.length > 0 ? (
+                  filteredTravels.map((travel) => (
+                    <TravelCard key={travel.id} trip={travel} />
+                  ))
+                ) : (
+                  <div className="py-8 text-center text-gray-300">
+                    {searchQuery
+                      ? 'No trips found matching your search.'
+                      : 'No trips available.'}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Add Travel Button */}
+          <button
+            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onClick={handleAddClick}
+          >
+            Add New Trip
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
