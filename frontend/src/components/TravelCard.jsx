@@ -1,47 +1,47 @@
-import { useState } from "react";
-import TravelModal from "./TravelModal.jsx";
+import { useState } from 'react'
+import TravelModal from './TravelModal.jsx'
 
 export default function TravelCard({ trip }) {
-  const [showModal, setShowModal] = useState(false);
-  const [imageError, setImageError] = useState(false);
+  const [showModal, setShowModal] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const handleImageError = () => {
-    setImageError(true);
-  };
+    setImageError(true)
+  }
 
   return (
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition w-80"
+        className="w-80 cursor-pointer overflow-hidden rounded-2xl bg-white shadow-md transition hover:shadow-lg"
       >
         {/* Title at the top */}
         <div className="p-4 pb-2">
-          <h2 className="text-xl font-semibold text-left">
+          <h2 className="text-left text-xl font-semibold">
             {trip.title || `${trip.start} → ${trip.end}`}
           </h2>
         </div>
 
         {/* Horizontal layout for image and info */}
-        <div className="flex px-4 pb-4 gap-3">
+        <div className="flex gap-3 px-4 pb-4">
           {/* Image on the left */}
           <div className="flex-shrink-0">
             {!imageError ? (
               <img
                 src={trip.image}
                 alt={trip.title}
-                className="w-24 h-20 object-cover rounded-lg"
+                className="h-20 w-24 rounded-lg object-cover"
                 onError={handleImageError}
               />
             ) : (
-              <div className="w-24 h-20 bg-gradient-to-r from-indigo-400 to-purple-500 flex items-center justify-center rounded-lg">
-                <span className="text-white text-lg">🏞️</span>
+              <div className="flex h-20 w-24 items-center justify-center rounded-lg bg-gradient-to-r from-indigo-400 to-purple-500">
+                <span className="text-lg text-white">🏞️</span>
               </div>
             )}
           </div>
 
           {/* Info on the right */}
-          <div className="flex-1 space-y-1 min-w-0">
+          <div className="min-w-0 flex-1 space-y-1">
             <p className="text-sm font-medium text-gray-800">
               {trip.start} → {trip.end}
             </p>
@@ -53,7 +53,9 @@ export default function TravelCard({ trip }) {
         </div>
       </div>
 
-      {showModal && <TravelModal trip={trip} onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <TravelModal trip={trip} onClose={() => setShowModal(false)} />
+      )}
     </>
-  );
+  )
 }
