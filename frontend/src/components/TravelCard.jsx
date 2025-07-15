@@ -54,18 +54,23 @@ export default function TravelCard({ trip }) {
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="relative h-32 w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-        style={{
-          backgroundImage: backgroundImage,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        className="relative h-32 w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg group"
       >
+        {/* Background image that scales on hover */}
+        <div
+          className="absolute inset-0 transition-transform duration-300 group-hover:scale-105"
+          style={{
+            backgroundImage: backgroundImage,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 rounded-lg bg-black/30" />
+        <div className="absolute inset-0 rounded-lg bg-black/30 transition-all duration-300 hover:bg-black/40" />
 
         {/* Content */}
-        <div className="relative flex h-full flex-col justify-between p-3 text-white">
+        <div className="relative flex h-full flex-col justify-between p-3 text-white transform transition-transform duration-300 group-hover:scale-105">
           {/* Title - top left */}
           <div className="flex-shrink-0">
             <h2 className="line-clamp-1 text-lg font-bold drop-shadow-lg">
