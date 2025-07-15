@@ -6,25 +6,12 @@ import {
   Route,
   Navigate,
 } from 'react-router-dom'
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Home from './pages/Home'
 import './index.css'
-
-const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth()
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
-      </div>
-    )
-  }
-
-  return currentUser ? children : <Navigate to="/login" />
-}
 
 // Make sure the root element is properly targeted
 const root = ReactDOM.createRoot(document.getElementById('root'))
@@ -36,15 +23,16 @@ root.render(
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
                 <Home />
               </ProtectedRoute>
             }
           />
+          <Route path="/" element={<Navigate to="/login" replace />} />
           {/* Add a catch-all route */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>
     </Router>

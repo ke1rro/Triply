@@ -3,7 +3,6 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import TravelCard from '../components/TravelCard'
 
-// Example travel card data
 const exampleTrip = {
   id: 'example-1',
   start: 'New York',
