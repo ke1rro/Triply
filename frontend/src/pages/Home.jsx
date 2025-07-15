@@ -77,7 +77,7 @@ const Homepage = () => {
   }
 
   const handleAddClick = () => {
-    console.log('Add travel clicked')
+    console.log('Create travel clicked')
   }
 
   return (
@@ -135,7 +135,7 @@ const Homepage = () => {
           </div>
 
           {/* Travel Cards */}
-          <div className="mb-6 max-h-80 flex-1 space-y-4 overflow-hidden overflow-y-auto">
+          <div className="mb-6 max-h-80 flex-1 space-y-4 overflow-hidden overflow-y-auto pr-2">
             {loading ? (
               <div className="py-8 text-center text-gray-300">
                 Loading trips...
@@ -143,9 +143,13 @@ const Homepage = () => {
             ) : (
               <>
                 {filteredTravels.length > 0 ? (
-                  filteredTravels.map((travel) => (
-                    <TravelCard key={travel.id} trip={travel} />
-                  ))
+                  <div className="space-y-4">
+                    {filteredTravels.map((travel) => (
+                      <div key={travel.id} className="px-1">
+                        <TravelCard trip={travel} />
+                      </div>
+                    ))}
+                  </div>
                 ) : (
                   <div className="py-8 text-center text-gray-300">
                     {searchQuery
@@ -157,12 +161,12 @@ const Homepage = () => {
             )}
           </div>
 
-          {/* Add Travel Button */}
+          {/* Create Travel Button */}
           <button
             className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
             onClick={handleAddClick}
           >
-            Add New Trip
+            Create New Trip
           </button>
         </div>
       </div>
