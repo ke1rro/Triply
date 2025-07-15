@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Home from './pages/Home'
+import TripDetails from './pages/TripDetails'
 import Profile from './pages/Profile'
 import './index.css'
 
@@ -28,6 +29,14 @@ root.render(
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trip/:tripId"
+            element={
+              <ProtectedRoute>
+                <TripDetails />
               </ProtectedRoute>
             }
           />
