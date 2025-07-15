@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Home from './pages/Home'
+import TripDetails from './pages/TripDetails'
 import './index.css'
 
 const ProtectedRoute = ({ children }) => {
@@ -40,6 +41,14 @@ root.render(
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trip/:tripId"
+            element={
+              <ProtectedRoute>
+                <TripDetails />
               </ProtectedRoute>
             }
           />
