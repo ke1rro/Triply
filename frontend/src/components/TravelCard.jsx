@@ -48,7 +48,7 @@ export default function TravelCard({ trip }) {
   const backgroundImage =
     imageUrl && !imageError
       ? `url(${imageUrl})`
-      : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'
 
   return (
     <>

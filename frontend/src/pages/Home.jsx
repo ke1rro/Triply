@@ -81,71 +81,90 @@ const Homepage = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="flex min-h-[500px] w-full max-w-md flex-col rounded-2xl bg-white/80 p-8 shadow-lg backdrop-blur-lg">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-3xl">✈️</div>
-            <h1 className="text-3xl font-bold text-indigo-900">Triply</h1>
-          </div>
-        </div>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
+      {/* Background image with overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
+        }}
+      >
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20"></div>
+      </div>
 
-        {/* Search Bar Section */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Search trips..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <button
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white transition-all duration-300 hover:bg-indigo-700 active:scale-95"
-              onClick={handleFilterClick}
-            >
-              🔍
-            </button>
-            <button
-              onClick={handleProfileClick}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white transition-all duration-200 hover:bg-indigo-700"
-            >
-              👤
-            </button>
-          </div>
-        </div>
-
-        {/* Travel Cards */}
-        <div className="mb-6 flex-1 space-y-4 overflow-hidden">
-          {loading ? (
-            <div className="py-8 text-center text-gray-600">
-              Loading trips...
+      {/* Content */}
+      <div className="relative z-10 w-full max-w-md">
+        {/* Main Card */}
+        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">✈️</div>
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+                Tripply
+              </h1>
             </div>
-          ) : (
-            <>
-              {filteredTravels.length > 0 ? (
-                filteredTravels.map((travel) => (
-                  <TravelCard key={travel.id} trip={travel} />
-                ))
-              ) : (
-                <div className="py-8 text-center text-gray-600">
-                  {searchQuery
-                    ? 'No trips found matching your search.'
-                    : 'No trips available.'}
-                </div>
-              )}
-            </>
-          )}
-        </div>
+          </div>
 
-        {/* Add Travel Button */}
-        <button
-          className="w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition duration-200 ease-in-out hover:bg-indigo-700"
-          onClick={handleAddClick}
-        >
-          Add New Trip
-        </button>
+          {/* Search Bar Section */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Search trips..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full flex-1 rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <button
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600/60 text-white backdrop-blur-sm transition-all duration-300 hover:bg-blue-600/80 active:scale-95"
+                onClick={handleFilterClick}
+              >
+                🔍
+              </button>
+              <button
+                onClick={handleProfileClick}
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-600/60 text-white backdrop-blur-sm transition-all duration-200 hover:bg-blue-600/80"
+              >
+                👤
+              </button>
+            </div>
+          </div>
+
+          {/* Travel Cards */}
+          <div className="mb-6 max-h-80 flex-1 space-y-4 overflow-hidden overflow-y-auto">
+            {loading ? (
+              <div className="py-8 text-center text-gray-300">
+                Loading trips...
+              </div>
+            ) : (
+              <>
+                {filteredTravels.length > 0 ? (
+                  filteredTravels.map((travel) => (
+                    <TravelCard key={travel.id} trip={travel} />
+                  ))
+                ) : (
+                  <div className="py-8 text-center text-gray-300">
+                    {searchQuery
+                      ? 'No trips found matching your search.'
+                      : 'No trips available.'}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Add Travel Button */}
+          <button
+            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onClick={handleAddClick}
+          >
+            Add New Trip
+          </button>
+        </div>
       </div>
     </div>
   )
