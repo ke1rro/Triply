@@ -101,10 +101,7 @@ const Profile = () => {
           </h1>
           <div className="h-10 w-10"></div> {/* Spacer for centering */}
         </div>
-
-        {/* Profile Card */}
         <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
-          {/* User Avatar and Info */}
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-teal-400">
               {currentUser?.photoURL ? (
@@ -117,10 +114,14 @@ const Profile = () => {
                 <FiUser className="h-8 w-8 text-white" />
               )}
             </div>
-            <h2 className="text-xl font-semibold text-white">
-              {currentUser?.displayName || 'Roman'}
-            </h2>
-            <p className="text-sm text-gray-300">
+            {currentUser?.displayName && (
+              <h2 className="text-xl font-semibold text-white">
+                {currentUser.displayName}
+              </h2>
+            )}
+            <p
+              className={`${currentUser?.displayName ? 'text-sm' : 'text-lg font-semibold'} text-gray-300`}
+            >
               {currentUser?.email || 'Travel Enthusiast'}
             </p>
             <div className="mt-3 text-xs text-gray-400">
