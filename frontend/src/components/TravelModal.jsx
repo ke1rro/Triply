@@ -297,14 +297,19 @@ export default function TravelModal({ trip, onClose }) {
                       id: trip.id,
                       parent_id: trip.parent_id,
                       published: trip.published,
-                      userId: trip.userId
+                      userId: trip.userId,
                     })
                     try {
-                      await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
+                      await updateDoc(doc(db, 'trips', trip.id), {
+                        published: !trip.published,
+                      })
                       onClose()
                       window.location.reload()
                     } catch (e) {
-                      alert('Failed to update publish state. ' + (e && e.message ? e.message : ''))
+                      alert(
+                        'Failed to update publish state. ' +
+                          (e && e.message ? e.message : '')
+                      )
                       console.error('[Publish Error]', e)
                     }
                   }}
@@ -317,7 +322,11 @@ export default function TravelModal({ trip, onClose }) {
           )}
         </div>
         {showEdit && (
-          <EditTripModal trip={trip} onClose={() => setShowEdit(false)} onSuccess={onClose} />
+          <EditTripModal
+            trip={trip}
+            onClose={() => setShowEdit(false)}
+            onSuccess={onClose}
+          />
         )}
       </div>
     </div>

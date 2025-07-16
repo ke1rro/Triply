@@ -7,7 +7,8 @@ import { getNearbyPlaces } from '../lib/places'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png',
+  iconRetinaUrl:
+    'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
 })
@@ -45,7 +46,7 @@ export default function LocationPickerMap({ onSelect, selectedPlace }) {
       <MapContainer
         center={mapCenter}
         zoom={14}
-        className="h-64 w-full rounded mb-3"
+        className="mb-3 h-64 w-full rounded"
         whenCreated={(map) => {
           map.locate({ setView: true, maxZoom: 14 })
           map.on('moveend', () => {
@@ -70,7 +71,9 @@ export default function LocationPickerMap({ onSelect, selectedPlace }) {
         <LocationMarker onSelect={onSelect} />
       </MapContainer>
 
-      {loading && <p className="text-sm text-gray-500">Loading nearby places...</p>}
+      {loading && (
+        <p className="text-sm text-gray-500">Loading nearby places...</p>
+      )}
       <ul className="max-h-32 overflow-y-auto text-sm">
         {places.map((place) => (
           <li
