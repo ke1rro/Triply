@@ -1,7 +1,17 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 
 export default function TravelModal({ trip, onClose }) {
   const navigate = useNavigate()
+
+  // Lock scroll when modal opens
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
 
   const handleSelectTrip = () => {
     navigate(`/trip/${trip.dataName}`)
