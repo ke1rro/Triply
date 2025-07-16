@@ -1,32 +1,63 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
-import EditTripModal from './EditTripModal'
-import { useState } from 'react'
+import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore'
+import React, { useState } from 'react'
 
-export default function TravelModal({ trip, onClose }) {
+export default function TravelModalWithCopy({ trip, onClose, onCopied }) {
   const navigate = useNavigate()
-
   const { currentUser } = useAuth()
-  const [showEdit, setShowEdit] = useState(false)
-  const [deleting, setDeleting] = useState(false)
+  const [copying, setCopying] = useState(false)
 
-  const handleSelectTrip = () => {
-    navigate(`/trip/${trip.id || trip.dataName}`)
-  }
-
-  const handleDeleteTrip = async () => {
-    if (!window.confirm('Are you sure you want to delete this trip?')) return
-    setDeleting(true)
-    try {
-      await deleteDoc(doc(db, 'trips', trip.id))
-      onClose()
-      window.location.reload() // quick refresh to update UI
-    } catch (e) {
-      alert('Failed to delete trip. Please try again.')
+  const handleSelectTrip = async () => {
+    if (trip.userId === currentUser?.uid) {
+      navigate(`/trip/${trip.dataName || trip.id}`)
+      return
     }
-    setDeleting(false)
+    setCopying(true)
+    try {
+      // Check if user already has a copy of this trip
+      const tripsRef = collection(db, 'trips')
+      let existingCopyId = null
+      const querySnapshot = await getDocs(tripsRef)
+      querySnapshot.forEach((doc) => {
+        const data = doc.data()
+        if (
+          data.userId === currentUser?.uid &&
+          (data.parent_id === trip.id || data.parent_id === trip.dataName)
+        ) {
+          existingCopyId = doc.id
+        }
+      })
+      if (existingCopyId) {
+        navigate(`/trip/${existingCopyId}`)
+        return
+      }
+      const newTrip = {
+        ...trip,
+        name: trip.name + ' (My Copy)',
+        userId: currentUser?.uid || '',
+        createdAt: serverTimestamp(),
+        likes: 0,
+        comments: [],
+        Events: Array.isArray(trip.Events)
+          ? JSON.parse(JSON.stringify(trip.Events))
+          : Array.isArray(trip.events)
+          ? JSON.parse(JSON.stringify(trip.events))
+          : [],
+        published: false,
+        parent_id: trip.id || trip.dataName || 'original',
+      }
+      delete newTrip.id
+      delete newTrip.dataName
+      const docRef = await addDoc(collection(db, 'trips'), newTrip)
+      if (onCopied) onCopied(docRef.id)
+      navigate(`/trip/${docRef.id}`)
+    } catch (e) {
+      alert('Failed to copy trip. Please try again.')
+    } finally {
+      setCopying(false)
+    }
   }
 
   const formatRating = (rating) => {
@@ -54,12 +85,10 @@ export default function TravelModal({ trip, onClose }) {
             ×
           </button>
         </div>
-
         {/* Description */}
         <p className="mb-6 leading-relaxed text-gray-300">
           {trip.description || 'No description available.'}
         </p>
-
         {/* Trip Info */}
         <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
           <div>
@@ -73,7 +102,6 @@ export default function TravelModal({ trip, onClose }) {
             <p className="text-white">❤️ {trip.likes}</p>
           </div>
         </div>
-
         {/* Locations */}
         {trip.locations && trip.locations.length > 0 && (
           <div className="mb-6">
@@ -90,7 +118,6 @@ export default function TravelModal({ trip, onClose }) {
             </div>
           </div>
         )}
-
         {/* Comments */}
         {trip.comments && trip.comments.length > 0 && (
           <div className="mb-6">
@@ -115,62 +142,14 @@ export default function TravelModal({ trip, onClose }) {
             </div>
           </div>
         )}
-
-        {/* Select Trip Button and Edit/Delete for owner */}
-        <div className="flex flex-col gap-3">
-          <button
-            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            onClick={handleSelectTrip}
-          >
-            Select Trip
-          </button>
-          {currentUser?.uid === trip.userId && (
-            <div className="flex w-full gap-2">
-              <button
-                className="flex-1 rounded-lg bg-yellow-600/80 px-4 py-3 font-medium text-white hover:bg-yellow-700/80"
-                onClick={() => setShowEdit(true)}
-                type="button"
-              >
-                Edit
-              </button>
-              <button
-                className="flex-1 rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white hover:bg-red-700/80"
-                onClick={handleDeleteTrip}
-                disabled={deleting}
-                type="button"
-              >
-                {deleting ? 'Deleting...' : 'Delete'}
-              </button>
-              {trip.parent_id === 'original' && (
-                <button
-                  className={`flex-1 rounded-lg ${trip.published ? 'bg-gray-600/80 hover:bg-gray-700/80' : 'bg-green-600/80 hover:bg-green-700/80'} px-4 py-3 font-medium text-white`}
-                  onClick={async () => {
-                    console.log('[Publish Debug]', {
-                      id: trip.id,
-                      parent_id: trip.parent_id,
-                      published: trip.published,
-                      userId: trip.userId
-                    })
-                    try {
-                      await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
-                      onClose()
-                      window.location.reload()
-                    } catch (e) {
-                      alert('Failed to update publish state. ' + (e && e.message ? e.message : ''))
-                      console.error('[Publish Error]', e)
-                    }
-                  }}
-                  type="button"
-                >
-                  {trip.published ? 'Unpublish' : 'Publish'}
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-        {showEdit && (
-          <EditTripModal trip={trip} onClose={() => setShowEdit(false)} onSuccess={onClose} />
-        )}
+        {/* Select Trip Button */}
+        <button
+          className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50"
+          onClick={handleSelectTrip}
+          disabled={copying}
+        >
+          {trip.userId === currentUser?.uid ? 'Open Trip' : copying ? 'Copying...' : 'Select Trip'}
+        </button>
       </div>
     </div>
   )

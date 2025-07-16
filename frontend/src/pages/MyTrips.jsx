@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
-import { collection, getDocs } from 'firebase/firestore'
-import { db } from '../lib/firebase'
-import { useNavigate } from 'react-router-dom'
-import TravelCard from '../components/TravelCard'
-import TravelModalWithCopy from '../components/TravelModalWithCopy'
-import CreateTripModal from '../components/CreateTripModal'
+import React, { useState, useEffect } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import TravelCard from '../components/TravelCard';
+import CreateTripModal from '../components/CreateTripModal';
 import {
   FiSearch,
   FiUser,
@@ -12,103 +12,55 @@ import {
   FiHome,
   FiPlus,
   FiHeart,
-} from 'react-icons/fi'
+} from 'react-icons/fi';
 
-const Homepage = () => {
-  const [travelData, setTravelData] = useState([])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [activeTab, setActiveTab] = useState('home')
-  const navigate = useNavigate()
-
-  const fetchTravelData = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'trips'))
-      const trips = querySnapshot.docs.map((doc) => {
-        const data = doc.data()
-
-        // Calculate average rating from comments
-        const averageRating =
-          data.comments && data.comments.length > 0
-            ? data.comments.reduce(
-                (sum, comment) => sum + (comment.rating || 0),
-                0
-              ) / data.comments.length
-            : 0
-
-        // Get location names (limit to 5)
-        const locationNames = data.Locations
-          ? data.Locations.map((loc) => loc.name).slice(0, 5)
-          : []
-
-        return {
-          id: doc.id,
-          dataName: doc.id, // Use document ID as data name
-          name: data.name || 'Untitled Trip',
-          description: data.description || '',
-          days: data.days || 0,
-          likes: data.likes || 0,
-          fileName: data.fileName || null,
-          locations: locationNames,
-          Events: data.Events || data.events || [],
-          comments: data.comments || [],
-          averageRating: averageRating,
-          createdAt: data.createdAt,
-          userId: data.userId,
-          parent_id: data.parent_id || 'original',
-        }
-      })
-      // Only show original trips on main page
-      .filter(trip => trip.parent_id === 'original')
-
-      setTravelData(trips)
-    } catch (error) {
-      console.error('Error fetching travel data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+const MyTrips = () => {
+  const [travelData, setTravelData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('mytrips');
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    fetchTravelData()
-  }, [])
+    const fetchTravelData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'trips'));
+        const trips = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name || 'Untitled Trip',
+            description: data.description || '',
+            days: data.days || 0,
+            likes: data.likes || 0,
+            fileName: data.fileName || null,
+            locations: data.Locations ? data.Locations.map((loc) => loc.name).slice(0, 5) : [],
+            Events: data.Events || data.events || [],
+            comments: data.comments || [],
+            averageRating:
+              data.comments && data.comments.length > 0
+                ? data.comments.reduce((sum, comment) => sum + (comment.rating || 0), 0) / data.comments.length
+                : 0,
+            createdAt: data.createdAt,
+            userId: data.userId,
+            parent_id: data.parent_id,
+            published: data.published,
+          };
+        });
+        setTravelData(trips.filter((trip) => trip.userId === currentUser?.uid));
+      } catch (err) {
+        setTravelData([]);
+      }
+      setLoading(false);
+    };
+    if (currentUser) fetchTravelData();
+  }, [currentUser]);
 
-  const filteredTravels = travelData.filter(
-    (travel) =>
-      travel.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      travel.locations?.some((location) =>
-        location.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-  )
-
-  const handleFilterClick = () => {
-    console.log('Filter clicked')
-  }
-
-  const handleProfileClick = () => {
-    setActiveTab('profile')
-    navigate('/profile')
-  }
-
-  const handleAddClick = () => {
-    setShowCreateModal(true)
-  }
-
-  const handleCreateSuccess = () => {
-    // Refresh the travel data after successful creation
-    fetchTravelData()
-  }
-
-  const handleHomeClick = () => {
-    setActiveTab('home')
-  }
-
-  const handleLikesClick = () => {
-    setActiveTab('likes')
-    console.log('Likes clicked')
-  }
+  const handleSelectTrip = (tripId) => {
+    navigate(`/trip/${tripId}`);
+  };
 
   return (
     <div className="relative flex min-h-screen flex-col">
@@ -134,7 +86,7 @@ const Homepage = () => {
               <FiNavigation className="h-10 w-10" />
             </div>
             <h1 className="text-4xl font-bold text-white drop-shadow-lg">
-              Triply
+              My Trips
             </h1>
           </div>
         </div>
@@ -144,14 +96,13 @@ const Homepage = () => {
           <div className="flex items-center gap-3">
             <input
               type="text"
-              placeholder="Search trips..."
+              placeholder="Search my trips..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full flex-1 rounded-xl border border-gray-300/30 bg-white/10 px-5 py-4 text-lg text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <FiSearch
               className="h-7 w-7 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
-              onClick={handleFilterClick}
             />
           </div>
         </div>
@@ -165,13 +116,20 @@ const Homepage = () => {
               </div>
             ) : (
               <>
-                {filteredTravels.length > 0 ? (
+                {travelData.length > 0 ? (
                   <div className="flex w-full flex-col items-center space-y-6">
-                    {filteredTravels.map((travel) => (
-                      <div key={travel.id} className="w-full max-w-md">
-                        <TravelCard trip={travel} ModalComponent={TravelModalWithCopy} />
-                      </div>
-                    ))}
+                    {travelData
+                      .filter((trip) => trip.name.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .map((trip) => (
+                        <div key={trip.id} className="w-full max-w-md">
+                          <TravelCard
+                            trip={trip}
+                            onSelect={() => handleSelectTrip(trip.id)}
+                            ModalComponent={undefined}
+                            showLike={false}
+                          />
+                        </div>
+                      ))}
                   </div>
                 ) : (
                   <div className="py-8 text-center text-gray-300">
@@ -193,7 +151,10 @@ const Homepage = () => {
             <div className="flex items-center justify-around">
               {/* Home */}
               <button
-                onClick={handleHomeClick}
+                onClick={() => {
+                  setActiveTab('home')
+                  navigate('/home')
+                }}
                 className={`flex w-24 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
                   activeTab === 'home'
                     ? 'bg-blue-600/30 text-blue-400'
@@ -203,8 +164,6 @@ const Homepage = () => {
                 <FiHome className="h-7 w-7" />
                 <span className="text-xs font-medium">Home</span>
               </button>
-
-
 
               {/* My Trips */}
               <button
@@ -224,7 +183,7 @@ const Homepage = () => {
 
               {/* Add Trip */}
               <button
-                onClick={handleAddClick}
+                onClick={() => setShowCreateModal(true)}
                 className="flex w-24 flex-col items-center gap-1 rounded-lg bg-blue-600/20 px-3 py-3 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600">
@@ -233,9 +192,13 @@ const Homepage = () => {
                 <span className="text-xs font-medium">Create</span>
               </button>
 
+
               {/* Profile */}
               <button
-                onClick={handleProfileClick}
+                onClick={() => {
+                  setActiveTab('profile')
+                  navigate('/profile')
+                }}
                 className={`flex w-24 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
                   activeTab === 'profile'
                     ? 'bg-purple-600/30 text-purple-400'
@@ -252,13 +215,10 @@ const Homepage = () => {
 
       {/* Create Trip Modal */}
       {showCreateModal && (
-        <CreateTripModal
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
-        />
+        <CreateTripModal open={showCreateModal} onClose={() => setShowCreateModal(false)} />
       )}
     </div>
   )
-}
+};
 
-export default Homepage
+export default MyTrips;
