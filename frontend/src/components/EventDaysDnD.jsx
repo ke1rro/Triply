@@ -28,6 +28,7 @@ export default function EventDaysDnD({ days, eventsByDay, onAddEvent, onEditEven
                       + Add Event
                     </button>
                   </div>
+                  <>
                   {eventsByDay[day] && eventsByDay[day].length > 0 ? (
                     eventsByDay[day].map((event, idx) => (
                       <Draggable key={event.id || idx} draggableId={String(event.id || `${day}-${idx}`)} index={idx}>
@@ -45,14 +46,14 @@ export default function EventDaysDnD({ days, eventsByDay, onAddEvent, onEditEven
 
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))
-                ) : (
-                  <div className="text-sm italic text-gray-400">No events</div>
-                )}
-                {provided.placeholder}
+                        )}
+                      </Draggable>
+                    ))
+                  ) : (
+                    <div className="text-sm italic text-gray-400">No events</div>
+                  )}
+                  {provided.placeholder}
+                  </>
               </div>
             )}
           </Droppable>
