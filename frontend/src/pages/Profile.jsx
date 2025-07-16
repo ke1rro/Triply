@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../lib/auth'
 import { useAuth } from '../context/AuthContext'
@@ -13,12 +13,14 @@ import {
 } from 'react-icons/fi'
 import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
+import { getUserDocument } from '../lib/userService'
 
 const Profile = () => {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [userData, setUserData] = useState(null)
 
   const handleLogout = async () => {
     try {
@@ -32,11 +34,26 @@ const Profile = () => {
     }
   }
 
-  // Mock user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (currentUser) {
+        try {
+          const data = await getUserDocument(currentUser.uid)
+          setUserData(data)
+        } catch (error) {
+          console.error('Error fetching user data:', error)
+        }
+      }
+    }
+
+    fetchUserData()
+  }, [currentUser])
+
+  // Update user stats to use real data
   const userStats = {
-    tripsCompleted: 12,
-    likedTrips: 8,
-    activeSessions: 2,
+    tripsCompleted: 12, // This could be calculated from user's trips
+    likedTrips: userData?.likedTrips?.length || 0,
+    activeSessions: 2, // This could be calculated from active trips
     totalDistance: 15420,
   }
 
@@ -50,10 +67,10 @@ const Profile = () => {
     },
     {
       title: 'Liked Trips',
-      subtitle: `${userStats.likedTrips} saved adventures`,
+      subtitle: `${userStats.likedTrips} liked adventures`,
       icon: <FiHeart className="h-6 w-6" />,
       color: 'from-rose-400 to-rose-600',
-      onClick: () => console.log('Liked Trips clicked'),
+      onClick: () => navigate('/liked'),
     },
     {
       title: 'Active Sessions',

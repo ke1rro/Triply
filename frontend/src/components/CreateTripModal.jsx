@@ -131,10 +131,17 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         parent_id: 'original',
       }
 
-      await addDoc(collection(db, 'trips'), tripData)
+      const docRef = await addDoc(collection(db, 'trips'), tripData)
+
+      // Create the complete trip object with the new ID
+      const createdTrip = {
+        id: docRef.id,
+        ...tripData,
+        createdAt: new Date(), // Use current date since serverTimestamp() isn't immediately available
+      }
 
       if (onSuccess) {
-        onSuccess()
+        onSuccess(createdTrip)
       }
       onClose()
     } catch (error) {

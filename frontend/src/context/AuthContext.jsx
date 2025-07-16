@@ -1,18 +1,32 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { auth } from '../lib/firebase'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../lib/firebase'
+import { createUserDocument } from '../lib/userService'
 
-const AuthContext = createContext()
+const AuthContext = createContext({})
 
-export const useAuth = () => useContext(AuthContext)
+export function useAuth() {
+  return useContext(AuthContext)
+}
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user)
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Create user document if it doesn't exist
+        try {
+          await createUserDocument(user)
+          setCurrentUser(user)
+        } catch (error) {
+          console.error('Error handling user authentication:', error)
+          setCurrentUser(user) // Still set user even if document creation fails
+        }
+      } else {
+        setCurrentUser(null)
+      }
       setLoading(false)
     })
 
