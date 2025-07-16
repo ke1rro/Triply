@@ -217,7 +217,7 @@ export default function TripDetails() {
                     : 'default',
               }}
               onClick={() => {
-                if (!isDragging) navigate('/home')
+                if (!isDragging) navigate('/mytrips')
               }}
             >
               {/* Crossfade text transition */}

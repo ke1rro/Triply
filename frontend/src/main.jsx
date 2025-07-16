@@ -13,6 +13,7 @@ import SignUp from './pages/SignUp'
 import Home from './pages/Home'
 import TripDetails from './pages/TripDetails'
 import Profile from './pages/Profile'
+import MyTrips from './pages/MyTrips'
 import './index.css'
 
 // Make sure the root element is properly targeted
@@ -37,6 +38,14 @@ root.render(
             element={
               <ProtectedRoute>
                 <TripDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mytrips"
+            element={
+              <ProtectedRoute>
+                <MyTrips />
               </ProtectedRoute>
             }
           />

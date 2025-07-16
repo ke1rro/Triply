@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
-import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
+import { doc, deleteDoc, updateDoc } from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import EditTripModal from './EditTripModal'
+import { useState } from 'react'
+
 
 export default function TravelModal({ trip, onClose }) {
   const navigate = useNavigate()
@@ -30,8 +32,25 @@ export default function TravelModal({ trip, onClose }) {
     setLocalComments(trip.comments || [])
   }, [trip.comments])
 
+  const { currentUser } = useAuth()
+  const [showEdit, setShowEdit] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
   const handleSelectTrip = () => {
-    navigate(`/trip/${trip.dataName}`)
+    navigate(`/trip/${trip.id || trip.dataName}`)
+  }
+
+  const handleDeleteTrip = async () => {
+    if (!window.confirm('Are you sure you want to delete this trip?')) return
+    setDeleting(true)
+    try {
+      await deleteDoc(doc(db, 'trips', trip.id))
+      onClose()
+      window.location.reload() // quick refresh to update UI
+    } catch (e) {
+      alert('Failed to delete trip. Please try again.')
+    }
+    setDeleting(false)
   }
 
   const formatRating = (rating) => {
@@ -248,13 +267,61 @@ export default function TravelModal({ trip, onClose }) {
           )}
         </div>
 
-        {/* Select Trip Button */}
-        <button
-          className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          onClick={handleSelectTrip}
-        >
-          Select Trip
-        </button>
+        {/* Select Trip Button and Edit/Delete for owner */}
+        <div className="flex flex-col gap-3">
+          <button
+            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onClick={handleSelectTrip}
+          >
+            Select Trip
+          </button>
+          {currentUser?.uid === trip.userId && (
+            <div className="flex w-full gap-2">
+              <button
+                className="flex-1 rounded-lg bg-yellow-600/80 px-4 py-3 font-medium text-white hover:bg-yellow-700/80"
+                onClick={() => setShowEdit(true)}
+                type="button"
+              >
+                Edit
+              </button>
+              <button
+                className="flex-1 rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white hover:bg-red-700/80"
+                onClick={handleDeleteTrip}
+                disabled={deleting}
+                type="button"
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+              {trip.parent_id === 'original' && (
+                <button
+                  className={`flex-1 rounded-lg ${trip.published ? 'bg-gray-600/80 hover:bg-gray-700/80' : 'bg-green-600/80 hover:bg-green-700/80'} px-4 py-3 font-medium text-white`}
+                  onClick={async () => {
+                    console.log('[Publish Debug]', {
+                      id: trip.id,
+                      parent_id: trip.parent_id,
+                      published: trip.published,
+                      userId: trip.userId
+                    })
+                    try {
+                      await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
+                      onClose()
+                      window.location.reload()
+                    } catch (e) {
+                      alert('Failed to update publish state. ' + (e && e.message ? e.message : ''))
+                      console.error('[Publish Error]', e)
+                    }
+                  }}
+                  type="button"
+                >
+                  {trip.published ? 'Unpublish' : 'Publish'}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+        {showEdit && (
+          <EditTripModal trip={trip} onClose={() => setShowEdit(false)} onSuccess={onClose} />
+        )}
       </div>
     </div>
   )

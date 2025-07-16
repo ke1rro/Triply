@@ -11,7 +11,7 @@ import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
 import TravelModal from './TravelModal.jsx'
 
-export default function TravelCard({ trip }) {
+export default function TravelCard({ trip, ModalComponent = TravelModal }) {
   const [showModal, setShowModal] = useState(false)
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
@@ -163,7 +163,7 @@ export default function TravelCard({ trip }) {
       </div>
 
       {showModal && (
-        <TravelModal trip={trip} onClose={() => setShowModal(false)} />
+        <ModalComponent trip={trip} onClose={() => setShowModal(false)} />
       )}
     </>
   )
