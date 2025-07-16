@@ -12,6 +12,7 @@ import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Home from './pages/Home'
 import TripDetails from './pages/TripDetails'
+import Trip from './pages/Trip'
 import Profile from './pages/Profile'
 import './index.css'
 
@@ -37,6 +38,14 @@ root.render(
             element={
               <ProtectedRoute>
                 <TripDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tripview/:tripviewId"
+            element={
+              <ProtectedRoute>
+                <Trip />
               </ProtectedRoute>
             }
           />
