@@ -2,20 +2,48 @@ import React, { useState } from 'react'
 import EventDaysDnD from '../components/EventDaysDnD'
 import { DragDropContext } from '@hello-pangea/dnd'
 import EventAddModal from '../components/EventAddModal'
+import RouteMap from '../components/RouteMap'
 
 const EventDaysDnDPage = () => {
-  // Sample data for demonstration
+  // Sample data for demonstration with coordinates
   const [days] = useState([1, 2, 3])
   const [eventsByDay, setEventsByDay] = useState({
     1: [
-      { id: '1-1', name: 'Visit Museum', time: '10:00 AM' },
-      { id: '1-2', name: 'Lunch at Restaurant', time: '1:00 PM' },
+      {
+        id: '1-1',
+        name: 'Visit Museum of Modern Art',
+        time: '10:00 AM',
+        coordinates: { lat: 37.7857, lng: -122.4011 }, // San Francisco MoMA
+      },
+      {
+        id: '1-2',
+        name: 'Lunch at Ferry Building',
+        time: '1:00 PM',
+        coordinates: { lat: 37.7955, lng: -122.3937 }, // SF Ferry Building
+      },
     ],
     2: [
-      { id: '2-1', name: 'City Tour', time: '9:00 AM' },
-      { id: '2-2', name: 'Shopping', time: '3:00 PM' },
+      {
+        id: '2-1',
+        name: 'Golden Gate Park',
+        time: '9:00 AM',
+        coordinates: { lat: 37.7694, lng: -122.4862 }, // Golden Gate Park
+      },
+      {
+        id: '2-2',
+        name: 'Shopping at Union Square',
+        time: '3:00 PM',
+        coordinates: { lat: 37.7881, lng: -122.4075 }, // Union Square
+      },
     ],
-    3: [{ id: '3-1', name: 'Beach Day', time: '11:00 AM' }],
+    3: [
+      {
+        id: '3-1',
+        name: 'Alcatraz Island Tour',
+        time: '11:00 AM',
+        coordinates: { lat: 37.827, lng: -122.423 }, // Alcatraz Island
+      },
+    ],
   })
 
   const [showEventModal, setShowEventModal] = useState(false)
@@ -141,6 +169,23 @@ const EventDaysDnDPage = () => {
               onEditEvent={handleEditEvent}
             />
           </DragDropContext>
+
+          {/* Route Map showing all locations */}
+          <div className="animate-fadeIn mx-auto mt-12 max-w-4xl px-2">
+            <div className="mb-4 text-center">
+              <h2 className="text-2xl font-bold text-blue-300 drop-shadow-lg">
+                Your Trip Route
+              </h2>
+              <p className="text-gray-300">
+                View and explore your planned journey
+              </p>
+            </div>
+            <RouteMap
+              events={Object.values(eventsByDay)
+                .flat()
+                .filter((event) => event.coordinates)}
+            />
+          </div>
         </div>
       </div>
 
