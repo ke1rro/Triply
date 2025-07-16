@@ -56,7 +56,7 @@ const Homepage = () => {
             published: data.published || false,
           }
         })
-        .filter((trip) => trip.published === true && trip.parent_id === 'original') // Only show published trips
+        .filter((trip) => trip.published === true) // Only show published trips
 
       setTravelData(trips)
     } catch (error) {

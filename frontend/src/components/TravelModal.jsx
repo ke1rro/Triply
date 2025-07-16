@@ -5,7 +5,6 @@ import { db } from '../lib/firebase'
 import EditTripModal from './EditTripModal'
 import { useState } from 'react'
 
-
 export default function TravelModal({ trip, onClose }) {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
@@ -17,6 +16,8 @@ export default function TravelModal({ trip, onClose }) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [localComments, setLocalComments] = useState(trip.comments || [])
+  const [showEdit, setShowEdit] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   // Lock scroll when modal opens
   useEffect(() => {
@@ -31,10 +32,6 @@ export default function TravelModal({ trip, onClose }) {
   useEffect(() => {
     setLocalComments(trip.comments || [])
   }, [trip.comments])
-
-  const { currentUser } = useAuth()
-  const [showEdit, setShowEdit] = useState(false)
-  const [deleting, setDeleting] = useState(false)
 
   const handleSelectTrip = () => {
     navigate(`/trip/${trip.id || trip.dataName}`)
