@@ -28,7 +28,6 @@ const Navbar = ({
   const handleProfileClick = () => {
     navigate('/profile')
   }
-
   const handleLikesClick = () => {
     console.log('Likes clicked')
     // Add future functionality for liked trips
@@ -61,58 +60,44 @@ const Navbar = ({
       {/* Bottom Navigation Bar */}
       {showBottomNav && (
         <div className="fixed bottom-0 left-0 right-0 z-20">
-          <div className="border-t border-white/10 bg-black/80 backdrop-blur-lg">
-            <div className="safe-area-bottom px-4 py-4">
+          <div className="bg-black/50 backdrop-blur-lg">
+            <div className="safe-area-bottom px-4 py-2">
               <div className="flex items-center justify-around">
                 {/* Home */}
-                <button
+                <FiHome
                   onClick={handleHomeClick}
-                  className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
+                  className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${
                     activeTab === 'home'
-                      ? 'bg-blue-600/30 text-blue-400'
+                      ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}
-                >
-                  <FiHome className="h-7 w-7" />
-                  <span className="text-xs font-medium">Home</span>
-                </button>
+                />
 
                 {/* Likes */}
-                <button
+                <FiHeart
                   onClick={handleLikesClick}
-                  className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
+                  className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${
                     activeTab === 'likes'
-                      ? 'bg-rose-600/30 text-rose-400'
+                      ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}
-                >
-                  <FiHeart className="h-7 w-7" />
-                  <span className="text-xs font-medium">Saved</span>
-                </button>
+                />
 
                 {/* Add Trip */}
-                <button
+                <FiPlus
                   onClick={onAddClick}
-                  className="flex w-16 flex-col items-center gap-1 rounded-lg bg-blue-600/20 px-3 py-3 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
-                >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600">
-                    <FiPlus className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="text-xs font-medium">Create</span>
-                </button>
+                  className="h-8 w-8 cursor-pointer text-white transition-transform duration-300 active:scale-95"
+                />
 
                 {/* Profile */}
-                <button
+                <FiUser
                   onClick={handleProfileClick}
-                  className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
+                  className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${
                     activeTab === 'profile'
-                      ? 'bg-purple-600/30 text-purple-400'
+                      ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}
-                >
-                  <FiUser className="h-7 w-7" />
-                  <span className="text-xs font-medium">Profile</span>
-                </button>
+                />
               </div>
             </div>
           </div>
