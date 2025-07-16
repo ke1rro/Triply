@@ -11,7 +11,7 @@ import {
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
-import { FiArrowLeft, FiClock, FiHeart } from 'react-icons/fi'
+import { FiArrowLeft, FiClock, FiHeart, FiStar } from 'react-icons/fi'
 
 const Trip = () => {
   const { tripviewId } = useParams()
@@ -168,26 +168,23 @@ const Trip = () => {
     )
   }
 
-  const backgroundImage = imageUrl
-    ? `url(${imageUrl})`
-    : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'
-
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-white">
       {/* Hero Section with Background Image */}
       <div
-        className="relative h-80 bg-cover bg-center"
-        style={{ backgroundImage }}
+        className="relative h-80"
+        style={{
+          background: imageUrl
+            ? `linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url(${imageUrl}) center/cover no-repeat`
+            : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
+        }}
       >
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/40" />
-
         {/* Back Button */}
         <button
-          onClick={() => navigate('/home')}
-          className="absolute left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all duration-200 hover:bg-black/70"
+        onClick={() => navigate('/home')}
+        className="absolute left-4 top-4 z-10 text-white hover:text-gray-300 transition-colors duration-200"
         >
-          <FiArrowLeft className="h-5 w-5" />
+        <FiArrowLeft className="h-6 w-6" />
         </button>
 
         {/* Trip Info Overlay */}
@@ -203,73 +200,99 @@ const Trip = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-gray-800 px-6 py-4">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-gray-300">
-            <FiClock className="h-5 w-5" />
-            <span>
-              {trip.days} day{trip.days !== 1 ? 's' : ''}
-            </span>
+      <div className="bg-gray-100 px-6 py-4">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-3">
+            <FiClock className="h-6 w-6 text-gray-700" />
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-900">
+                {trip.days} day{trip.days !== 1 ? 's' : ''}
+              </span>
+              <span className="text-xs text-gray-500">Duration</span>
+            </div>
           </div>
-          <button
+
+          <div className="flex items-center gap-3">
+            <FiStar className="h-6 w-6 text-gray-700" />
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-gray-900">
+                {localComments.length}
+              </span>
+              <span className="text-xs text-gray-500">Reviews</span>
+            </div>
+          </div>
+
+          <div
             onClick={handleLike}
-            disabled={!currentUser || isLiking}
-            className={`flex items-center gap-2 transition-all duration-200 ${
-              currentUser ? 'hover:scale-105' : 'cursor-default'
-            } ${isLiked ? 'text-red-400' : 'text-gray-300'}`}
+            className={`flex items-center gap-3 ${
+              currentUser ? 'cursor-pointer hover:scale-105' : 'cursor-default'
+            } transition-all duration-200`}
           >
-            <FiHeart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />
-            <span>{localLikes}</span>
-          </button>
+            <FiHeart
+              className={`h-6 w-6 ${isLiked ? 'fill-current text-red-500' : 'text-gray-700'}`}
+            />
+            <div className="flex flex-col">
+              <span
+                className={`text-sm font-semibold ${
+                  isLiked ? 'text-red-500' : 'text-gray-900'
+                }`}
+              >
+                {localLikes}
+              </span>
+              <span className="text-xs text-gray-500">Likes</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-700 bg-gray-800">
-        <div className="flex">
-          <button
-            onClick={() => setActiveTab('details')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'details'
-                ? 'border-b-2 border-blue-400 text-blue-400'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Details
-          </button>
-          <button
-            onClick={() => setActiveTab('reviews')}
-            className={`px-6 py-3 font-medium transition-colors ${
-              activeTab === 'reviews'
-                ? 'border-b-2 border-blue-400 text-blue-400'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Reviews
-          </button>
+      <div className="bg-white">
+        <div className="flex justify-center">
+          <div className="flex gap-8">
+            <button
+              onClick={() => setActiveTab('details')}
+              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
+                activeTab === 'details'
+                  ? 'text-blue-600 bg-blue-100 border-2 border-blue-200'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Details
+            </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
+                activeTab === 'reviews'
+                  ? 'text-blue-600 bg-blue-100 border-2 border-blue-200'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Reviews
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="min-h-[400px] bg-gray-900 p-6">
+      <div className="min-h-[400px] bg-white p-6">
         {activeTab === 'details' ? (
           <div className="space-y-6">
             {/* About Section */}
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-white">
+              <h2 className="mb-3 text-xl font-semibold text-gray-900">
                 About the trip
               </h2>
-              <p className="leading-relaxed text-gray-300">
+              <p className="leading-relaxed text-gray-700">
                 {trip.description || 'No description available.'}
               </p>
             </div>
 
             {/* Divider */}
-            <hr className="border-gray-700" />
+            <hr className="border-gray-200" />
 
             {/* Gallery Section */}
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-white">Gallery</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-900">Gallery</h2>
               {imageUrl ? (
                 <div className="grid grid-cols-1 gap-4">
                   <img
@@ -279,7 +302,7 @@ const Trip = () => {
                   />
                 </div>
               ) : (
-                <p className="text-gray-400">No images available</p>
+                <p className="text-gray-500">No images available</p>
               )}
             </div>
           </div>
@@ -299,13 +322,13 @@ const Trip = () => {
 
             {/* Comment Form */}
             {showCommentForm && (
-              <div className="rounded-lg bg-gray-800 p-4">
+              <div className="rounded-lg bg-gray-50 border p-4">
                 {error && (
-                  <div className="mb-3 text-sm text-red-400">{error}</div>
+                  <div className="mb-3 text-sm text-red-600">{error}</div>
                 )}
                 <form onSubmit={handleCommentSubmit} className="space-y-3">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       Rating:
                     </label>
                     <div className="flex gap-1">
@@ -321,9 +344,9 @@ const Trip = () => {
                           }
                           className={`text-xl transition-colors ${
                             star <= commentData.rating
-                              ? 'text-yellow-400'
-                              : 'text-gray-500'
-                          } hover:text-yellow-300`}
+                              ? 'text-black'
+                              : 'text-gray-300'
+                          } hover:text-gray-600`}
                         >
                           ★
                         </button>
@@ -331,7 +354,7 @@ const Trip = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-300">
+                    <label className="mb-1 block text-sm font-medium text-gray-700">
                       Review:
                     </label>
                     <textarea
@@ -344,7 +367,7 @@ const Trip = () => {
                       }
                       placeholder="Share your thoughts about this trip..."
                       rows={3}
-                      className="w-full resize-none rounded-lg border border-gray-600 bg-gray-700 px-3 py-2 text-white placeholder-gray-400 focus:border-blue-400 focus:outline-none"
+                      className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       required
                     />
                   </div>
@@ -364,24 +387,24 @@ const Trip = () => {
               {localComments.length > 0 ? (
                 localComments.map((comment, index) => (
                   <div key={index}>
-                    <div className="rounded-lg bg-gray-800 p-4">
+                    <div className="rounded-lg bg-gray-50 border p-4">
                       <div className="mb-2 flex items-start justify-between">
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-gray-900">
                           {comment.name || 'Anonymous'}
                         </span>
-                        <span className="text-yellow-400">
+                        <span className="text-black">
                           {formatRating(comment.rating || 0)}
                         </span>
                       </div>
-                      <p className="text-gray-300">{comment.body}</p>
+                      <p className="text-gray-700">{comment.body}</p>
                     </div>
                     {index < localComments.length - 1 && (
-                      <hr className="my-4 border-gray-700" />
+                      <hr className="my-4 border-gray-200" />
                     )}
                   </div>
                 ))
               ) : (
-                <p className="py-8 text-center text-gray-400">
+                <p className="py-8 text-center text-gray-500">
                   No reviews yet. Be the first to share your thoughts!
                 </p>
               )}

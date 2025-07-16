@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore'
+import { doc, deleteDoc, updateDoc, arrayUnion } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import EditTripModal from './EditTripModal'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function TravelModal({ trip, onClose }) {
   const navigate = useNavigate()
@@ -133,11 +133,9 @@ export default function TravelModal({ trip, onClose }) {
             <p className="text-white">❤️ {trip.likes}</p>
           </div>
           <div>
-            <span className="font-medium text-blue-300">Rating:</span>
+            <span className="font-medium text-blue-300">Reviews:</span>
             <p className="text-white">
-              {trip.averageRating > 0
-                ? `★ ${trip.averageRating.toFixed(1)}`
-                : 'No ratings'}
+              {trip.comments?.length || 0} review{(trip.comments?.length || 0) !== 1 ? 's' : ''}
             </p>
           </div>
         </div>
@@ -195,9 +193,9 @@ export default function TravelModal({ trip, onClose }) {
                         }
                         className={`text-xl transition-colors ${
                           star <= commentData.rating
-                            ? 'text-yellow-400'
+                            ? 'text-white'
                             : 'text-gray-500'
-                        } hover:text-yellow-300`}
+                        } hover:text-gray-300`}
                       >
                         ★
                       </button>
@@ -249,7 +247,7 @@ export default function TravelModal({ trip, onClose }) {
                     <span className="text-sm font-medium text-white">
                       {comment.name || 'Anonymous'}
                     </span>
-                    <span className="text-sm text-yellow-400">
+                    <span className="text-sm text-white">
                       {formatRating(comment.rating || 0)}
                     </span>
                   </div>
@@ -297,19 +295,14 @@ export default function TravelModal({ trip, onClose }) {
                       id: trip.id,
                       parent_id: trip.parent_id,
                       published: trip.published,
-                      userId: trip.userId,
+                      userId: trip.userId
                     })
                     try {
-                      await updateDoc(doc(db, 'trips', trip.id), {
-                        published: !trip.published,
-                      })
+                      await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
                       onClose()
                       window.location.reload()
                     } catch (e) {
-                      alert(
-                        'Failed to update publish state. ' +
-                          (e && e.message ? e.message : '')
-                      )
+                      alert('Failed to update publish state. ' + (e && e.message ? e.message : ''))
                       console.error('[Publish Error]', e)
                     }
                   }}
@@ -322,13 +315,11 @@ export default function TravelModal({ trip, onClose }) {
           )}
         </div>
         {showEdit && (
-          <EditTripModal
-            trip={trip}
-            onClose={() => setShowEdit(false)}
-            onSuccess={onClose}
-          />
+          <EditTripModal trip={trip} onClose={() => setShowEdit(false)} onSuccess={onClose} />
         )}
       </div>
     </div>
+  )
+}
   )
 }
