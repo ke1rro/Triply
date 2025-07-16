@@ -3,12 +3,13 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
-import { FiSearch, FiUser, FiNavigation } from 'react-icons/fi'
+import { FiSearch, FiUser, FiNavigation, FiHome, FiPlus, FiHeart } from 'react-icons/fi'
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('home')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -27,7 +28,6 @@ const Homepage = () => {
                 ) / data.comments.length
               : 0
 
-          // Get location names (limit to 5)
           const locationNames = data.Locations
             ? data.Locations.map((loc) => loc.name).slice(0, 5)
             : []
@@ -74,6 +74,7 @@ const Homepage = () => {
   }
 
   const handleProfileClick = () => {
+    setActiveTab('profile')
     navigate('/profile')
   }
 
@@ -81,9 +82,18 @@ const Homepage = () => {
     console.log('Create travel clicked')
   }
 
+  const handleHomeClick = () => {
+    setActiveTab('home')
+  }
+
+  const handleLikesClick = () => {
+    setActiveTab('likes')
+    console.log('Likes clicked')
+  }
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
-      {/* Background image with overlay */}
+    <div className="relative flex min-h-screen flex-col overflow-hidden">
+      {/* Background image with overlay - full screen */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -96,45 +106,42 @@ const Homepage = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20"></div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md">
-        {/* Main Card */}
-        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
+      {/* Main Content - Full Screen */}
+      <div className="relative z-10 flex flex-1 flex-col bg-black/70 backdrop-blur-md">
+        {/* Header */}
+        <div className="safe-area-top px-6 pt-12 pb-6 w-full">
+          <div className="flex items-center justify-center w-full">
             <div className="flex items-center gap-3">
               <div className="text-3xl text-white">
                 <FiNavigation className="h-8 w-8" />
               </div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg whitespace-nowrap overflow-hidden text-ellipsis">
                 Triply
               </h1>
             </div>
           </div>
+        </div>
 
-          {/* Search Bar Section */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                placeholder="Search trips..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full flex-1 rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
-              />
-              <FiSearch
-                className="h-6 w-6 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
-                onClick={handleFilterClick}
-              />
-              <FiUser
-                className="h-6 w-6 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
-                onClick={handleProfileClick}
-              />
-            </div>
+        {/* Search Bar */}
+        <div className="px-6 mb-6">
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Search trips..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full flex-1 rounded-lg border border-gray-300/30 bg-white/10 px-4 py-3 text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <FiSearch
+              className="h-6 w-6 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
+              onClick={handleFilterClick}
+            />
           </div>
+        </div>
 
-          {/* Travel Cards */}
-          <div className="mb-6 max-h-80 flex-1 space-y-4 overflow-hidden overflow-y-auto pr-2">
+        {/* Travel Cards - Scrollable Area */}
+        <div className="flex-1 px-6 pb-24 overflow-hidden">
+          <div className="h-full space-y-4 overflow-y-auto">
             {loading ? (
               <div className="py-8 text-center text-gray-300">
                 Loading trips...
@@ -144,7 +151,7 @@ const Homepage = () => {
                 {filteredTravels.length > 0 ? (
                   <div className="space-y-4">
                     {filteredTravels.map((travel) => (
-                      <div key={travel.id} className="px-1">
+                      <div key={travel.id}>
                         <TravelCard trip={travel} />
                       </div>
                     ))}
@@ -159,14 +166,65 @@ const Homepage = () => {
               </>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* Create Travel Button */}
-          <button
-            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            onClick={handleAddClick}
-          >
-            Create New Trip
-          </button>
+      {/* Bottom Navigation Bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-20">
+        <div className="bg-black/80 backdrop-blur-lg border-t border-white/10">
+          <div className="safe-area-bottom px-4 py-3">
+            <div className="flex items-center justify-around">
+              {/* Home */}
+              <button
+                onClick={handleHomeClick}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 ${
+                  activeTab === 'home'
+                    ? 'bg-blue-600/30 text-blue-400'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <FiHome className="h-6 w-6" />
+                <span className="text-xs font-medium">Home</span>
+              </button>
+
+              {/* Likes */}
+              <button
+                onClick={handleLikesClick}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 ${
+                  activeTab === 'likes'
+                    ? 'bg-rose-600/30 text-rose-400'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <FiHeart className="h-6 w-6" />
+                <span className="text-xs font-medium">Saved</span>
+              </button>
+
+              {/* Add Trip */}
+              <button
+                onClick={handleAddClick}
+                className="flex flex-col items-center gap-1 px-4 py-2 rounded-lg bg-blue-600/20 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
+              >
+                <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full">
+                  <FiPlus className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xs font-medium">Create</span>
+              </button>
+
+              {/* Profile */}
+              <button
+                onClick={handleProfileClick}
+                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 ${
+                  activeTab === 'profile'
+                    ? 'bg-purple-600/30 text-purple-400'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <FiUser className="h-6 w-6" />
+                <span className="text-xs font-medium">Profile</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
