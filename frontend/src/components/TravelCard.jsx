@@ -33,9 +33,9 @@ export default function TravelCard({ trip }) {
     if (!locations || locations.length === 0) return 'No locations'
 
     if (locations.length <= 5) {
-      return locations.join(' → ')
+      return locations.join(', ')
     } else {
-      return locations.slice(0, 5).join(' → ') + ' ...'
+      return locations.slice(0, 5).join(', ') + ' ...'
     }
   }
 
