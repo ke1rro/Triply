@@ -168,7 +168,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       onClick={onClose}
     >
       <div
-        className="w-screen max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
+        className="max-h-[90vh] w-screen max-w-4xl overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with title and close button */}
@@ -192,10 +192,10 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         </div>
 
         {/* Form Section - Single column */}
-        <div className="max-w-md mx-auto">
+        <div className="mx-auto max-w-md">
           {/* Error message */}
           {error && (
-            <div className="mb-4 rounded-lg bg-red-500/20 border border-red-400/30 px-4 py-2 text-red-300 text-sm">
+            <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/20 px-4 py-2 text-sm text-red-300">
               {error}
             </div>
           )}
