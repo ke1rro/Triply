@@ -101,17 +101,17 @@ export default function EventAddModal({
           </div>
           <div className="mt-6 flex gap-3">
             <button
-              type="submit"
-              className="flex-1 rounded-full bg-indigo-500 py-2 font-semibold text-white shadow transition-colors hover:bg-indigo-600"
-            >
-              {mode === 'edit' ? 'Save' : 'Add'}
-            </button>
-            <button
               type="button"
               className="flex-1 rounded-full bg-indigo-500 py-2 font-semibold text-white shadow transition-colors hover:bg-indigo-600"
               onClick={onClose}
             >
               Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 rounded-full bg-indigo-500 py-2 font-semibold text-white shadow transition-colors hover:bg-indigo-600"
+            >
+              {mode === 'edit' ? 'Save' : 'Add'}
             </button>
           </div>
         </form>
