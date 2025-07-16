@@ -173,7 +173,7 @@ export default function TripDetails() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-0">
+    <div className="min-h-screen w-screen bg-gray-50 p-0">
       <DragDropContext
         onDragEnd={(result) => {
           handleDaysDnD(result)
