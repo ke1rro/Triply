@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import React, { useState } from 'react'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 export default function EventDaysDnD({ days, eventsByDay, onAddEvent, onEditEvent }) {
   const isSingleDay = days.length === 1;
@@ -42,20 +42,22 @@ export default function EventDaysDnD({ days, eventsByDay, onAddEvent, onEditEven
                             <div>
                               <div className="font-semibold">{event.name}</div>
                               <div className="text-xs text-gray-500">{event.time}</div>
+
                             </div>
                           </div>
-                        )}
-                      </Draggable>
-                    ))
-                  ) : (
-                    <div className="text-gray-400 italic text-sm">No events</div>
-                  )}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          ))}
-        </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))
+                ) : (
+                  <div className="text-sm italic text-gray-400">No events</div>
+                )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        ))}
+      </div>
     </div>
-  );
+  )
 }
