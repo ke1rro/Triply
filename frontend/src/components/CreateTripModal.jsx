@@ -7,7 +7,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     title: '',
     locations: '',
-    description: ''
+    description: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -15,15 +15,15 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     // Clear previous errors
     setError('')
 
@@ -41,8 +41,8 @@ export default function CreateTripModal({ onClose, onSuccess }) {
     // Validate that locations contain actual content after parsing
     const locationArray = formData.locations
       .split(',')
-      .map(loc => loc.trim())
-      .filter(loc => loc.length > 0)
+      .map((loc) => loc.trim())
+      .filter((loc) => loc.length > 0)
 
     if (locationArray.length === 0) {
       setError('Please enter valid location names')
@@ -53,7 +53,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
     try {
       // Parse locations with validation
-      const validLocationArray = locationArray.map(loc => ({
+      const validLocationArray = locationArray.map((loc) => ({
         name: loc,
         location: [0, 0], // Default coordinates
       }))
@@ -68,11 +68,11 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         likes: 0,
         fileName: null,
         userId: currentUser?.uid || '',
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       }
 
       await addDoc(collection(db, 'trips'), tripData)
-      
+
       if (onSuccess) {
         onSuccess()
       }
@@ -86,9 +86,10 @@ export default function CreateTripModal({ onClose, onSuccess }) {
   }
 
   // Check if form is valid for submit button state
-  const isFormValid = formData.title.trim().length > 0 && 
-                     formData.locations.trim().length > 0 &&
-                     formData.locations.split(',').some(loc => loc.trim().length > 0)
+  const isFormValid =
+    formData.title.trim().length > 0 &&
+    formData.locations.trim().length > 0 &&
+    formData.locations.split(',').some((loc) => loc.trim().length > 0)
 
   return (
     <div
@@ -114,7 +115,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
         {/* Error message */}
         {error && (
-          <div className="mb-4 rounded-lg bg-red-500/20 border border-red-400/30 px-4 py-2 text-red-300 text-sm">
+          <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/20 px-4 py-2 text-sm text-red-300">
             {error}
           </div>
         )}
@@ -167,7 +168,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
               onChange={handleInputChange}
               placeholder="Describe your trip..."
               rows={3}
-              className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 resize-none"
+              className="w-full resize-none rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
             />
           </div>
 
@@ -183,7 +184,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
             <button
               type="submit"
               disabled={loading || !isFormValid}
-              className="flex-1 rounded-lg bg-blue-600/80 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 rounded-lg bg-blue-600/80 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Trip'}
             </button>
