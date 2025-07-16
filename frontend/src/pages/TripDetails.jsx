@@ -33,7 +33,6 @@ export default function TripDetails() {
   const [editModalDay, setEditModalDay] = useState(1)
   const [editEventIdx, setEditEventIdx] = useState(null)
   const [editEventData, setEditEventData] = useState(null)
-  const [draggedEvent, setDraggedEvent] = useState(null) // To track which event is being dragged
 
   useEffect(() => {
     async function fetchTrip() {
@@ -63,20 +62,11 @@ export default function TripDetails() {
   if (error) return <div className="p-8 text-red-600">{error}</div>
   if (!trip) return null
 
-  async function handleReorderEvents(newEvents) {
-    setTrip((prev) => ({ ...prev, Events: newEvents }))
-    try {
-      await updateDoc(doc(db, 'trips', tripId), { Events: newEvents })
-    } catch (e) {
-      console.error('Failed to save reordered events', e)
-    }
-  }
-
   function handleEditEvent(day, idxInDay) {
     // Find the correct event index in the flat Events array
     const eventsForDay = (trip.Events || []).filter((e) => (e.day || 1) === day)
     const event = eventsForDay[idxInDay]
-    const globalIdx = (trip.Events || []).findIndex((e, i) => {
+    const globalIdx = (trip.Events || []).findIndex((e) => {
       if ((e.day || 1) !== day) return false
       // Count only up to idxInDay
       return eventsForDay.indexOf(e) === idxInDay
@@ -85,22 +75,6 @@ export default function TripDetails() {
     setEditEventData(event)
     setEditModalDay(day)
     setEditModalOpen(true)
-  }
-
-  function handleDeleteEvent(idx) {
-    if (window.confirm('Delete this event?')) {
-      const updated = trip.Events.filter((_, i) => i !== idx)
-      handleReorderEvents(updated)
-    }
-  }
-
-  function handleAddEvent() {
-    const name = prompt('New event name:')
-    const time = prompt('New event time:')
-    if (name) {
-      const updated = [...(trip.Events || []), { name, time }]
-      handleReorderEvents(updated)
-    }
   }
 
   // Helper: group events by day
@@ -151,7 +125,7 @@ export default function TripDetails() {
     // Insert into dest
     const destEvents = newEvents.filter((e) => (e.day || 1) === destDay)
     const before = newEvents.findIndex(
-      (e, i) => (e.day || 1) === destDay && destEvents.indexOf(e) === destIdx
+      (e) => (e.day || 1) === destDay && destEvents.indexOf(e) === destIdx
     )
     moved.day = destDay
     if (destEvents.length === 0) {
