@@ -200,7 +200,7 @@ const Trip = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-gray-100 px-6 py-4">
+      <div className="bg-gray-100 px-6 py-4 mb-6">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <FiClock className="h-6 w-6 text-gray-700" />
@@ -246,29 +246,29 @@ const Trip = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white">
+      <div className="bg-white pb-4">
         <div className="flex justify-center">
           <div className="flex gap-8">
-            <button
+            <div
               onClick={() => setActiveTab('details')}
-              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
+              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 ${
                 activeTab === 'details'
-                  ? 'text-blue-600 bg-blue-100 border-2 border-blue-200'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'text-white bg-gray-800 border-gray-700'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-gray-300'
               }`}
             >
               Details
-            </button>
-            <button
+            </div>
+            <div
               onClick={() => setActiveTab('reviews')}
-              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg ${
+              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 ${
                 activeTab === 'reviews'
-                  ? 'text-blue-600 bg-blue-100 border-2 border-blue-200'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  ? 'text-white bg-gray-800 border-gray-700'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-gray-300'
               }`}
             >
               Reviews
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -311,12 +311,12 @@ const Trip = () => {
             {/* Add Comment Button */}
             {currentUser && (
               <div className="flex justify-end">
-                <button
+                <div
                   onClick={() => setShowCommentForm(!showCommentForm)}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white transition-all duration-200 hover:bg-blue-700"
+                  className="px-6 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 text-white bg-gray-800 border-gray-700 hover:bg-gray-900"
                 >
                   {showCommentForm ? 'Cancel' : 'Add Review'}
-                </button>
+                </div>
               </div>
             )}
 
@@ -415,9 +415,9 @@ const Trip = () => {
 
       {/* Add Trip Button - Fixed at bottom center */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform">
-        <button className="rounded-full bg-blue-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-blue-700 hover:shadow-xl">
+        <div className="px-8 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 text-white bg-gray-800 border-gray-700 shadow-lg hover:shadow-xl hover:bg-gray-900">
           Add this trip
-        </button>
+        </div>
       </div>
     </div>
   )
