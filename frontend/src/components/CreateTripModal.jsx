@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { db } from '../lib/firebase'
@@ -17,6 +17,15 @@ export default function CreateTripModal({ onClose, onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { currentUser } = useAuth()
+
+  // Lock scroll when modal opens
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -115,6 +124,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         likes: 0,
         fileName: fileName,
         userId: currentUser?.uid || '',
+        published: false, // Default to unpublished
         createdAt: serverTimestamp(),
       }
 
@@ -159,21 +169,21 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       onClick={onClose}
     >
       <div
-        className="relative max-h-[90vh] w-screen max-w-4xl overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
+        className="w-screen max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-600/50 text-xl font-bold text-gray-300 transition-all duration-200 hover:bg-gray-600/70 hover:text-white"
-        >
-          ×
-        </button>
-
-        {/* Title */}
-        <h3 className="mb-6 text-2xl font-bold text-white drop-shadow-lg">
-          Create New Trip
-        </h3>
+        {/* Header with title and close button */}
+        <div className="mb-6 flex items-start justify-between">
+          <h3 className="text-2xl font-bold text-white drop-shadow-lg">
+            Create New Trip
+          </h3>
+          <button
+            onClick={onClose}
+            className="ml-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-600/50 text-xl font-bold text-gray-300 transition-all duration-200 hover:bg-gray-600/70 hover:text-white"
+          >
+            ×
+          </button>
+        </div>
 
         {/* Preview at the top */}
         <div className="mb-6 flex justify-center">
@@ -183,10 +193,10 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         </div>
 
         {/* Form Section - Single column */}
-        <div className="mx-auto max-w-md">
+        <div className="max-w-md mx-auto">
           {/* Error message */}
           {error && (
-            <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/20 px-4 py-2 text-sm text-red-300">
+            <div className="mb-4 rounded-lg bg-red-500/20 border border-red-400/30 px-4 py-2 text-red-300 text-sm">
               {error}
             </div>
           )}

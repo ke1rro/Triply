@@ -18,39 +18,42 @@ const Homepage = () => {
   const fetchTravelData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'trips'))
-      const trips = querySnapshot.docs.map((doc) => {
-        const data = doc.data()
+      const trips = querySnapshot.docs
+        .map((doc) => {
+          const data = doc.data()
 
-        // Calculate average rating from comments
-        const averageRating =
-          data.comments && data.comments.length > 0
-            ? data.comments.reduce(
-                (sum, comment) => sum + (comment.rating || 0),
-                0
-              ) / data.comments.length
-            : 0
+          // Calculate average rating from comments
+          const averageRating =
+            data.comments && data.comments.length > 0
+              ? data.comments.reduce(
+                  (sum, comment) => sum + (comment.rating || 0),
+                  0
+                ) / data.comments.length
+              : 0
 
-        // Get location names (limit to 5)
-        const locationNames = data.Locations
-          ? data.Locations.map((loc) => loc.name).slice(0, 5)
-          : []
+          // Get location names (limit to 5)
+          const locationNames = data.Locations
+            ? data.Locations.map((loc) => loc.name).slice(0, 5)
+            : []
 
-        return {
-          id: doc.id,
-          dataName: doc.id, // Use document ID as data name
-          name: data.name || 'Untitled Trip',
-          description: data.description || '',
-          days: data.days || 0,
-          likes: data.likes || 0,
-          fileName: data.fileName || null,
-          locations: locationNames,
-          events: data.Events || [],
-          comments: data.comments || [],
-          averageRating: averageRating,
-          createdAt: data.createdAt,
-          userId: data.userId,
-        }
-      })
+          return {
+            id: doc.id,
+            dataName: doc.id, // Use document ID as data name
+            name: data.name || 'Untitled Trip',
+            description: data.description || '',
+            days: data.days || 0,
+            likes: data.likes || 0,
+            fileName: data.fileName || null,
+            locations: locationNames,
+            events: data.Events || [],
+            comments: data.comments || [],
+            averageRating: averageRating,
+            createdAt: data.createdAt,
+            userId: data.userId,
+            published: data.published || false,
+          }
+        })
+        .filter((trip) => trip.published === true) // Only show published trips
 
       setTravelData(trips)
     } catch (error) {
