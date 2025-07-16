@@ -43,6 +43,7 @@ const Homepage = () => {
             description: data.description || '',
             days: data.days || 0,
             likes: data.likes || 0,
+            likedBy: data.likedBy || [], // Array of user IDs who liked this trip
             fileName: data.fileName || null,
             locations: locationNames,
             events: data.Events || [],

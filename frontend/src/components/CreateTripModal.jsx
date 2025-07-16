@@ -122,6 +122,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         comments: [],
         days: parseInt(formData.days) || 0,
         likes: 0,
+        likedBy: [], // Initialize empty array for user IDs who liked this trip
         fileName: fileName,
         userId: currentUser?.uid || '',
         published: false, // Default to unpublished
