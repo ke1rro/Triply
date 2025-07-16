@@ -54,7 +54,7 @@ export default function TravelCard({ trip }) {
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="relative h-36 w-full cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl group active:scale-98"
+        className="active:scale-98 group relative h-36 w-full cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
       >
         {/* Background image that scales on hover */}
         <div
@@ -87,12 +87,12 @@ export default function TravelCard({ trip }) {
 
           {/* Duration and Rating - bottom right */}
           <div className="flex items-end justify-between">
-            <div className="flex items-center gap-2 text-sm font-medium drop-shadow-md bg-black/20 rounded-lg px-3 py-1">
+            <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
               <span>
                 {trip.days} day{trip.days !== 1 ? 's' : ''}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm font-medium drop-shadow-md bg-black/20 rounded-lg px-3 py-1">
+            <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
               <span>{formatRating(trip.averageRating)}</span>
             </div>
           </div>

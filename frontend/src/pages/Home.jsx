@@ -4,7 +4,14 @@ import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
 import CreateTripModal from '../components/CreateTripModal'
-import { FiSearch, FiUser, FiNavigation, FiHome, FiPlus, FiHeart } from 'react-icons/fi'
+import {
+  FiSearch,
+  FiUser,
+  FiNavigation,
+  FiHome,
+  FiPlus,
+  FiHeart,
+} from 'react-icons/fi'
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
@@ -117,14 +124,14 @@ const Homepage = () => {
       {/* Content */}
       <div className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
         {/* Main Card */}
-        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md w-full">
+        <div className="w-full rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="text-3xl text-white">
                 <FiNavigation className="h-8 w-8" />
               </div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-lg whitespace-nowrap overflow-hidden text-ellipsis">
+              <h1 className="overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-bold text-white drop-shadow-lg">
                 Triply
               </h1>
             </div>
@@ -132,7 +139,7 @@ const Homepage = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="px-6 mb-6">
+        <div className="mb-6 px-6">
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -149,7 +156,7 @@ const Homepage = () => {
         </div>
 
         {/* Travel Cards - Scrollable Area */}
-        <div className="flex-1 px-6 pb-24 overflow-hidden">
+        <div className="flex-1 overflow-hidden px-6 pb-24">
           <div className="h-full space-y-4 overflow-y-auto">
             {loading ? (
               <div className="py-8 text-center text-gray-300">
@@ -158,7 +165,7 @@ const Homepage = () => {
             ) : (
               <>
                 {filteredTravels.length > 0 ? (
-                  <div className="space-y-4 flex flex-col items-center w-full">
+                  <div className="flex w-full flex-col items-center space-y-4">
                     {filteredTravels.map((travel) => (
                       <div key={travel.id} className="w-full max-w-sm">
                         <TravelCard trip={travel} />
@@ -180,13 +187,13 @@ const Homepage = () => {
 
       {/* Bottom Navigation Bar */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="bg-black/80 backdrop-blur-lg border-t border-white/10">
+        <div className="border-t border-white/10 bg-black/80 backdrop-blur-lg">
           <div className="safe-area-bottom px-4 py-3">
             <div className="flex items-center justify-around">
               {/* Home */}
               <button
                 onClick={handleHomeClick}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 ${
+                className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-all duration-300 ${
                   activeTab === 'home'
                     ? 'bg-blue-600/30 text-blue-400'
                     : 'text-gray-400 hover:text-white'
@@ -199,7 +206,7 @@ const Homepage = () => {
               {/* Likes */}
               <button
                 onClick={handleLikesClick}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 ${
+                className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-all duration-300 ${
                   activeTab === 'likes'
                     ? 'bg-rose-600/30 text-rose-400'
                     : 'text-gray-400 hover:text-white'
@@ -212,9 +219,9 @@ const Homepage = () => {
               {/* Add Trip */}
               <button
                 onClick={handleAddClick}
-                className="flex flex-col items-center gap-1 px-4 py-2 rounded-lg bg-blue-600/20 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
+                className="flex flex-col items-center gap-1 rounded-lg bg-blue-600/20 px-4 py-2 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
               >
-                <div className="flex items-center justify-center w-8 h-8 bg-blue-600 rounded-full">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
                   <FiPlus className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xs font-medium">Create</span>
@@ -223,7 +230,7 @@ const Homepage = () => {
               {/* Profile */}
               <button
                 onClick={handleProfileClick}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 ${
+                className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-all duration-300 ${
                   activeTab === 'profile'
                     ? 'bg-purple-600/30 text-purple-400'
                     : 'text-gray-400 hover:text-white'
