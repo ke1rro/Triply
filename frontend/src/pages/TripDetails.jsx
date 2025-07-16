@@ -189,13 +189,13 @@ export default function TripDetails() {
             <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-10 py-4 rounded-full shadow-xl text-xl font-bold z-50 transition-colors duration-300 !transform-none ${snapshot.isDraggingOver ? 'bg-red-600 text-white' : isDragging ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white'} ${!isDragging && !snapshot.isDraggingOver ? 'hover:bg-indigo-700 cursor-pointer' : ''}`}
-            style={{ minWidth: 200, transition: 'none', transform: 'none', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.12)', cursor: !isDragging && !snapshot.isDraggingOver ? 'pointer' : 'default' }}
-            onClick={() => { if (!isDragging) navigate('/'); }}
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-10 py-4 rounded-full shadow-xl text-xl font-bold z-50 transition-colors duration-300 !transform-none flex items-center justify-center ${snapshot.isDraggingOver ? 'bg-red-500 text-white' : isDragging ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white'} ${!isDragging && !snapshot.isDraggingOver ? 'hover:bg-indigo-700 cursor-pointer' : ''}`}
+            style={{ maxHeight:60, width: 260, transition: 'none', transform: 'none', outline: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.12)', cursor: !isDragging && !snapshot.isDraggingOver ? 'pointer' : 'default' }}
+            onClick={() => { if (!isDragging) navigate('/home'); }}
           >
             {/* Crossfade text transition */}
 <span
-  className={`block transition-opacity duration-300 ${fadeText ? 'opacity-0' : 'opacity-100'}`}
+  className={`block transition-opacity duration-300 text-center ${(fadeText || snapshot.isDraggingOver) ? 'opacity-0' : 'opacity-100'}`}
   style={{ minHeight: 24, display: 'inline-block' }}
 >
   {buttonText}

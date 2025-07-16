@@ -94,28 +94,6 @@ export default function EventListEditable({ events, onReorder, onEdit, onDelete,
           )}
         </Droppable>
         {/* Drag-to-delete area, only visible when dragging */}
-        {isDragging && (
-          <Droppable droppableId="delete-area">
-            {(provided, snapshot) => {
-              console.log('[DnD] Delete area rendered. isDraggingOver:', snapshot.isDraggingOver);
-              return (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className={`transition-all duration-300 transform flex flex-col items-center justify-center mt-8 rounded-2xl shadow-xl border-4 border-red-700 bg-red-500/90 text-white font-bold ${snapshot.isDraggingOver ? 'scale-105 bg-red-600' : 'scale-100'}`}
-                  style={{ minHeight: 96, height: 96, opacity: 1 }}
-                >
-                  <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mb-2">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" />
-                  </svg>
-                  <span className="text-lg">Drop here to delete</span>
-                  <span className="text-xs mt-1 opacity-80">isDraggingOver: {String(snapshot.isDraggingOver)}</span>
-                  {provided.placeholder}
-                </div>
-              );
-            }}
-          </Droppable>
-        )}
       </DragDropContext>
       <button
         onClick={handleAdd}
