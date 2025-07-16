@@ -3,59 +3,61 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
+import CreateTripModal from '../components/CreateTripModal'
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchTravelData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'trips'))
-        const trips = querySnapshot.docs.map((doc) => {
-          const data = doc.data()
+  const fetchTravelData = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'trips'))
+      const trips = querySnapshot.docs.map((doc) => {
+        const data = doc.data()
 
-          // Calculate average rating from comments
-          const averageRating =
-            data.comments && data.comments.length > 0
-              ? data.comments.reduce(
-                  (sum, comment) => sum + (comment.rating || 0),
-                  0
-                ) / data.comments.length
-              : 0
+        // Calculate average rating from comments
+        const averageRating =
+          data.comments && data.comments.length > 0
+            ? data.comments.reduce(
+                (sum, comment) => sum + (comment.rating || 0),
+                0
+              ) / data.comments.length
+            : 0
 
-          // Get location names (limit to 5)
-          const locationNames = data.Locations
-            ? data.Locations.map((loc) => loc.name).slice(0, 5)
-            : []
+        // Get location names (limit to 5)
+        const locationNames = data.Locations
+          ? data.Locations.map((loc) => loc.name).slice(0, 5)
+          : []
 
-          return {
-            id: doc.id,
-            dataName: doc.id, // Use document ID as data name
-            name: data.name || 'Untitled Trip',
-            description: data.description || '',
-            days: data.days || 0,
-            likes: data.likes || 0,
-            fileName: data.fileName || null,
-            locations: locationNames,
-            events: data.Events || [],
-            comments: data.comments || [],
-            averageRating: averageRating,
-            createdAt: data.createdAt,
-            userId: data.userId,
-          }
-        })
+        return {
+          id: doc.id,
+          dataName: doc.id, // Use document ID as data name
+          name: data.name || 'Untitled Trip',
+          description: data.description || '',
+          days: data.days || 0,
+          likes: data.likes || 0,
+          fileName: data.fileName || null,
+          locations: locationNames,
+          events: data.Events || [],
+          comments: data.comments || [],
+          averageRating: averageRating,
+          createdAt: data.createdAt,
+          userId: data.userId,
+        }
+      })
 
-        setTravelData(trips)
-      } catch (error) {
-        console.error('Error fetching travel data:', error)
-      } finally {
-        setLoading(false)
-      }
+      setTravelData(trips)
+    } catch (error) {
+      console.error('Error fetching travel data:', error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchTravelData()
   }, [])
 
@@ -77,7 +79,12 @@ const Homepage = () => {
   }
 
   const handleAddClick = () => {
-    console.log('Create travel clicked')
+    setShowCreateModal(true)
+  }
+
+  const handleCreateSuccess = () => {
+    // Refresh the travel data after successful creation
+    fetchTravelData()
   }
 
   return (
@@ -96,9 +103,9 @@ const Homepage = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
         {/* Main Card */}
-        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
+        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md w-full">
           {/* Header */}
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -143,9 +150,9 @@ const Homepage = () => {
             ) : (
               <>
                 {filteredTravels.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-4 flex flex-col items-center w-full">
                     {filteredTravels.map((travel) => (
-                      <div key={travel.id} className="px-1">
+                      <div key={travel.id} className="w-full max-w-sm">
                         <TravelCard trip={travel} />
                       </div>
                     ))}
@@ -170,6 +177,14 @@ const Homepage = () => {
           </button>
         </div>
       </div>
+
+      {/* Create Trip Modal */}
+      {showCreateModal && (
+        <CreateTripModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleCreateSuccess}
+        />
+      )}
     </div>
   )
 }
