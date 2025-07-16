@@ -9,7 +9,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
     title: '',
     locations: '',
     description: '',
-    days: ''
+    days: '',
   })
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState(null)
@@ -20,9 +20,9 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
   }
 
@@ -34,7 +34,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         setError('Please select an image file')
         return
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setError('File size must be less than 5MB')
@@ -43,7 +43,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
       setSelectedFile(file)
       setError('')
-      
+
       // Create preview URL
       const reader = new FileReader()
       reader.onload = (e) => setPreviewUrl(e.target.result)
@@ -55,14 +55,14 @@ export default function CreateTripModal({ onClose, onSuccess }) {
     const storage = getStorage()
     const fileName = `trip-images/${Date.now()}-${file.name}`
     const storageRef = ref(storage, fileName)
-    
+
     await uploadBytes(storageRef, file)
     return fileName // Return the storage path, not the download URL
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     // Clear previous errors
     setError('')
 
@@ -80,8 +80,8 @@ export default function CreateTripModal({ onClose, onSuccess }) {
     // Validate that locations contain actual content after parsing
     const locationArray = formData.locations
       .split(',')
-      .map(loc => loc.trim())
-      .filter(loc => loc.length > 0)
+      .map((loc) => loc.trim())
+      .filter((loc) => loc.length > 0)
 
     if (locationArray.length === 0) {
       setError('Please enter valid location names')
@@ -93,14 +93,14 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
     try {
       let fileName = null
-      
+
       // Upload image if selected
       if (selectedFile) {
         fileName = await uploadImage(selectedFile)
       }
 
       // Parse locations with validation
-      const validLocationArray = locationArray.map(loc => ({
+      const validLocationArray = locationArray.map((loc) => ({
         name: loc,
         location: [0, 0], // Default coordinates
       }))
@@ -115,11 +115,11 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         likes: 0,
         fileName: fileName,
         userId: currentUser?.uid || '',
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       }
 
       await addDoc(collection(db, 'trips'), tripData)
-      
+
       if (onSuccess) {
         onSuccess()
       }
@@ -134,19 +134,23 @@ export default function CreateTripModal({ onClose, onSuccess }) {
   }
 
   // Check if form is valid for submit button state
-  const isFormValid = formData.title.trim().length > 0 && 
-                     formData.locations.trim().length > 0 &&
-                     formData.locations.split(',').some(loc => loc.trim().length > 0)
+  const isFormValid =
+    formData.title.trim().length > 0 &&
+    formData.locations.trim().length > 0 &&
+    formData.locations.split(',').some((loc) => loc.trim().length > 0)
 
   // Create preview trip data for TravelCard
   const previewTrip = {
     name: formData.title || 'Trip Preview',
-    locations: formData.locations 
-      ? formData.locations.split(',').map(loc => loc.trim()).filter(loc => loc.length > 0)
+    locations: formData.locations
+      ? formData.locations
+          .split(',')
+          .map((loc) => loc.trim())
+          .filter((loc) => loc.length > 0)
       : ['Location 1', 'Location 2'],
     days: parseInt(formData.days) || 0,
     averageRating: 0,
-    fileName: null // We'll use previewUrl for preview
+    fileName: null, // We'll use previewUrl for preview
   }
 
   return (
@@ -155,7 +159,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       onClick={onClose}
     >
       <div
-        className="w-screen max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
+        className="max-h-[90vh] w-screen max-w-4xl overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -179,10 +183,10 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         </div>
 
         {/* Form Section - Single column */}
-        <div className="max-w-md mx-auto">
+        <div className="mx-auto max-w-md">
           {/* Error message */}
           {error && (
-            <div className="mb-4 rounded-lg bg-red-500/20 border border-red-400/30 px-4 py-2 text-red-300 text-sm">
+            <div className="mb-4 rounded-lg border border-red-400/30 bg-red-500/20 px-4 py-2 text-sm text-red-300">
               {error}
             </div>
           )}
@@ -235,7 +239,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
                 onChange={handleInputChange}
                 placeholder="Describe your trip..."
                 rows={3}
-                className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 resize-none"
+                className="w-full resize-none rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               />
             </div>
 
@@ -267,7 +271,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
-                className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white backdrop-blur-sm file:mr-4 file:rounded file:border-0 file:bg-blue-600 file:px-2 file:py-1 file:text-sm file:text-white hover:file:bg-blue-700 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               />
               <p className="mt-1 text-xs text-gray-400">
                 Upload an image (max 5MB)
@@ -286,9 +290,13 @@ export default function CreateTripModal({ onClose, onSuccess }) {
               <button
                 type="submit"
                 disabled={loading || !isFormValid}
-                className="flex-1 rounded-lg bg-blue-600/80 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg bg-blue-600/80 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {loading ? (uploading ? 'Uploading...' : 'Creating...') : 'Create Trip'}
+                {loading
+                  ? uploading
+                    ? 'Uploading...'
+                    : 'Creating...'
+                  : 'Create Trip'}
               </button>
             </div>
           </form>
@@ -314,7 +322,7 @@ function PreviewTravelCard({ trip, imageUrl }) {
     return `★ ${rating.toFixed(1)}`
   }
 
-  const backgroundImage = imageUrl 
+  const backgroundImage = imageUrl
     ? `url(${imageUrl})`
     : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'
 
@@ -352,7 +360,9 @@ function PreviewTravelCard({ trip, imageUrl }) {
         {/* Duration and Rating */}
         <div className="flex items-end justify-between">
           <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
-            <span>{trip.days} day{trip.days !== 1 ? 's' : ''}</span>
+            <span>
+              {trip.days} day{trip.days !== 1 ? 's' : ''}
+            </span>
           </div>
           <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
             <span>{formatRating(trip.averageRating)}</span>

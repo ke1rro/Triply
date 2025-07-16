@@ -16,25 +16,24 @@ export default function TripDetails() {
   useEffect(() => {
     setFadeText(true)
     const timeout = setTimeout(() => {
-      setButtonText(isDragging ? 'Drop here to delete' : 'Save & Return');
-      setFadeText(false);
-    }, 150); // fade out, then switch label, then fade in
-    return () => clearTimeout(timeout);
-  }, [isDragging]);
+      setButtonText(isDragging ? 'Drop here to delete' : 'Save & Return')
+      setFadeText(false)
+    }, 150) // fade out, then switch label, then fade in
+    return () => clearTimeout(timeout)
+  }, [isDragging])
 
-  const navigate = useNavigate();
-  const { tripId } = useParams();
-  const [trip, setTrip] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [addModalDay, setAddModalDay] = useState(1);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [editModalDay, setEditModalDay] = useState(1);
-  const [editEventIdx, setEditEventIdx] = useState(null);
-  const [editEventData, setEditEventData] = useState(null);
-  const [draggedEvent, setDraggedEvent] = useState(null); // To track which event is being dragged
-
+  const navigate = useNavigate()
+  const { tripId } = useParams()
+  const [trip, setTrip] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [addModalDay, setAddModalDay] = useState(1)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editModalDay, setEditModalDay] = useState(1)
+  const [editEventIdx, setEditEventIdx] = useState(null)
+  const [editEventData, setEditEventData] = useState(null)
+  const [draggedEvent, setDraggedEvent] = useState(null) // To track which event is being dragged
 
   useEffect(() => {
     async function fetchTrip() {
@@ -75,18 +74,17 @@ export default function TripDetails() {
 
   function handleEditEvent(day, idxInDay) {
     // Find the correct event index in the flat Events array
-    const eventsForDay = (trip.Events || []).filter(e => (e.day || 1) === day);
-    const event = eventsForDay[idxInDay];
+    const eventsForDay = (trip.Events || []).filter((e) => (e.day || 1) === day)
+    const event = eventsForDay[idxInDay]
     const globalIdx = (trip.Events || []).findIndex((e, i) => {
-      if ((e.day || 1) !== day) return false;
+      if ((e.day || 1) !== day) return false
       // Count only up to idxInDay
-      return eventsForDay.indexOf(e) === idxInDay;
-    });
-    setEditEventIdx(globalIdx);
-    setEditEventData(event);
-    setEditModalDay(day);
-    setEditModalOpen(true);
-
+      return eventsForDay.indexOf(e) === idxInDay
+    })
+    setEditEventIdx(globalIdx)
+    setEditEventData(event)
+    setEditModalDay(day)
+    setEditModalOpen(true)
   }
 
   function handleDeleteEvent(idx) {
@@ -151,21 +149,23 @@ export default function TripDetails() {
       return idxInDay !== sourceIdx
     })
     // Insert into dest
-    const destEvents = newEvents.filter(e => (e.day || 1) === destDay);
-    const before = newEvents.findIndex((e, i) => (e.day || 1) === destDay && destEvents.indexOf(e) === destIdx);
-    moved.day = destDay;
+    const destEvents = newEvents.filter((e) => (e.day || 1) === destDay)
+    const before = newEvents.findIndex(
+      (e, i) => (e.day || 1) === destDay && destEvents.indexOf(e) === destIdx
+    )
+    moved.day = destDay
     if (destEvents.length === 0) {
       // Insert at the first position for that day in the global events array
       // Find the first event after all previous days' events
-      let insertIdx = newEvents.findIndex(e => (e.day || 1) > destDay);
-      if (insertIdx === -1) insertIdx = newEvents.length;
-      newEvents.splice(insertIdx, 0, moved);
+      let insertIdx = newEvents.findIndex((e) => (e.day || 1) > destDay)
+      if (insertIdx === -1) insertIdx = newEvents.length
+      newEvents.splice(insertIdx, 0, moved)
     } else if (before === -1) {
-      newEvents.push(moved);
+      newEvents.push(moved)
     } else {
-      newEvents.splice(before, 0, moved);
+      newEvents.splice(before, 0, moved)
     }
-    setTrip(prev => ({ ...prev, Events: newEvents }));
+    setTrip((prev) => ({ ...prev, Events: newEvents }))
     try {
       await updateDoc(doc(db, 'trips', tripId), { Events: newEvents })
     } catch (e) {
@@ -180,15 +180,15 @@ export default function TripDetails() {
 
   function handleEditEventSubmit(eventData) {
     // Update the event at editEventIdx
-    const updated = [...(trip.Events || [])];
-    updated[editEventIdx] = eventData;
-    setTrip(prev => ({ ...prev, Events: updated }));
-    setEditModalOpen(false);
-    setEditEventIdx(null);
-    setEditEventData(null);
-    updateDoc(doc(db, 'trips', tripId), { Events: updated }).catch(e => {
-      console.error('Failed to update event', e);
-    });
+    const updated = [...(trip.Events || [])]
+    updated[editEventIdx] = eventData
+    setTrip((prev) => ({ ...prev, Events: updated }))
+    setEditModalOpen(false)
+    setEditEventIdx(null)
+    setEditEventData(null)
+    updateDoc(doc(db, 'trips', tripId), { Events: updated }).catch((e) => {
+      console.error('Failed to update event', e)
+    })
   }
 
   async function handleAddEventSubmit(eventData) {
@@ -203,14 +203,18 @@ export default function TripDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-0 w-screen">
+    <div className="min-h-screen w-screen bg-gray-50 p-0">
       <DragDropContext
-  onDragEnd={result => { handleDaysDnD(result); setIsDragging(false); }}
-  onDragCancel={() => setIsDragging(false)}
-  onDragStart={() => setIsDragging(true)}
-  onDragUpdate={() => {}}>
-        <div className="w-screen py-12 px-4 sm:px-8">
-          <h1 className="text-4xl font-bold mb-8 text-center">{trip.name}</h1>
+        onDragEnd={(result) => {
+          handleDaysDnD(result)
+          setIsDragging(false)
+        }}
+        onDragCancel={() => setIsDragging(false)}
+        onDragStart={() => setIsDragging(true)}
+        onDragUpdate={() => {}}
+      >
+        <div className="w-screen px-4 py-12 sm:px-8">
+          <h1 className="mb-8 text-center text-4xl font-bold">{trip.name}</h1>
 
           <EventDaysDnD
             days={days}
