@@ -16,7 +16,7 @@ import {
   getUserDocument,
 } from '../lib/userService'
 
-export default function TravelCard({ trip }) {
+export default function TravelCard({ trip, onSelect }) {
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
   const [localLikes, setLocalLikes] = useState(trip.likes || 0)
@@ -126,7 +126,7 @@ export default function TravelCard({ trip }) {
 
   return (
     <div
-      onClick={handleCardClick}
+      onClick={onSelect ? onSelect : handleCardClick}
       className="active:scale-98 group relative h-36 w-full cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
     >
       {/* Background image that scales on hover */}

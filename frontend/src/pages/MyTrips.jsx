@@ -58,7 +58,7 @@ const MyTrips = () => {
   }, [currentUser])
 
   const handleSelectTrip = (tripId) => {
-    navigate(`/trip/${tripId}`)
+    navigate(`/tripview/${tripId}`)
   }
 
   const handleCreateSuccess = (newTripData) => {

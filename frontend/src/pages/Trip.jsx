@@ -35,6 +35,107 @@ const Trip = () => {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [userLikedTrips, setUserLikedTrips] = useState([])
+  const [copying, setCopying] = useState(false)
+
+  // Handler for Add this trip
+  const handleAddThisTrip = async () => {
+    if (!trip || !currentUser) return;
+    // If user owns the trip, go to trip details
+    if (trip.userId === currentUser.uid) {
+      navigate(`/trip/${trip.id || tripviewId}`)
+      return;
+    }
+    setCopying(true)
+    try {
+      // Check if user already has a copy
+      const tripsRef = window.firebase && window.firebase.firestore ? window.firebase.firestore().collection('trips') : null;
+      // But we use Firestore v9 modular API:
+      const { collection, getDocs, addDoc, serverTimestamp } = await import('firebase/firestore')
+      let existingCopyId = null
+      const querySnapshot = await getDocs(collection(db, 'trips'))
+      querySnapshot.forEach((doc) => {
+        const data = doc.data()
+        if (
+          data.userId === currentUser.uid &&
+          (data.parent_id === trip.id || data.parent_id === trip.dataName)
+        ) {
+          existingCopyId = doc.id
+        }
+      })
+      if (existingCopyId) {
+        navigate(`/trip/${existingCopyId}`)
+        return
+      }
+      // Prepare new trip data
+      const newTrip = {
+        ...trip,
+        name: trip.name + ' (My Copy)',
+        userId: currentUser.uid,
+        createdAt: serverTimestamp(),
+        likes: 0,
+        likedBy: [],
+        comments: [],
+        Events: Array.isArray(trip.Events)
+          ? JSON.parse(JSON.stringify(trip.Events))
+          : Array.isArray(trip.events)
+            ? JSON.parse(JSON.stringify(trip.events))
+            : [],
+        published: false,
+        parent_id: trip.id || trip.dataName || 'original',
+      }
+      delete newTrip.id
+      delete newTrip.dataName
+      const docRef = await addDoc(collection(db, 'trips'), newTrip)
+      navigate('/mytrips')
+    } catch (e) {
+      alert('Failed to copy trip. Please try again.')
+    } finally {
+      setCopying(false)
+    }
+  }
+
+  // Delete trip handler
+  const handleDeleteTrip = async () => {
+    if (!trip || !currentUser) return;
+    if (!window.confirm('Are you sure you want to delete this trip?')) return;
+    try {
+      const { doc, deleteDoc } = await import('firebase/firestore')
+      await deleteDoc(doc(db, 'trips', trip.id))
+      alert('Trip deleted successfully.')
+      navigate('/mytrips')
+    } catch (e) {
+      alert('Failed to delete trip. Please try again.')
+    }
+  }
+
+  // Edit trip handler
+  const handleEditTrip = () => {
+    navigate(`/trip/${trip.id}/edit`)
+  }
+
+  // Publish trip handler
+  const handlePublishTrip = async () => {
+    if (!trip || !currentUser) return;
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      await updateDoc(doc(db, 'trips', trip.id), { published: true })
+      alert('Trip published!')
+    } catch (e) {
+      alert('Failed to publish trip. Please try again.')
+    }
+  }
+
+  // Unpublish trip handler
+  const handleUnpublishTrip = async () => {
+    if (!trip || !currentUser) return;
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      await updateDoc(doc(db, 'trips', trip.id), { published: false })
+      alert('Trip unpublished!')
+    } catch (e) {
+      alert('Failed to unpublish trip. Please try again.')
+    }
+  }
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -200,6 +301,7 @@ const Trip = () => {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Section with Background Image */}
       <div
         className="relative h-80"
@@ -445,14 +547,53 @@ const Trip = () => {
         )}
       </div>
 
-      {/* Add Trip Button - Fixed at bottom center */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform">
-        <div className="cursor-pointer rounded-lg border-2 border-gray-700 bg-gray-800 px-8 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-900 hover:shadow-xl">
-          Add this trip
-        </div>
-      </div>
+      {/* Action Buttons - Fixed at bottom center */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform flex flex-row gap-4">
+        {trip.userId === currentUser?.uid ? (
+          <React.Fragment>
+            <button
+              className="rounded-full bg-blue-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-blue-700 hover:shadow-xl"
+              onClick={() => navigate(`/trip/${trip.id}`)}
+            >
+              Review
+            </button>
+            <button
+              className="rounded-full bg-red-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-red-700 hover:shadow-xl"
+              onClick={handleDeleteTrip}
+            >
+              Delete
+            </button>
+            {(!trip.parent_id || trip.parent_id === 'original') && (
+              trip.published ? (
+                <button
+                  className="rounded-full bg-red-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-red-700 hover:shadow-xl"
+                  onClick={handleUnpublishTrip}
+                >
+                  Unpublish
+                </button>
+              ) : (
+                <button
+                  className="rounded-full bg-green-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-green-700 hover:shadow-xl"
+                  onClick={handlePublishTrip}
+                >
+                  Publish
+                </button>
+              )
+            )}
+          </React.Fragment>
+        ) : (
+          <button
+            className="rounded-full bg-blue-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-blue-700 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={handleAddThisTrip}
+            disabled={copying}
+          >
+            {copying ? 'Copying...' : 'Copy this trip'}
+          </button>
+        )}
     </div>
-  )
+    </div>
+  );
 }
+
 
 export default Trip
