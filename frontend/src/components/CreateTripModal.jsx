@@ -127,6 +127,8 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         userId: currentUser?.uid || '',
         published: false, // Default to unpublished
         createdAt: serverTimestamp(),
+        published: false,
+        parent_id: 'original',
       }
 
       await addDoc(collection(db, 'trips'), tripData)

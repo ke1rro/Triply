@@ -3,6 +3,7 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
+import TravelModalWithCopy from '../components/TravelModalWithCopy'
 import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
 import { FiSearch, FiNavigation } from 'react-icons/fi'
@@ -18,6 +19,7 @@ const Homepage = () => {
   const fetchTravelData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'trips'))
+
       const trips = querySnapshot.docs
         .map((doc) => {
           const data = doc.data()
@@ -149,7 +151,7 @@ const Homepage = () => {
                   <div className="flex w-full flex-col items-center space-y-6">
                     {filteredTravels.map((travel) => (
                       <div key={travel.id} className="w-full max-w-md">
-                        <TravelCard trip={travel} />
+                        <TravelCard trip={travel} ModalComponent={TravelModalWithCopy} />
                       </div>
                     ))}
                   </div>
