@@ -15,6 +15,7 @@ import TripDetails from './pages/TripDetails'
 import Trip from './pages/Trip'
 import Profile from './pages/Profile'
 import MyTrips from './pages/MyTrips'
+import EventDaysDnDPage from './pages/EventDaysDnDPage'
 import './index.css'
 
 // Make sure the root element is properly targeted
@@ -63,6 +64,14 @@ root.render(
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/eventdays"
+            element={
+              <ProtectedRoute>
+                <EventDaysDnDPage />
               </ProtectedRoute>
             }
           />

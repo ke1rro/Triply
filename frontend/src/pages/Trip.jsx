@@ -181,10 +181,10 @@ const Trip = () => {
       >
         {/* Back Button */}
         <button
-        onClick={() => navigate('/home')}
-        className="absolute left-4 top-4 z-10 text-white hover:text-gray-300 transition-colors duration-200"
+          onClick={() => navigate('/home')}
+          className="absolute left-4 top-4 z-10 text-white transition-colors duration-200 hover:text-gray-300"
         >
-        <FiArrowLeft className="h-6 w-6" />
+          <FiArrowLeft className="h-6 w-6" />
         </button>
 
         {/* Trip Info Overlay */}
@@ -200,8 +200,8 @@ const Trip = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-gray-100 px-6 py-4 mb-6">
-        <div className="flex items-center justify-between w-full">
+      <div className="mb-6 bg-gray-100 px-6 py-4">
+        <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
             <FiClock className="h-6 w-6 text-gray-700" />
             <div className="flex flex-col">
@@ -251,20 +251,20 @@ const Trip = () => {
           <div className="flex gap-8">
             <div
               onClick={() => setActiveTab('details')}
-              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 ${
+              className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all duration-200 ${
                 activeTab === 'details'
-                  ? 'text-white bg-gray-800 border-gray-700'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-gray-300'
+                  ? 'border-gray-700 bg-gray-800 text-white'
+                  : 'border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700'
               }`}
             >
               Details
             </div>
             <div
               onClick={() => setActiveTab('reviews')}
-              className={`px-6 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 ${
+              className={`cursor-pointer rounded-lg border-2 px-6 py-3 font-medium transition-all duration-200 ${
                 activeTab === 'reviews'
-                  ? 'text-white bg-gray-800 border-gray-700'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50 border-gray-300'
+                  ? 'border-gray-700 bg-gray-800 text-white'
+                  : 'border-gray-300 text-gray-500 hover:bg-gray-50 hover:text-gray-700'
               }`}
             >
               Reviews
@@ -292,7 +292,9 @@ const Trip = () => {
 
             {/* Gallery Section */}
             <div>
-              <h2 className="mb-3 text-xl font-semibold text-gray-900">Gallery</h2>
+              <h2 className="mb-3 text-xl font-semibold text-gray-900">
+                Gallery
+              </h2>
               {imageUrl ? (
                 <div className="grid grid-cols-1 gap-4">
                   <img
@@ -313,7 +315,7 @@ const Trip = () => {
               <div className="flex justify-end">
                 <div
                   onClick={() => setShowCommentForm(!showCommentForm)}
-                  className="px-6 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 text-white bg-gray-800 border-gray-700 hover:bg-gray-900"
+                  className="cursor-pointer rounded-lg border-2 border-gray-700 bg-gray-800 px-6 py-3 font-medium text-white transition-all duration-200 hover:bg-gray-900"
                 >
                   {showCommentForm ? 'Cancel' : 'Add Review'}
                 </div>
@@ -322,7 +324,7 @@ const Trip = () => {
 
             {/* Comment Form */}
             {showCommentForm && (
-              <div className="rounded-lg bg-gray-50 border p-4">
+              <div className="rounded-lg border bg-gray-50 p-4">
                 {error && (
                   <div className="mb-3 text-sm text-red-600">{error}</div>
                 )}
@@ -387,7 +389,7 @@ const Trip = () => {
               {localComments.length > 0 ? (
                 localComments.map((comment, index) => (
                   <div key={index}>
-                    <div className="rounded-lg bg-gray-50 border p-4">
+                    <div className="rounded-lg border bg-gray-50 p-4">
                       <div className="mb-2 flex items-start justify-between">
                         <span className="font-medium text-gray-900">
                           {comment.name || 'Anonymous'}
@@ -415,7 +417,7 @@ const Trip = () => {
 
       {/* Add Trip Button - Fixed at bottom center */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform">
-        <div className="px-8 py-3 font-medium transition-all duration-200 rounded-lg cursor-pointer border-2 text-white bg-gray-800 border-gray-700 shadow-lg hover:shadow-xl hover:bg-gray-900">
+        <div className="cursor-pointer rounded-lg border-2 border-gray-700 bg-gray-800 px-8 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-900 hover:shadow-xl">
           Add this trip
         </div>
       </div>
