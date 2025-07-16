@@ -80,7 +80,7 @@ const Trip = () => {
       delete newTrip.id
       delete newTrip.dataName
       const docRef = await addDoc(collection(db, 'trips'), newTrip)
-      navigate(`/trip/${docRef.id}`)
+      navigate('/mytrips')
     } catch (e) {
       alert('Failed to copy trip. Please try again.')
     } finally {
@@ -116,6 +116,18 @@ const Trip = () => {
       alert('Trip published!')
     } catch (e) {
       alert('Failed to publish trip. Please try again.')
+    }
+  }
+
+  // Unpublish trip handler
+  const handleUnpublishTrip = async () => {
+    if (!trip || !currentUser) return;
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore')
+      await updateDoc(doc(db, 'trips', trip.id), { published: false })
+      alert('Trip unpublished!')
+    } catch (e) {
+      alert('Failed to unpublish trip. Please try again.')
     }
   }
 
@@ -520,12 +532,21 @@ const Trip = () => {
               Delete
             </button>
             {(!trip.parent_id || trip.parent_id === 'original') && (
-              <button
-                className="rounded-full bg-green-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-green-700 hover:shadow-xl"
-                onClick={handlePublishTrip}
-              >
-                Publish
-              </button>
+              trip.published ? (
+                <button
+                  className="rounded-full bg-red-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-red-700 hover:shadow-xl"
+                  onClick={handleUnpublishTrip}
+                >
+                  Unpublish
+                </button>
+              ) : (
+                <button
+                  className="rounded-full bg-green-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-green-700 hover:shadow-xl"
+                  onClick={handlePublishTrip}
+                >
+                  Publish
+                </button>
+              )
             )}
           </React.Fragment>
         ) : (
