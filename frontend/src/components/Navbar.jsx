@@ -1,12 +1,9 @@
-import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  FiSearch,
   FiUser,
   FiNavigation,
   FiHome,
   FiPlus,
-  FiHeart,
   FiArrowLeft,
 } from 'react-icons/fi'
 
@@ -28,9 +25,8 @@ const Navbar = ({
   const handleProfileClick = () => {
     navigate('/profile')
   }
-  const handleLikesClick = () => {
-    console.log('Likes clicked')
-    // Add future functionality for liked trips
+  const handleMyTripsClick = () => {
+    navigate('/mytrips')
   }
 
   const handleBackClick = () => {
@@ -75,11 +71,11 @@ const Navbar = ({
                   }`}
                 />
 
-                {/* Likes */}
-                <FiHeart
-                  onClick={handleLikesClick}
+                {/* My Trips */}
+                <FiNavigation
+                  onClick={handleMyTripsClick}
                   className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${
-                    activeTab === 'likes'
+                    activeTab === 'mytrips'
                       ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}

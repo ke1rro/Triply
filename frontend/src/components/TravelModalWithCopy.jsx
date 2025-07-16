@@ -1,7 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { db } from '../lib/firebase'
-import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore'
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+} from 'firebase/firestore'
 import React, { useState } from 'react'
 
 export default function TravelModalWithCopy({ trip, onClose, onCopied }) {
@@ -43,8 +48,8 @@ export default function TravelModalWithCopy({ trip, onClose, onCopied }) {
         Events: Array.isArray(trip.Events)
           ? JSON.parse(JSON.stringify(trip.Events))
           : Array.isArray(trip.events)
-          ? JSON.parse(JSON.stringify(trip.events))
-          : [],
+            ? JSON.parse(JSON.stringify(trip.events))
+            : [],
         published: false,
         parent_id: trip.id || trip.dataName || 'original',
       }
@@ -148,7 +153,11 @@ export default function TravelModalWithCopy({ trip, onClose, onCopied }) {
           onClick={handleSelectTrip}
           disabled={copying}
         >
-          {trip.userId === currentUser?.uid ? 'Open Trip' : copying ? 'Copying...' : 'Select Trip'}
+          {trip.userId === currentUser?.uid
+            ? 'Open Trip'
+            : copying
+              ? 'Copying...'
+              : 'Select Trip'}
         </button>
       </div>
     </div>

@@ -151,7 +151,10 @@ const Homepage = () => {
                   <div className="flex w-full flex-col items-center space-y-6">
                     {filteredTravels.map((travel) => (
                       <div key={travel.id} className="w-full max-w-md">
-                        <TravelCard trip={travel} ModalComponent={TravelModalWithCopy} />
+                        <TravelCard
+                          trip={travel}
+                          ModalComponent={TravelModalWithCopy}
+                        />
                       </div>
                     ))}
                   </div>

@@ -60,14 +60,19 @@ export default function EventAddModal({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30"
+      onClick={onClose}
+    >
       <div
         className="animate-slide-up w-full max-w-md rounded-t-2xl bg-white p-6 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit}>
           <h2 className="mb-4 text-center text-xl font-bold">
-            {mode === 'edit' ? `Edit Event (Day ${day})` : `Add Event (Day ${day})`}
+            {mode === 'edit'
+              ? `Edit Event (Day ${day})`
+              : `Add Event (Day ${day})`}
           </h2>
           <div className="mb-3">
             <label className="mb-1 block text-sm font-medium">Event Name</label>
@@ -90,7 +95,9 @@ export default function EventAddModal({
           </div>
 
           <div className="mb-3">
-            <label className="mb-1 block text-sm font-medium">Pick Location</label>
+            <label className="mb-1 block text-sm font-medium">
+              Pick Location
+            </label>
             <MapPicker
               onSelect={(place) => {
                 setSelectedPlace(place)
@@ -101,7 +108,9 @@ export default function EventAddModal({
           </div>
 
           <div className="mb-3">
-            <label className="mb-1 block text-sm font-medium">Location Name (Optional)</label>
+            <label className="mb-1 block text-sm font-medium">
+              Location Name (Optional)
+            </label>
             <input
               className="w-full rounded border px-3 py-2"
               value={location}
