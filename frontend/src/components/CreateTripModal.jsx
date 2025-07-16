@@ -159,13 +159,13 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-screen max-w-4xl overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
+        className="relative max-h-[90vh] w-screen max-w-4xl overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="float-right text-xl font-bold text-gray-300 hover:text-white"
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-600/50 text-xl font-bold text-gray-300 transition-all duration-200 hover:bg-gray-600/70 hover:text-white"
         >
           ×
         </button>
