@@ -10,7 +10,7 @@ export default function TravelModal({ trip, onClose }) {
   const [showCommentForm, setShowCommentForm] = useState(false)
   const [commentData, setCommentData] = useState({
     body: '',
-    rating: 5
+    rating: 5,
   })
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -40,7 +40,7 @@ export default function TravelModal({ trip, onClose }) {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!commentData.body.trim()) {
       setError('Comment cannot be empty')
       return
@@ -55,21 +55,20 @@ export default function TravelModal({ trip, onClose }) {
         body: commentData.body.trim(),
         rating: commentData.rating,
         name: currentUser?.displayName || currentUser?.email || 'Anonymous',
-        createdAt: new Date()
+        createdAt: new Date(),
       }
 
       // Update Firebase
       await updateDoc(tripRef, {
-        comments: arrayUnion(newComment)
+        comments: arrayUnion(newComment),
       })
 
       // Update local state immediately to show the comment
-      setLocalComments(prev => [...prev, newComment])
+      setLocalComments((prev) => [...prev, newComment])
 
       // Reset form and hide it
       setCommentData({ body: '', rating: 5 })
       setShowCommentForm(false)
-      
     } catch (error) {
       console.error('Error adding comment:', error)
       setError('Failed to add comment. Please try again.')
@@ -138,12 +137,12 @@ export default function TravelModal({ trip, onClose }) {
 
         {/* Comments */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <h4 className="font-medium text-blue-300">Comments:</h4>
             {currentUser && (
               <button
                 onClick={() => setShowCommentForm(!showCommentForm)}
-                className="text-xs bg-blue-600/60 hover:bg-blue-600/80 px-3 py-1 rounded-md text-white transition-all duration-200"
+                className="rounded-md bg-blue-600/60 px-3 py-1 text-xs text-white transition-all duration-200 hover:bg-blue-600/80"
               >
                 {showCommentForm ? 'Cancel' : 'Add Comment'}
               </button>
@@ -152,14 +151,14 @@ export default function TravelModal({ trip, onClose }) {
 
           {/* Comment Form */}
           {showCommentForm && (
-            <div className="mb-4 p-4 bg-white/5 rounded-lg border border-blue-400/30">
+            <div className="mb-4 rounded-lg border border-blue-400/30 bg-white/5 p-4">
               {error && (
-                <div className="mb-3 text-red-300 text-sm">{error}</div>
+                <div className="mb-3 text-sm text-red-300">{error}</div>
               )}
               <form onSubmit={handleCommentSubmit} className="space-y-3">
                 {/* Rating Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-blue-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-blue-300">
                     Rating:
                   </label>
                   <div className="flex gap-1">
@@ -167,10 +166,12 @@ export default function TravelModal({ trip, onClose }) {
                       <button
                         key={star}
                         type="button"
-                        onClick={() => setCommentData(prev => ({ ...prev, rating: star }))}
+                        onClick={() =>
+                          setCommentData((prev) => ({ ...prev, rating: star }))
+                        }
                         className={`text-xl transition-colors ${
-                          star <= commentData.rating 
-                            ? 'text-yellow-400' 
+                          star <= commentData.rating
+                            ? 'text-yellow-400'
                             : 'text-gray-500'
                         } hover:text-yellow-300`}
                       >
@@ -182,15 +183,20 @@ export default function TravelModal({ trip, onClose }) {
 
                 {/* Comment Body */}
                 <div>
-                  <label className="block text-sm font-medium text-blue-300 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-blue-300">
                     Comment:
                   </label>
                   <textarea
                     value={commentData.body}
-                    onChange={(e) => setCommentData(prev => ({ ...prev, body: e.target.value }))}
+                    onChange={(e) =>
+                      setCommentData((prev) => ({
+                        ...prev,
+                        body: e.target.value,
+                      }))
+                    }
                     placeholder="Share your thoughts about this trip..."
                     rows={3}
-                    className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-3 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 resize-none text-sm"
+                    className="w-full resize-none rounded-lg border border-gray-300/30 bg-white/10 px-3 py-2 text-sm text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
                     required
                   />
                 </div>
@@ -199,7 +205,7 @@ export default function TravelModal({ trip, onClose }) {
                 <button
                   type="submit"
                   disabled={submitting || !commentData.body.trim()}
-                  className="w-full rounded-lg bg-blue-600/80 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg bg-blue-600/80 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? 'Posting...' : 'Post Comment'}
                 </button>
@@ -228,7 +234,9 @@ export default function TravelModal({ trip, onClose }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 italic">No comments yet. Be the first to share your thoughts!</p>
+            <p className="text-sm italic text-gray-400">
+              No comments yet. Be the first to share your thoughts!
+            </p>
           )}
         </div>
 

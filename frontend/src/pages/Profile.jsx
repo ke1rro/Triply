@@ -10,9 +10,9 @@ import {
   FiSettings,
   FiLogOut,
   FiUser,
-  FiArrowLeft,
 } from 'react-icons/fi'
 import CreateTripModal from '../components/CreateTripModal'
+import Navbar from '../components/Navbar'
 
 const Profile = () => {
   const { currentUser } = useAuth()
@@ -32,11 +32,7 @@ const Profile = () => {
     }
   }
 
-  const handleBack = () => {
-    navigate('/home')
-  }
-
-  // Mock user data - in a real app this would come from your database
+  // Mock user data
   const userStats = {
     tripsCompleted: 12,
     likedTrips: 8,
@@ -76,34 +72,45 @@ const Profile = () => {
   ]
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4">
-      {/* Background with same style as login/signup */}
+    <div className="fixed h-screen w-screen overflow-hidden bg-gray-900">
+      {/* Background */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
         }}
       >
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-transparent to-green-900/30"></div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md">
-        {/* Header with back button */}
-        <div className="mb-6 flex items-center justify-between">
-          <FiArrowLeft
-            className="h-8 w-8 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
-            onClick={handleBack}
-          />
-          <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-            Profile
-          </h1>
-          <div className="h-8 w-8"></div> {/* Spacer for centering */}
+      {/* Navbar */}
+      <Navbar
+        showBottomNav
+        activeTab="profile"
+        onAddClick={() => setShowCreateModal(true)}
+      />
+
+      {/* Header - Fixed at top */}
+      <div className="scale-z-100 fixed left-0 right-0 top-0 px-4 py-6 backdrop-blur-sm sm:px-6 md:px-8">
+        <div className="flex items-center justify-center">
+          <div className="flex items-center gap-4">
+            <div className="text-3xl text-white">
+              <FiUser className="h-8 w-8" />
+            </div>
+            <h1 className="text-3xl font-bold text-white drop-shadow-md">
+              Profile
+            </h1>
+          </div>
         </div>
-        <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-teal-400">
+      </div>
+
+      {/* Content - Fixed in center, positioned lower to add space from title */}
+      <div className="top-85 fixed left-1/2 z-10 w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform px-4">
+        <div className="rounded-2xl bg-black/70 p-5 shadow-2xl backdrop-blur-md">
+          {/* Avatar and info */}
+          <div className="mb-4 text-center">
+            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-teal-400">
               {currentUser?.photoURL ? (
                 <img
                   src={currentUser.photoURL}
@@ -115,33 +122,35 @@ const Profile = () => {
               )}
             </div>
             {currentUser?.displayName && (
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-lg font-semibold text-white">
                 {currentUser.displayName}
               </h2>
             )}
             <p
-              className={`${currentUser?.displayName ? 'text-sm' : 'text-lg font-semibold'} text-gray-300`}
+              className={`${
+                currentUser?.displayName ? 'text-sm' : 'text-lg font-semibold'
+              } text-gray-300`}
             >
               {currentUser?.email || 'Travel Enthusiast'}
             </p>
-            <div className="mt-3 text-xs text-gray-400">
+            <div className="mt-2 text-xs text-gray-400">
               {userStats.totalDistance.toLocaleString()} km traveled
             </div>
           </div>
 
-          {/* Profile Tiles Grid */}
-          <div className="mb-6 grid grid-cols-2 gap-4">
+          {/* Tiles - Fixed grid */}
+          <div className="mb-4 grid grid-cols-2 gap-2">
             {profileTiles.map((tile, index) => (
               <button
                 key={index}
                 onClick={tile.onClick}
-                className="group relative overflow-hidden rounded-xl bg-white/10 p-4 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/20 active:scale-95"
+                className="group relative overflow-hidden rounded-xl bg-white/10 p-3 backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 active:bg-white/15"
               >
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${tile.color} opacity-0 transition-opacity duration-300 group-hover:opacity-20`}
                 ></div>
-                <div className="relative flex flex-col items-start justify-start gap-2 text-left">
-                  <div className="mb-2 text-white">{tile.icon}</div>
+                <div className="relative flex flex-col items-start justify-start gap-1 text-left">
+                  <div className="mb-1 text-white">{tile.icon}</div>
                   <h3 className="text-sm font-medium text-white">
                     {tile.title}
                   </h3>
@@ -151,11 +160,11 @@ const Profile = () => {
             ))}
           </div>
 
-          {/* Settings and Logout Buttons */}
-          <div className="space-y-3">
+          {/* Buttons - Fixed position */}
+          <div className="space-y-2">
             <button
               onClick={() => console.log('Settings clicked')}
-              className="flex w-full items-center justify-center gap-3 rounded-xl bg-white/10 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="flex w-full items-center justify-center gap-3 rounded-xl bg-white/10 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-gray-400"
             >
               <FiSettings className="h-5 w-5" />
               Settings
@@ -164,36 +173,15 @@ const Profile = () => {
             <button
               onClick={handleLogout}
               disabled={loading}
-              className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-300 ease-in-out hover:bg-red-700/80 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600/80 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
             >
               <FiLogOut className="h-5 w-5" />
               {loading ? 'Signing out...' : 'Sign Out'}
             </button>
           </div>
-
-          {/* Footer Stats */}
-          <div className="mt-6 grid grid-cols-3 gap-4 rounded-xl bg-white/5 p-4">
-            <div className="text-center">
-              <div className="text-lg font-bold text-white">
-                {userStats.tripsCompleted}
-              </div>
-              <div className="text-xs text-gray-400">Trips</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-white">
-                {userStats.likedTrips}
-              </div>
-              <div className="text-xs text-gray-400">Likes</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-white">
-                {userStats.activeSessions}
-              </div>
-              <div className="text-xs text-gray-400">Active</div>
-            </div>
-          </div>
         </div>
       </div>
+
       {showCreateModal && (
         <CreateTripModal onClose={() => setShowCreateModal(false)} />
       )}
