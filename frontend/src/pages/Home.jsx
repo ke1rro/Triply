@@ -110,7 +110,7 @@ const Homepage = () => {
     <div className="relative flex min-h-screen flex-col">
       {/* Background image with overlay - full screen */}
       <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 h-lvh bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
         }}
@@ -153,8 +153,8 @@ const Homepage = () => {
         </div>
 
         {/* Travel Cards - Scrollable Area */}
-        <div className="flex-1 overflow-hidden pb-24">
-          <div className="h-full space-y-4 overflow-y-auto">
+        <div className="flex-1 pb-32">
+          <div className="h-full space-y-4">
             {loading ? (
               <div className="py-8 text-center text-gray-300">
                 Loading trips...
@@ -183,7 +183,7 @@ const Homepage = () => {
       </div>
 
       {/* Bottom Navigation Bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20">
+      <div className="fixed bottom-0 left-0 right-0 z-20">
         <div className="border-t border-white/10 bg-black/80 backdrop-blur-lg">
           <div className="safe-area-bottom px-4 py-4">
             <div className="flex items-center justify-around">

@@ -138,7 +138,7 @@ const Profile = () => {
                 <div
                   className={`absolute inset-0 bg-gradient-to-r ${tile.color} opacity-0 transition-opacity duration-300 group-hover:opacity-20`}
                 ></div>
-                <div className="relative">
+                <div className="relative flex flex-col items-start justify-start gap-2 text-left">
                   <div className="mb-2 text-white">{tile.icon}</div>
                   <h3 className="text-sm font-medium text-white">
                     {tile.title}
