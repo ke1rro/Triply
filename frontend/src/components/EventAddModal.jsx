@@ -121,27 +121,6 @@ export default function EventAddModal({
             />
           </div>
 
-          <div className="mb-3">
-            <label className="mb-1 block text-sm font-medium">
-              Location Name (Optional)
-            </label>
-            <input
-              className="w-full rounded border px-3 py-2"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="e.g., Central Park"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="mb-1 block text-sm font-medium">Notes</label>
-            <textarea
-              className="w-full rounded border px-3 py-2"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Optional"
-            />
-          </div>
-
           <div className="mt-6 flex gap-3">
             <button
               type="button"

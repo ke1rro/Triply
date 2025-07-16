@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import MapPicker from './MapPicker'
 
 export default function EditTripModal({ trip, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -13,10 +14,31 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedLocation, setSelectedLocation] = useState(null)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleLocationSelect = (place) => {
+    setSelectedLocation(place)
+    if (place) {
+      // Add the selected place to the locations
+      const locationName = place.name
+      const currentLocations = formData.locations.trim()
+        ? formData.locations.split(',').map((l) => l.trim())
+        : []
+
+      // Only add if it's not already in the list
+      if (!currentLocations.includes(locationName)) {
+        const newLocations = [...currentLocations, locationName]
+        setFormData((prev) => ({
+          ...prev,
+          locations: newLocations.join(', '),
+        }))
+      }
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -40,10 +62,37 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
     }
     setLoading(true)
     try {
+      // Create the locations array with proper coordinates if we have them from the map selection
+      const locationsWithCoordinates = locationArray.map((name) => {
+        // If this is our selected location and it has coordinates, use those
+        if (selectedLocation && selectedLocation.name.includes(name)) {
+          return {
+            name,
+            location: [selectedLocation.latitude, selectedLocation.longitude],
+            notes: selectedLocation.notes || '',
+          }
+        }
+        // For existing locations, preserve their coordinates if available
+        const existingLocation = trip.Locations?.find((l) => l.name === name)
+        if (
+          existingLocation &&
+          existingLocation.location &&
+          existingLocation.location.length === 2
+        ) {
+          return {
+            name,
+            location: existingLocation.location,
+            notes: existingLocation.notes || '',
+          }
+        }
+        // Default to [0,0] if no coordinates available
+        return { name, location: [0, 0], notes: '' }
+      })
+
       await updateDoc(doc(db, 'trips', trip.id), {
         name: formData.title.trim(),
         description: formData.description.trim(),
-        Locations: locationArray.map((name) => ({ name, location: [0, 0] })),
+        Locations: locationsWithCoordinates,
         days: parseInt(formData.days) || 0,
       })
       if (onSuccess) onSuccess()
@@ -79,22 +128,36 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
             value={formData.title}
             onChange={handleInputChange}
             placeholder="Title"
-            className="w-full rounded-lg p-3"
+            className="w-full rounded-lg p-3 text-black"
           />
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-white">
+              Add location by clicking on the map
+            </label>
+            <MapPicker
+              onSelect={handleLocationSelect}
+              selectedPlace={selectedLocation}
+            />
+          </div>
+
           <input
             name="locations"
             value={formData.locations}
             onChange={handleInputChange}
             placeholder="Locations (comma separated)"
-            className="w-full rounded-lg p-3"
+            className="w-full rounded-lg p-3 text-black"
           />
+
           <textarea
             name="description"
             value={formData.description}
             onChange={handleInputChange}
             placeholder="Description"
-            className="w-full rounded-lg p-3"
+            className="w-full rounded-lg p-3 text-black"
+            rows={4}
           />
+
           <input
             name="days"
             type="number"
@@ -102,12 +165,14 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
             value={formData.days}
             onChange={handleInputChange}
             placeholder="Days"
-            className="w-full rounded-lg p-3"
+            className="w-full rounded-lg p-3 text-black"
           />
+
           {error && <div className="text-red-400">{error}</div>}
+
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white"
+            className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white hover:bg-blue-700/80"
             disabled={loading}
           >
             {loading ? 'Saving...' : 'Save Changes'}

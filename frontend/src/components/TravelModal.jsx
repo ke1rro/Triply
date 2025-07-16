@@ -135,7 +135,8 @@ export default function TravelModal({ trip, onClose }) {
           <div>
             <span className="font-medium text-blue-300">Reviews:</span>
             <p className="text-white">
-              {trip.comments?.length || 0} review{(trip.comments?.length || 0) !== 1 ? 's' : ''}
+              {trip.comments?.length || 0} review
+              {(trip.comments?.length || 0) !== 1 ? 's' : ''}
             </p>
           </div>
         </div>
@@ -295,14 +296,19 @@ export default function TravelModal({ trip, onClose }) {
                       id: trip.id,
                       parent_id: trip.parent_id,
                       published: trip.published,
-                      userId: trip.userId
+                      userId: trip.userId,
                     })
                     try {
-                      await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
+                      await updateDoc(doc(db, 'trips', trip.id), {
+                        published: !trip.published,
+                      })
                       onClose()
                       window.location.reload()
                     } catch (e) {
-                      alert('Failed to update publish state. ' + (e && e.message ? e.message : ''))
+                      alert(
+                        'Failed to update publish state. ' +
+                          (e && e.message ? e.message : '')
+                      )
                       console.error('[Publish Error]', e)
                     }
                   }}
@@ -315,11 +321,13 @@ export default function TravelModal({ trip, onClose }) {
           )}
         </div>
         {showEdit && (
-          <EditTripModal trip={trip} onClose={() => setShowEdit(false)} onSuccess={onClose} />
+          <EditTripModal
+            trip={trip}
+            onClose={() => setShowEdit(false)}
+            onSuccess={onClose}
+          />
         )}
       </div>
     </div>
-  )
-}
   )
 }
