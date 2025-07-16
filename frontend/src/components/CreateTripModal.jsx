@@ -122,10 +122,13 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         comments: [],
         days: parseInt(formData.days) || 0,
         likes: 0,
+        likedBy: [], // Initialize empty array for user IDs who liked this trip
         fileName: fileName,
         userId: currentUser?.uid || '',
         published: false, // Default to unpublished
         createdAt: serverTimestamp(),
+        published: false,
+        parent_id: 'original',
       }
 
       await addDoc(collection(db, 'trips'), tripData)
