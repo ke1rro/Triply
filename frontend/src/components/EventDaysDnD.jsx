@@ -1,17 +1,33 @@
 import React, { useState } from 'react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
-export default function EventDaysDnD({ days, eventsByDay, onAddEvent }) {
+export default function EventDaysDnD({
+  days,
+  eventsByDay,
+  onAddEvent,
+  onEditEvent,
+}) {
+  const isSingleDay = days.length === 1
   return (
     <div className="w-full bg-gray-50 p-2 sm:p-6">
-      <div className="flex w-full flex-row flex-wrap gap-6">
+      <div
+        className={
+          isSingleDay
+            ? 'flex w-full justify-center'
+            : 'flex w-full flex-row flex-wrap gap-6'
+        }
+      >
         {days.map((day, dayIdx) => (
           <Droppable droppableId={`day-${day}`} key={day}>
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className={`min-h-[120px] min-w-[250px] max-w-full flex-1 rounded-xl bg-white p-4 shadow transition ${snapshot.isDraggingOver ? 'ring-2 ring-indigo-400' : ''}`}
+                className={
+                  isSingleDay
+                    ? `mx-auto min-h-[120px] w-full max-w-2xl rounded-xl bg-white p-4 shadow transition ${snapshot.isDraggingOver ? 'ring-2 ring-indigo-400' : ''}`
+                    : `min-h-[120px] min-w-[250px] max-w-full flex-1 rounded-xl bg-white p-4 shadow transition ${snapshot.isDraggingOver ? 'ring-2 ring-indigo-400' : ''}`
+                }
               >
                 <div className="mb-2 flex items-center justify-between">
                   <div className="text-lg font-bold">Day {day}</div>
@@ -23,34 +39,39 @@ export default function EventDaysDnD({ days, eventsByDay, onAddEvent }) {
                     + Add Event
                   </button>
                 </div>
-                {eventsByDay[day] && eventsByDay[day].length > 0 ? (
-                  eventsByDay[day].map((event, idx) => (
-                    <Draggable
-                      key={event.id || idx}
-                      draggableId={String(event.id || `${day}-${idx}`)}
-                      index={idx}
-                    >
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={`mb-3 flex items-center justify-between rounded bg-indigo-50 p-3 shadow-sm ${snapshot.isDragging ? 'ring-2 ring-indigo-300' : ''}`}
-                        >
-                          <div>
-                            <div className="font-semibold">{event.name}</div>
-                            <div className="text-xs text-gray-500">
-                              {event.time}
+                <>
+                  {eventsByDay[day] && eventsByDay[day].length > 0 ? (
+                    eventsByDay[day].map((event, idx) => (
+                      <Draggable
+                        key={event.id || idx}
+                        draggableId={String(event.id || `${day}-${idx}`)}
+                        index={idx}
+                      >
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={`mb-3 flex items-center justify-between rounded bg-indigo-50 p-3 shadow-sm ${snapshot.isDragging ? 'ring-2 ring-indigo-300' : ''}`}
+                            onClick={() => onEditEvent && onEditEvent(day, idx)}
+                          >
+                            <div>
+                              <div className="font-semibold">{event.name}</div>
+                              <div className="text-xs text-gray-500">
+                                {event.time}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))
-                ) : (
-                  <div className="text-sm italic text-gray-400">No events</div>
-                )}
-                {provided.placeholder}
+                        )}
+                      </Draggable>
+                    ))
+                  ) : (
+                    <div className="text-sm italic text-gray-400">
+                      No events
+                    </div>
+                  )}
+                  {provided.placeholder}
+                </>
               </div>
             )}
           </Droppable>
