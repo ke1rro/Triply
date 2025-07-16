@@ -1,11 +1,31 @@
 import { useState } from 'react'
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
+import {
+  doc,
+  updateDoc,
+  increment,
+  arrayUnion,
+  arrayRemove,
+} from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import { useAuth } from '../context/AuthContext'
 import TravelModal from './TravelModal.jsx'
 
 export default function TravelCard({ trip, ModalComponent = TravelModal }) {
   const [showModal, setShowModal] = useState(false)
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
+  const [localLikes, setLocalLikes] = useState(trip.likes || 0)
+  const [isLiked, setIsLiked] = useState(false)
+  const [isLiking, setIsLiking] = useState(false)
+  const { currentUser } = useAuth()
+
+  // Check if user has already liked this trip
+  useState(() => {
+    if (currentUser && trip.likedBy) {
+      setIsLiked(trip.likedBy.includes(currentUser.uid))
+    }
+  }, [currentUser, trip.likedBy])
 
   // Load image from Firebase Storage when component mounts
   useState(() => {
@@ -28,6 +48,40 @@ export default function TravelCard({ trip, ModalComponent = TravelModal }) {
     loadImage()
   }, [trip.fileName])
 
+  const handleLike = async (e) => {
+    e.stopPropagation() // Prevent opening modal when clicking heart
+
+    if (!currentUser || isLiking) return
+
+    setIsLiking(true)
+
+    try {
+      const tripRef = doc(db, 'trips', trip.id)
+
+      if (isLiked) {
+        // Unlike: decrease likes and remove user from likedBy array
+        await updateDoc(tripRef, {
+          likes: increment(-1),
+          likedBy: arrayRemove(currentUser.uid),
+        })
+        setLocalLikes((prev) => prev - 1)
+        setIsLiked(false)
+      } else {
+        // Like: increase likes and add user to likedBy array
+        await updateDoc(tripRef, {
+          likes: increment(1),
+          likedBy: arrayUnion(currentUser.uid),
+        })
+        setLocalLikes((prev) => prev + 1)
+        setIsLiked(true)
+      }
+    } catch (error) {
+      console.error('Error updating likes:', error)
+    } finally {
+      setIsLiking(false)
+    }
+  }
+
   // Format locations display
   const formatLocations = (locations) => {
     if (!locations || locations.length === 0) return 'No locations'
@@ -37,12 +91,6 @@ export default function TravelCard({ trip, ModalComponent = TravelModal }) {
     } else {
       return locations.slice(0, 5).join(', ') + ' ...'
     }
-  }
-
-  // Format rating display
-  const formatRating = (rating) => {
-    if (rating === 0) return 'No ratings'
-    return `★ ${rating.toFixed(1)}`
   }
 
   const backgroundImage =
@@ -85,15 +133,30 @@ export default function TravelCard({ trip, ModalComponent = TravelModal }) {
             </p>
           </div>
 
-          {/* Duration and Rating - bottom right */}
+          {/* Duration and Likes - bottom */}
           <div className="flex items-end justify-between">
             <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
               <span>
                 {trip.days} day{trip.days !== 1 ? 's' : ''}
               </span>
             </div>
-            <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
-              <span>{formatRating(trip.averageRating)}</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleLike}
+                disabled={!currentUser || isLiking}
+                className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md transition-all duration-200 ${
+                  currentUser
+                    ? 'hover:bg-black/40 active:scale-95'
+                    : 'cursor-default'
+                } ${isLiked ? 'text-red-400' : 'text-white'}`}
+              >
+                <span
+                  className={`transition-all duration-200 ${isLiking ? 'scale-110' : ''}`}
+                >
+                  {isLiked ? '❤️' : '🤍'}
+                </span>
+                <span>{localLikes}</span>
+              </button>
             </div>
           </div>
         </div>
