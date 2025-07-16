@@ -111,13 +111,11 @@ const Homepage = () => {
       <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-8 sm:px-6 md:px-8">
         {/* Header - No black box */}
         <div className="mb-8 flex items-center justify-center">
-          <div className="flex items-center gap-4">
-            <div className="text-4xl text-white">
-              <FiNavigation className="h-10 w-10" />
-            </div>
-            <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+          <div className="flex flex-col items-center">
+            <h1 className="text-5xl font-bold text-blue-400 drop-shadow-lg">
               Triply
             </h1>
+            <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
           </div>
         </div>
 
