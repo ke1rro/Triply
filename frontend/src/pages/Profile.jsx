@@ -12,11 +12,13 @@ import {
   FiUser,
   FiArrowLeft,
 } from 'react-icons/fi'
+import CreateTripModal from '../components/CreateTripModal'
 
 const Profile = () => {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -69,7 +71,7 @@ const Profile = () => {
       subtitle: 'Plan your next adventure',
       icon: <FiPlus className="h-6 w-6" />,
       color: 'from-green-400 to-green-600',
-      onClick: () => console.log('Create Trip clicked'),
+      onClick: () => setShowCreateModal(true),
     },
   ]
 
@@ -192,6 +194,9 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      {showCreateModal && (
+        <CreateTripModal onClose={() => setShowCreateModal(false)} />
+      )}
     </div>
   )
 }
