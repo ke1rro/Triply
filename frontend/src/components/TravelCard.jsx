@@ -33,9 +33,9 @@ export default function TravelCard({ trip }) {
     if (!locations || locations.length === 0) return 'No locations'
 
     if (locations.length <= 5) {
-      return locations.join(' → ')
+      return locations.join(', ')
     } else {
-      return locations.slice(0, 5).join(' → ') + ' ...'
+      return locations.slice(0, 5).join(', ') + ' ...'
     }
   }
 
@@ -54,7 +54,7 @@ export default function TravelCard({ trip }) {
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="relative h-32 w-full cursor-pointer overflow-hidden rounded-lg shadow-md transition-all duration-300 hover:shadow-lg group"
+        className="active:scale-98 group relative h-36 w-full cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
       >
         {/* Background image that scales on hover */}
         <div
@@ -67,30 +67,34 @@ export default function TravelCard({ trip }) {
         />
 
         {/* Overlay for better text readability */}
-        <div className="absolute inset-0 rounded-lg bg-black/30 transition-all duration-300 hover:bg-black/40" />
+        <div className="absolute inset-0 rounded-xl bg-black/30 transition-all duration-300 hover:bg-black/40" />
 
         {/* Content */}
-        <div className="relative flex h-full flex-col justify-between p-3 text-white transform transition-transform duration-300 group-hover:scale-105">
+        <div className="relative flex h-full flex-col justify-between p-4 text-white">
           {/* Title - top left */}
           <div className="flex-shrink-0">
-            <h2 className="line-clamp-1 text-lg font-bold drop-shadow-lg">
+            <h2 className="line-clamp-1 text-xl font-bold drop-shadow-lg">
               {trip.name}
             </h2>
           </div>
 
           {/* Locations - middle */}
           <div className="flex flex-1 items-center">
-            <p className="line-clamp-2 text-sm leading-tight drop-shadow-md">
+            <p className="line-clamp-2 text-base leading-tight drop-shadow-md">
               {formatLocations(trip.locations)}
             </p>
           </div>
 
           {/* Duration and Rating - bottom right */}
-          <div className="flex items-end justify-end gap-3 text-sm font-medium drop-shadow-md">
-            <span>
-              {trip.days} day{trip.days !== 1 ? 's' : ''}
-            </span>
-            <span>{formatRating(trip.averageRating)}</span>
+          <div className="flex items-end justify-between">
+            <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
+              <span>
+                {trip.days} day{trip.days !== 1 ? 's' : ''}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
+              <span>{formatRating(trip.averageRating)}</span>
+            </div>
           </div>
         </div>
       </div>
