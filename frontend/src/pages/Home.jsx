@@ -107,10 +107,10 @@ const Homepage = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden">
+    <div className="relative flex min-h-screen flex-col">
       {/* Background image with overlay - full screen */}
       <div
-        className="inset-0 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')`,
         }}
@@ -122,41 +122,38 @@ const Homepage = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
-        {/* Main Card */}
-        <div className="w-full rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="text-3xl text-white">
-                <FiNavigation className="h-8 w-8" />
-              </div>
-              <h1 className="overflow-hidden text-ellipsis whitespace-nowrap text-3xl font-bold text-white drop-shadow-lg">
-                Triply
-              </h1>
+      <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-8 sm:px-6 md:px-8">
+        {/* Header - No black box */}
+        <div className="mb-8 flex items-center justify-center">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl text-white">
+              <FiNavigation className="h-10 w-10" />
             </div>
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg">
+              Triply
+            </h1>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6 px-6">
-          <div className="flex items-center gap-2">
+        <div className="mb-8">
+          <div className="flex items-center gap-3">
             <input
               type="text"
               placeholder="Search trips..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full flex-1 rounded-lg border border-gray-300/30 bg-white/10 px-4 py-3 text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full flex-1 rounded-xl border border-gray-300/30 bg-white/10 px-5 py-4 text-lg text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <FiSearch
-              className="h-6 w-6 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
+              className="h-7 w-7 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
               onClick={handleFilterClick}
             />
           </div>
         </div>
 
         {/* Travel Cards - Scrollable Area */}
-        <div className="flex-1 overflow-hidden px-6 pb-24">
+        <div className="flex-1 overflow-hidden pb-24">
           <div className="h-full space-y-4 overflow-y-auto">
             {loading ? (
               <div className="py-8 text-center text-gray-300">
@@ -165,9 +162,9 @@ const Homepage = () => {
             ) : (
               <>
                 {filteredTravels.length > 0 ? (
-                  <div className="flex w-full flex-col items-center space-y-4">
+                  <div className="flex w-full flex-col items-center space-y-6">
                     {filteredTravels.map((travel) => (
-                      <div key={travel.id} className="w-full max-w-sm">
+                      <div key={travel.id} className="w-full max-w-md">
                         <TravelCard trip={travel} />
                       </div>
                     ))}
@@ -188,40 +185,40 @@ const Homepage = () => {
       {/* Bottom Navigation Bar */}
       <div className="absolute bottom-0 left-0 right-0 z-20">
         <div className="border-t border-white/10 bg-black/80 backdrop-blur-lg">
-          <div className="safe-area-bottom px-4 py-3">
+          <div className="safe-area-bottom px-4 py-4">
             <div className="flex items-center justify-around">
               {/* Home */}
               <button
                 onClick={handleHomeClick}
-                className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-all duration-300 ${
+                className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
                   activeTab === 'home'
                     ? 'bg-blue-600/30 text-blue-400'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <FiHome className="h-6 w-6" />
+                <FiHome className="h-7 w-7" />
                 <span className="text-xs font-medium">Home</span>
               </button>
 
               {/* Likes */}
               <button
                 onClick={handleLikesClick}
-                className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-all duration-300 ${
+                className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
                   activeTab === 'likes'
                     ? 'bg-rose-600/30 text-rose-400'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <FiHeart className="h-6 w-6" />
+                <FiHeart className="h-7 w-7" />
                 <span className="text-xs font-medium">Saved</span>
               </button>
 
               {/* Add Trip */}
               <button
                 onClick={handleAddClick}
-                className="flex flex-col items-center gap-1 rounded-lg bg-blue-600/20 px-4 py-2 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
+                className="flex w-16 flex-col items-center gap-1 rounded-lg bg-blue-600/20 px-3 py-3 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600">
                   <FiPlus className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xs font-medium">Create</span>
@@ -230,13 +227,13 @@ const Homepage = () => {
               {/* Profile */}
               <button
                 onClick={handleProfileClick}
-                className={`flex flex-col items-center gap-1 rounded-lg px-4 py-2 transition-all duration-300 ${
+                className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
                   activeTab === 'profile'
                     ? 'bg-purple-600/30 text-purple-400'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <FiUser className="h-6 w-6" />
+                <FiUser className="h-7 w-7" />
                 <span className="text-xs font-medium">Profile</span>
               </button>
             </div>
