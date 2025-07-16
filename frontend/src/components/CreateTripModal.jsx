@@ -124,6 +124,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         likes: 0,
         fileName: fileName,
         userId: currentUser?.uid || '',
+        published: false, // Default to unpublished
         createdAt: serverTimestamp(),
       }
 

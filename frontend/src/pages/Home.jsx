@@ -4,14 +4,8 @@ import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import TravelCard from '../components/TravelCard'
 import CreateTripModal from '../components/CreateTripModal'
-import {
-  FiSearch,
-  FiUser,
-  FiNavigation,
-  FiHome,
-  FiPlus,
-  FiHeart,
-} from 'react-icons/fi'
+import Navbar from '../components/Navbar'
+import { FiSearch, FiNavigation } from 'react-icons/fi'
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
@@ -24,39 +18,42 @@ const Homepage = () => {
   const fetchTravelData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'trips'))
-      const trips = querySnapshot.docs.map((doc) => {
-        const data = doc.data()
+      const trips = querySnapshot.docs
+        .map((doc) => {
+          const data = doc.data()
 
-        // Calculate average rating from comments
-        const averageRating =
-          data.comments && data.comments.length > 0
-            ? data.comments.reduce(
-                (sum, comment) => sum + (comment.rating || 0),
-                0
-              ) / data.comments.length
-            : 0
+          // Calculate average rating from comments
+          const averageRating =
+            data.comments && data.comments.length > 0
+              ? data.comments.reduce(
+                  (sum, comment) => sum + (comment.rating || 0),
+                  0
+                ) / data.comments.length
+              : 0
 
-        // Get location names (limit to 5)
-        const locationNames = data.Locations
-          ? data.Locations.map((loc) => loc.name).slice(0, 5)
-          : []
+          // Get location names (limit to 5)
+          const locationNames = data.Locations
+            ? data.Locations.map((loc) => loc.name).slice(0, 5)
+            : []
 
-        return {
-          id: doc.id,
-          dataName: doc.id, // Use document ID as data name
-          name: data.name || 'Untitled Trip',
-          description: data.description || '',
-          days: data.days || 0,
-          likes: data.likes || 0,
-          fileName: data.fileName || null,
-          locations: locationNames,
-          events: data.Events || [],
-          comments: data.comments || [],
-          averageRating: averageRating,
-          createdAt: data.createdAt,
-          userId: data.userId,
-        }
-      })
+          return {
+            id: doc.id,
+            dataName: doc.id, // Use document ID as data name
+            name: data.name || 'Untitled Trip',
+            description: data.description || '',
+            days: data.days || 0,
+            likes: data.likes || 0,
+            fileName: data.fileName || null,
+            locations: locationNames,
+            events: data.Events || [],
+            comments: data.comments || [],
+            averageRating: averageRating,
+            createdAt: data.createdAt,
+            userId: data.userId,
+            published: data.published || false,
+          }
+        })
+        .filter((trip) => trip.published === true) // Only show published trips
 
       setTravelData(trips)
     } catch (error) {
@@ -83,11 +80,6 @@ const Homepage = () => {
     console.log('Filter clicked')
   }
 
-  const handleProfileClick = () => {
-    setActiveTab('profile')
-    navigate('/profile')
-  }
-
   const handleAddClick = () => {
     setShowCreateModal(true)
   }
@@ -95,15 +87,6 @@ const Homepage = () => {
   const handleCreateSuccess = () => {
     // Refresh the travel data after successful creation
     fetchTravelData()
-  }
-
-  const handleHomeClick = () => {
-    setActiveTab('home')
-  }
-
-  const handleLikesClick = () => {
-    setActiveTab('likes')
-    console.log('Likes clicked')
   }
 
   return (
@@ -182,64 +165,13 @@ const Homepage = () => {
         </div>
       </div>
 
-      {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-20">
-        <div className="border-t border-white/10 bg-black/80 backdrop-blur-lg">
-          <div className="safe-area-bottom px-4 py-4">
-            <div className="flex items-center justify-around">
-              {/* Home */}
-              <button
-                onClick={handleHomeClick}
-                className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
-                  activeTab === 'home'
-                    ? 'bg-blue-600/30 text-blue-400'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <FiHome className="h-7 w-7" />
-                <span className="text-xs font-medium">Home</span>
-              </button>
-
-              {/* Likes */}
-              <button
-                onClick={handleLikesClick}
-                className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
-                  activeTab === 'likes'
-                    ? 'bg-rose-600/30 text-rose-400'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <FiHeart className="h-7 w-7" />
-                <span className="text-xs font-medium">Saved</span>
-              </button>
-
-              {/* Add Trip */}
-              <button
-                onClick={handleAddClick}
-                className="flex w-16 flex-col items-center gap-1 rounded-lg bg-blue-600/20 px-3 py-3 text-blue-400 transition-all duration-300 hover:bg-blue-600/30 active:scale-95"
-              >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600">
-                  <FiPlus className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-xs font-medium">Create</span>
-              </button>
-
-              {/* Profile */}
-              <button
-                onClick={handleProfileClick}
-                className={`flex w-16 flex-col items-center gap-1 rounded-lg px-3 py-3 transition-all duration-300 ${
-                  activeTab === 'profile'
-                    ? 'bg-purple-600/30 text-purple-400'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <FiUser className="h-7 w-7" />
-                <span className="text-xs font-medium">Profile</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Navigation */}
+      <Navbar
+        activeTab={activeTab}
+        onAddClick={handleAddClick}
+        showBottomNav={true}
+        showHeaderNav={false}
+      />
 
       {/* Create Trip Modal */}
       {showCreateModal && (
