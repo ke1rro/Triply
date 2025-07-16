@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
-export default function EventDaysDnD({ days, eventsByDay, onAddEvent }) {
+export default function EventDaysDnD({ days, eventsByDay, onAddEvent, onEditEvent }) {
+  const isSingleDay = days.length === 1;
   return (
     <div className="bg-gray-50 w-full p-2 sm:p-6">
-      <div className="flex flex-row flex-wrap gap-6 w-full">
+      <div className={isSingleDay ? 'flex justify-center w-full' : 'flex flex-row flex-wrap gap-6 w-full'}>
           {days.map((day, dayIdx) => (
             <Droppable droppableId={`day-${day}`} key={day}>
               {(provided, snapshot) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className={`bg-white flex-1 min-w-[250px] max-w-full rounded-xl p-4 shadow transition min-h-[120px] ${snapshot.isDraggingOver ? 'ring-2 ring-indigo-400' : ''}`}
+                  className={
+                    isSingleDay
+                      ? `bg-white w-full max-w-2xl mx-auto rounded-xl p-4 shadow transition min-h-[120px] ${snapshot.isDraggingOver ? 'ring-2 ring-indigo-400' : ''}`
+                      : `bg-white flex-1 min-w-[250px] max-w-full rounded-xl p-4 shadow transition min-h-[120px] ${snapshot.isDraggingOver ? 'ring-2 ring-indigo-400' : ''}`
+                  }
                 >
                   <div className="flex justify-between items-center mb-2">
                     <div className="font-bold text-lg">Day {day}</div>
@@ -32,6 +37,7 @@ export default function EventDaysDnD({ days, eventsByDay, onAddEvent }) {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={`mb-3 rounded bg-indigo-50 p-3 shadow-sm flex justify-between items-center ${snapshot.isDragging ? 'ring-2 ring-indigo-300' : ''}`}
+                            onClick={() => onEditEvent && onEditEvent(day, idx)}
                           >
                             <div>
                               <div className="font-semibold">{event.name}</div>

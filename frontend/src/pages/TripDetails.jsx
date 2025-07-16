@@ -30,6 +30,10 @@ export default function TripDetails() {
   const [error, setError] = useState(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [addModalDay, setAddModalDay] = useState(1);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editModalDay, setEditModalDay] = useState(1);
+  const [editEventIdx, setEditEventIdx] = useState(null);
+  const [editEventData, setEditEventData] = useState(null);
   const [draggedEvent, setDraggedEvent] = useState(null); // To track which event is being dragged
 
   useEffect(() => {
@@ -69,15 +73,19 @@ export default function TripDetails() {
     }
   }
 
-  function handleEditEvent(idx) {
-    // Simple prompt-based edit for demo; replace with modal/editor as needed
-    const name = prompt('Event name:', trip.Events[idx]?.name || '');
-    const time = prompt('Event time:', trip.Events[idx]?.time || '');
-    if (name) {
-      const updated = [...trip.Events];
-      updated[idx] = { ...updated[idx], name, time };
-      handleReorderEvents(updated);
-    }
+  function handleEditEvent(day, idxInDay) {
+    // Find the correct event index in the flat Events array
+    const eventsForDay = (trip.Events || []).filter(e => (e.day || 1) === day);
+    const event = eventsForDay[idxInDay];
+    const globalIdx = (trip.Events || []).findIndex((e, i) => {
+      if ((e.day || 1) !== day) return false;
+      // Count only up to idxInDay
+      return eventsForDay.indexOf(e) === idxInDay;
+    });
+    setEditEventIdx(globalIdx);
+    setEditEventData(event);
+    setEditModalDay(day);
+    setEditModalOpen(true);
   }
 
   function handleDeleteEvent(idx) {
@@ -141,8 +149,17 @@ export default function TripDetails() {
     const destEvents = newEvents.filter(e => (e.day || 1) === destDay);
     const before = newEvents.findIndex((e, i) => (e.day || 1) === destDay && destEvents.indexOf(e) === destIdx);
     moved.day = destDay;
-    if (before === -1) newEvents.push(moved);
-    else newEvents.splice(before, 0, moved);
+    if (destEvents.length === 0) {
+      // Insert at the first position for that day in the global events array
+      // Find the first event after all previous days' events
+      let insertIdx = newEvents.findIndex(e => (e.day || 1) > destDay);
+      if (insertIdx === -1) insertIdx = newEvents.length;
+      newEvents.splice(insertIdx, 0, moved);
+    } else if (before === -1) {
+      newEvents.push(moved);
+    } else {
+      newEvents.splice(before, 0, moved);
+    }
     setTrip(prev => ({ ...prev, Events: newEvents }));
     try {
       await updateDoc(doc(db, 'trips', tripId), { Events: newEvents });
@@ -154,6 +171,19 @@ export default function TripDetails() {
   function handleAddEvent(day) {
     setAddModalDay(day);
     setAddModalOpen(true);
+  }
+
+  function handleEditEventSubmit(eventData) {
+    // Update the event at editEventIdx
+    const updated = [...(trip.Events || [])];
+    updated[editEventIdx] = eventData;
+    setTrip(prev => ({ ...prev, Events: updated }));
+    setEditModalOpen(false);
+    setEditEventIdx(null);
+    setEditEventData(null);
+    updateDoc(doc(db, 'trips', tripId), { Events: updated }).catch(e => {
+      console.error('Failed to update event', e);
+    });
   }
 
   async function handleAddEventSubmit(eventData) {
@@ -168,18 +198,19 @@ export default function TripDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-0 w-full">
+    <div className="min-h-screen bg-gray-50 p-0 w-screen">
       <DragDropContext
   onDragEnd={result => { handleDaysDnD(result); setIsDragging(false); }}
   onDragCancel={() => setIsDragging(false)}
   onDragStart={() => setIsDragging(true)}
   onDragUpdate={() => {}}>
-        <div className="w-full py-12 px-4 sm:px-8">
+        <div className="w-screen py-12 px-4 sm:px-8">
           <h1 className="text-4xl font-bold mb-8 text-center">{trip.name}</h1>
           <EventDaysDnD
             days={days}
             eventsByDay={eventsByDay}
             onAddEvent={handleAddEvent}
+            onEditEvent={handleEditEvent}
           />
         </div>
         {/* Save Button fixed at bottom */}
@@ -210,6 +241,15 @@ export default function TripDetails() {
           onClose={() => setAddModalOpen(false)}
           onSubmit={handleAddEventSubmit}
           day={addModalDay}
+          mode="add"
+        />
+        <EventAddModal
+          open={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onSubmit={handleEditEventSubmit}
+          day={editModalDay}
+          mode="edit"
+          initialEvent={editEventData || {}}
         />
       </DragDropContext>
     </div>
