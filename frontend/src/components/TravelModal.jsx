@@ -1,8 +1,20 @@
 import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
+import { db } from '../lib/firebase'
+import { useAuth } from '../context/AuthContext'
 
 export default function TravelModal({ trip, onClose }) {
   const navigate = useNavigate()
+  const { currentUser } = useAuth()
+  const [showCommentForm, setShowCommentForm] = useState(false)
+  const [commentData, setCommentData] = useState({
+    body: '',
+    rating: 5
+  })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [localComments, setLocalComments] = useState(trip.comments || [])
 
   // Lock scroll when modal opens
   useEffect(() => {
@@ -13,12 +25,57 @@ export default function TravelModal({ trip, onClose }) {
     }
   }, [])
 
+  // Update local comments when trip prop changes
+  useEffect(() => {
+    setLocalComments(trip.comments || [])
+  }, [trip.comments])
+
   const handleSelectTrip = () => {
     navigate(`/trip/${trip.dataName}`)
   }
 
   const formatRating = (rating) => {
     return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating))
+  }
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault()
+    
+    if (!commentData.body.trim()) {
+      setError('Comment cannot be empty')
+      return
+    }
+
+    setSubmitting(true)
+    setError('')
+
+    try {
+      const tripRef = doc(db, 'trips', trip.id)
+      const newComment = {
+        body: commentData.body.trim(),
+        rating: commentData.rating,
+        name: currentUser?.displayName || currentUser?.email || 'Anonymous',
+        createdAt: new Date()
+      }
+
+      // Update Firebase
+      await updateDoc(tripRef, {
+        comments: arrayUnion(newComment)
+      })
+
+      // Update local state immediately to show the comment
+      setLocalComments(prev => [...prev, newComment])
+
+      // Reset form and hide it
+      setCommentData({ body: '', rating: 5 })
+      setShowCommentForm(false)
+      
+    } catch (error) {
+      console.error('Error adding comment:', error)
+      setError('Failed to add comment. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -80,11 +137,80 @@ export default function TravelModal({ trip, onClose }) {
         )}
 
         {/* Comments */}
-        {trip.comments && trip.comments.length > 0 && (
-          <div className="mb-6">
-            <h4 className="mb-3 font-medium text-blue-300">Comments:</h4>
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-medium text-blue-300">Comments:</h4>
+            {currentUser && (
+              <button
+                onClick={() => setShowCommentForm(!showCommentForm)}
+                className="text-xs bg-blue-600/60 hover:bg-blue-600/80 px-3 py-1 rounded-md text-white transition-all duration-200"
+              >
+                {showCommentForm ? 'Cancel' : 'Add Comment'}
+              </button>
+            )}
+          </div>
+
+          {/* Comment Form */}
+          {showCommentForm && (
+            <div className="mb-4 p-4 bg-white/5 rounded-lg border border-blue-400/30">
+              {error && (
+                <div className="mb-3 text-red-300 text-sm">{error}</div>
+              )}
+              <form onSubmit={handleCommentSubmit} className="space-y-3">
+                {/* Rating Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-blue-300 mb-1">
+                    Rating:
+                  </label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setCommentData(prev => ({ ...prev, rating: star }))}
+                        className={`text-xl transition-colors ${
+                          star <= commentData.rating 
+                            ? 'text-yellow-400' 
+                            : 'text-gray-500'
+                        } hover:text-yellow-300`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Comment Body */}
+                <div>
+                  <label className="block text-sm font-medium text-blue-300 mb-1">
+                    Comment:
+                  </label>
+                  <textarea
+                    value={commentData.body}
+                    onChange={(e) => setCommentData(prev => ({ ...prev, body: e.target.value }))}
+                    placeholder="Share your thoughts about this trip..."
+                    rows={3}
+                    className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-3 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 resize-none text-sm"
+                    required
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={submitting || !commentData.body.trim()}
+                  className="w-full rounded-lg bg-blue-600/80 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Posting...' : 'Post Comment'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {/* Existing Comments */}
+          {localComments && localComments.length > 0 ? (
             <div className="max-h-40 space-y-3 overflow-y-auto">
-              {trip.comments.map((comment, index) => (
+              {localComments.map((comment, index) => (
                 <div
                   key={index}
                   className="rounded-r-lg border-l-4 border-blue-400/50 bg-white/5 p-3 pl-3"
@@ -101,8 +227,10 @@ export default function TravelModal({ trip, onClose }) {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-sm text-gray-400 italic">No comments yet. Be the first to share your thoughts!</p>
+          )}
+        </div>
 
         {/* Select Trip Button */}
         <button
