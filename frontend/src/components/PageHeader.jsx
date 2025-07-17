@@ -2,7 +2,7 @@ import React from 'react'
 
 const PageHeader = ({ title }) => {
   return (
-    <div className="flex-shrink-0 px-4 pb-4 pt-6 backdrop-blur-sm">
+    <div className="flex-shrink-0 px-4 pb-4 pt-6">
       {/* Logo */}
       <div className="mb-6 text-center">
         <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
