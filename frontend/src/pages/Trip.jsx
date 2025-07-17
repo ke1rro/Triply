@@ -408,12 +408,16 @@ const Trip = () => {
                     </span>
                     <span className="text-xs text-gray-400">Reviews</span>
                   </div>
-                  <div 
-                    className="flex flex-col items-center cursor-pointer"
+                  <div
+                    className="flex cursor-pointer flex-col items-center"
                     onClick={handleLike}
                   >
-                    <FiHeart className={`mb-1 h-5 w-5 ${isLiked ? 'fill-current text-red-500' : 'text-blue-400'}`} />
-                    <span className={`text-sm font-semibold ${isLiked ? 'text-red-500' : 'text-white'}`}>
+                    <FiHeart
+                      className={`mb-1 h-5 w-5 ${isLiked ? 'fill-current text-red-500' : 'text-blue-400'}`}
+                    />
+                    <span
+                      className={`text-sm font-semibold ${isLiked ? 'text-red-500' : 'text-white'}`}
+                    >
                       {localLikes}
                     </span>
                     <span className="text-xs text-gray-400">Likes</span>
@@ -452,7 +456,9 @@ const Trip = () => {
                     <div className="space-y-4">
                       {/* About Section */}
                       <div>
-                        <h3 className="mb-2 text-lg font-semibold text-blue-400">About</h3>
+                        <h3 className="mb-2 text-lg font-semibold text-blue-400">
+                          About
+                        </h3>
                         <p className="text-sm leading-relaxed text-gray-300">
                           {trip.description || 'No description available.'}
                         </p>
@@ -476,9 +482,14 @@ const Trip = () => {
                       {showCommentForm && (
                         <div className="rounded-lg border border-blue-400/30 bg-white/5 p-4">
                           {error && (
-                            <div className="mb-3 text-sm text-red-300">{error}</div>
+                            <div className="mb-3 text-sm text-red-300">
+                              {error}
+                            </div>
                           )}
-                          <form onSubmit={handleCommentSubmit} className="space-y-3">
+                          <form
+                            onSubmit={handleCommentSubmit}
+                            className="space-y-3"
+                          >
                             <div>
                               <label className="mb-1 block text-sm font-medium text-blue-300">
                                 Rating:
@@ -550,7 +561,9 @@ const Trip = () => {
                                   {formatRating(comment.rating || 0)}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-300">{comment.body}</p>
+                              <p className="text-sm text-gray-300">
+                                {comment.body}
+                              </p>
                             </div>
                           ))
                         ) : (
@@ -576,9 +589,16 @@ const Trip = () => {
                       <button
                         className="flex-1 rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80"
                         onClick={async () => {
-                          if (!window.confirm('Are you sure you want to delete this trip?')) return
+                          if (
+                            !window.confirm(
+                              'Are you sure you want to delete this trip?'
+                            )
+                          )
+                            return
                           try {
-                            const { doc, deleteDoc } = await import('firebase/firestore')
+                            const { doc, deleteDoc } = await import(
+                              'firebase/firestore'
+                            )
                             await deleteDoc(doc(db, 'trips', trip.id))
                             navigate('/mytrips')
                           } catch (e) {
@@ -597,9 +617,16 @@ const Trip = () => {
                           }`}
                           onClick={async () => {
                             try {
-                              const { doc, updateDoc } = await import('firebase/firestore')
-                              await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
-                              setTrip(prev => ({ ...prev, published: !prev.published }))
+                              const { doc, updateDoc } = await import(
+                                'firebase/firestore'
+                              )
+                              await updateDoc(doc(db, 'trips', trip.id), {
+                                published: !trip.published,
+                              })
+                              setTrip((prev) => ({
+                                ...prev,
+                                published: !prev.published,
+                              }))
                             } catch (e) {
                               alert('Failed to update publish state.')
                             }
@@ -627,16 +654,22 @@ const Trip = () => {
                               ? window.firebase.firestore().collection('trips')
                               : null
                           // But we use Firestore v9 modular API:
-                          const { collection, getDocs, addDoc, serverTimestamp } = await import(
-                            'firebase/firestore'
-                          )
+                          const {
+                            collection,
+                            getDocs,
+                            addDoc,
+                            serverTimestamp,
+                          } = await import('firebase/firestore')
                           let existingCopyId = null
-                          const querySnapshot = await getDocs(collection(db, 'trips'))
+                          const querySnapshot = await getDocs(
+                            collection(db, 'trips')
+                          )
                           querySnapshot.forEach((doc) => {
                             const data = doc.data()
                             if (
                               data.userId === currentUser.uid &&
-                              (data.parent_id === trip.id || data.parent_id === trip.dataName)
+                              (data.parent_id === trip.id ||
+                                data.parent_id === trip.dataName)
                             ) {
                               existingCopyId = doc.id
                             }
@@ -664,7 +697,10 @@ const Trip = () => {
                           }
                           delete newTrip.id
                           delete newTrip.dataName
-                          const docRef = await addDoc(collection(db, 'trips'), newTrip)
+                          const docRef = await addDoc(
+                            collection(db, 'trips'),
+                            newTrip
+                          )
                           navigate('/mytrips')
                         } catch (e) {
                           alert('Failed to copy trip. Please try again.')

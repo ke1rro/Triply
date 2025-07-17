@@ -16,7 +16,12 @@ import {
   getUserDocument,
 } from '../lib/userService'
 
-export default function TravelCard({ trip, onSelect, showEdit = false, onEdit }) {
+export default function TravelCard({
+  trip,
+  onSelect,
+  showEdit = false,
+  onEdit,
+}) {
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
   const [localLikes, setLocalLikes] = useState(trip.likes || 0)
