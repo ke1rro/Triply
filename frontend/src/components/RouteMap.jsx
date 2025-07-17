@@ -75,17 +75,18 @@ export default function RouteMap({ events = [] }) {
         lng = mapCenter.lng + (Math.random() - 0.5) * 0.05
       }
 
-      // Determine marker color based on event day
+      // Determine marker color based on current event day
       let color = 'blue'
-      if (event.id.startsWith('1-')) color = 'green'
-      if (event.id.startsWith('2-')) color = 'orange'
-      if (event.id.startsWith('3-')) color = 'red'
+      const currentDay = event.currentDay || parseInt(event.id.split('-')[0]) // Use currentDay if available, fallback to ID
+      if (currentDay === 1) color = 'green'
+      if (currentDay === 2) color = 'orange'
+      if (currentDay === 3) color = 'red'
 
       return {
         id: event.id,
         name: event.name,
         time: event.time,
-        day: event.id.split('-')[0],
+        day: currentDay.toString(),
         position: [lat, lng],
         icon: createCustomIcon(color),
         // OpenRouteService needs [longitude, latitude] format

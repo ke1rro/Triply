@@ -267,15 +267,20 @@ const EventDaysDnDPage = () => {
               </p>
             </div>
             <RouteMap
-              events={Object.values(eventsByDay)
-                .flat()
-                .filter(
-                  (event) =>
-                    event.coordinates ||
-                    (event.place &&
-                      event.place.latitude &&
-                      event.place.longitude)
-                )}
+              events={Object.entries(eventsByDay).flatMap(([day, events]) =>
+                events
+                  .filter(
+                    (event) =>
+                      event.coordinates ||
+                      (event.place &&
+                        event.place.latitude &&
+                        event.place.longitude)
+                  )
+                  .map((event) => ({
+                    ...event,
+                    currentDay: parseInt(day), // Add current day info
+                  }))
+              )}
             />
           </div>
         </div>
