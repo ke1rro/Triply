@@ -32,12 +32,15 @@ jobs:
           node-version: '22'
       - name: Install dependencies
         run: npm install
+        working-directory: frontend
       - name: Build project
         run: npm run build
+        working-directory: frontend
       - name: Upload build output
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+            path: dist/
+        working-directory: frontend
   deploy:
     needs: build
     runs-on: ubuntu-latest
