@@ -110,12 +110,22 @@ const Homepage = () => {
       {/* Content */}
       <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-8 sm:px-6 md:px-8">
         {/* Header - No black box */}
-        <div className="mb-8 flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <h1 className="text-5xl font-bold text-blue-400 drop-shadow-lg">
+        <div className="flex-shrink-0 px-4 pb-6 pt-12 backdrop-blur-sm">
+          {/* Logo */}
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
               Triply
             </h1>
-            <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
+            <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
+          </div>
+
+          {/* Profile Title and Description */}
+          <div className="text-center">
+            <div className="mb-3 flex items-center justify-center gap-3">
+              <p className="text-xl font-bold text-white drop-shadow-md">
+                Home
+              </p>
+            </div>
           </div>
         </div>
 

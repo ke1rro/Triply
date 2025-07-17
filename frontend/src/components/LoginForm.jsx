@@ -37,21 +37,23 @@ const LoginForm = ({ onSuccess, onError }) => {
   return (
     <div className="w-full max-w-md">
       {/* Logo */}
-      <div className="mb-6 text-center">
-        <h1 className="text-5xl font-black text-blue-400 drop-shadow-2xl">
-          Triply
-        </h1>
-        <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
-      </div>
+      <div className="flex-shrink-0 px-4 pb-6 pt-12 backdrop-blur-sm">
+        {/* Logo */}
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
+            Triply
+          </h1>
+          <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
+        </div>
 
-      {/* Main heading outside the form card */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-semibold italic text-white drop-shadow-lg">
-          Ready to start an
-        </h1>
-        <h1 className="text-3xl font-semibold italic text-white drop-shadow-lg">
-          adventure?
-        </h1>
+        {/* Profile Title and Description */}
+        <div className="text-center">
+          <div className="mb-3 flex items-center justify-center gap-3">
+            <p className="text-xl font-bold text-white drop-shadow-md">
+              Ready to start an andventure?
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Form card with dark glassmorphism */}

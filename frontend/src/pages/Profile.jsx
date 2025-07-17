@@ -89,7 +89,7 @@ const Profile = () => {
   ]
 
   return (
-    <div className="fixed h-screen w-screen overflow-hidden bg-gray-900">
+    <div className="min-h-screen bg-gray-900">
       {/* Background */}
       <div
         className="fixed inset-0 bg-cover bg-center bg-no-repeat"
@@ -101,104 +101,119 @@ const Profile = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-transparent to-green-900/30"></div>
       </div>
 
-      {/* Navbar */}
+      {/* Content Container */}
+      <div className="relative z-10 flex min-h-screen flex-col">
+        {/* Header Section */}
+        <div className="flex-shrink-0 px-4 pb-6 pt-12 backdrop-blur-sm">
+          {/* Logo */}
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
+              Triply
+            </h1>
+            <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
+          </div>
+
+          {/* Profile Title and Description */}
+          <div className="text-center">
+            <div className="mb-3 flex items-center justify-center gap-3">
+              <p className="text-xl font-bold text-white drop-shadow-md">
+                Profile
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 px-4 pb-20">
+          <div className="mx-auto max-w-md">
+            <div className="rounded-2xl bg-black/70 p-6 shadow-2xl backdrop-blur-md">
+              {/* Avatar and User Info */}
+              <div className="mb-6 text-center">
+                <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-teal-400">
+                  {currentUser?.photoURL ? (
+                    <img
+                      src={currentUser.photoURL}
+                      alt="Profile"
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <FiUser className="h-10 w-10 text-white" />
+                  )}
+                </div>
+
+                {currentUser?.displayName && (
+                  <h2 className="mb-1 text-lg font-semibold text-white">
+                    {currentUser.displayName}
+                  </h2>
+                )}
+
+                <p
+                  className={`${currentUser?.displayName ? 'text-sm' : 'text-lg font-semibold'} mb-2 text-gray-300`}
+                >
+                  {currentUser?.email || 'Travel Enthusiast'}
+                </p>
+
+                <div className="text-xs text-gray-400">
+                  {userStats.totalDistance.toLocaleString()} km traveled
+                </div>
+              </div>
+
+              {/* Profile Tiles Grid */}
+              <div className="mb-6 grid grid-cols-2 gap-3">
+                {profileTiles.map((tile, index) => (
+                  <button
+                    key={index}
+                    onClick={tile.onClick}
+                    className="group relative overflow-hidden rounded-xl bg-white/10 p-4 backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 active:bg-white/15"
+                  >
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r ${tile.color} opacity-0 transition-opacity duration-300 group-hover:opacity-20`}
+                    ></div>
+                    <div className="relative flex flex-col items-start justify-start gap-2 text-left">
+                      <div className="text-white">{tile.icon}</div>
+                      <h3 className="text-sm font-medium leading-tight text-white">
+                        {tile.title}
+                      </h3>
+                      <p className="text-xs leading-tight text-gray-300">
+                        {tile.subtitle}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={() => console.log('Settings clicked')}
+                  className="flex w-full items-center justify-center gap-3 rounded-xl bg-white/10 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                >
+                  <FiSettings className="h-5 w-5" />
+                  Settings
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  disabled={loading}
+                  className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
+                >
+                  <FiLogOut className="h-5 w-5" />
+                  {loading ? 'Signing out...' : 'Sign Out'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
       <Navbar
         showBottomNav
         activeTab="profile"
         onAddClick={() => setShowCreateModal(true)}
       />
 
-      {/* Header - Fixed at top */}
-      <div className="scale-z-100 fixed left-0 right-0 top-0 px-4 py-6 backdrop-blur-sm sm:px-6 md:px-8">
-        <div className="flex items-center justify-center">
-          <div className="flex items-center gap-4">
-            <div className="text-3xl text-white">
-              <FiUser className="h-8 w-8" />
-            </div>
-            <h1 className="text-3xl font-bold text-white drop-shadow-md">
-              Profile
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      {/* Content - Fixed in center, positioned lower to add space from title */}
-      <div className="top-85 fixed left-1/2 z-10 w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform px-4">
-        <div className="rounded-2xl bg-black/70 p-5 shadow-2xl backdrop-blur-md">
-          {/* Avatar and info */}
-          <div className="mb-4 text-center">
-            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-teal-400">
-              {currentUser?.photoURL ? (
-                <img
-                  src={currentUser.photoURL}
-                  alt="Profile"
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : (
-                <FiUser className="h-8 w-8 text-white" />
-              )}
-            </div>
-            {currentUser?.displayName && (
-              <h2 className="text-lg font-semibold text-white">
-                {currentUser.displayName}
-              </h2>
-            )}
-            <p
-              className={`${
-                currentUser?.displayName ? 'text-sm' : 'text-lg font-semibold'
-              } text-gray-300`}
-            >
-              {currentUser?.email || 'Travel Enthusiast'}
-            </p>
-            <div className="mt-2 text-xs text-gray-400">
-              {userStats.totalDistance.toLocaleString()} km traveled
-            </div>
-          </div>
-
-          {/* Tiles - Fixed grid */}
-          <div className="mb-4 grid grid-cols-2 gap-2">
-            {profileTiles.map((tile, index) => (
-              <button
-                key={index}
-                onClick={tile.onClick}
-                className="group relative overflow-hidden rounded-xl bg-white/10 p-3 backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 active:bg-white/15"
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-r ${tile.color} opacity-0 transition-opacity duration-300 group-hover:opacity-20`}
-                ></div>
-                <div className="relative flex flex-col items-start justify-start gap-1 text-left">
-                  <div className="mb-1 text-white">{tile.icon}</div>
-                  <h3 className="text-sm font-medium text-white">
-                    {tile.title}
-                  </h3>
-                  <p className="text-xs text-gray-300">{tile.subtitle}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Buttons - Fixed position */}
-          <div className="space-y-2">
-            <button
-              onClick={() => console.log('Settings clicked')}
-              className="flex w-full items-center justify-center gap-3 rounded-xl bg-white/10 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-gray-400"
-            >
-              <FiSettings className="h-5 w-5" />
-              Settings
-            </button>
-
-            <button
-              onClick={handleLogout}
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-3 rounded-xl bg-red-600/80 px-4 py-2 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80 focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50"
-            >
-              <FiLogOut className="h-5 w-5" />
-              {loading ? 'Signing out...' : 'Sign Out'}
-            </button>
-          </div>
-        </div>
-      </div>
-
+      {/* Create Trip Modal */}
       {showCreateModal && (
         <CreateTripModal onClose={() => setShowCreateModal(false)} />
       )}
