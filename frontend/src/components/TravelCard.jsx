@@ -180,10 +180,10 @@ export default function TravelCard({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md ${isLiked ? 'text-red-400' : 'text-white'}`}>
-              <span>
-                {isLiked ? '❤️' : '🤍'}
-              </span>
+            <div
+              className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md ${isLiked ? 'text-red-400' : 'text-white'}`}
+            >
+              <span>{isLiked ? '❤️' : '🤍'}</span>
               <span>{localLikes}</span>
             </div>
           </div>
@@ -192,4 +192,3 @@ export default function TravelCard({
     </div>
   )
 }
-

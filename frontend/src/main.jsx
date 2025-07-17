@@ -53,10 +53,7 @@ root.render(
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/invite/:tripId"
-            element={<TripInvite />}
-          />
+          <Route path="/invite/:tripId" element={<TripInvite />} />
           <Route
             path="/mytrips"
             element={
@@ -78,6 +75,14 @@ root.render(
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/eventdays"
+            element={
+              <ProtectedRoute>
+                <EventDaysDnDPage />
               </ProtectedRoute>
             }
           />

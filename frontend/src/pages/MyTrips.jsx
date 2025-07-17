@@ -55,12 +55,16 @@ const MyTrips = () => {
         })
 
         // Get user's own trips and visiting trips
-        const userTrips = trips.filter((trip) => trip.userId === currentUser?.uid)
-        
+        const userTrips = trips.filter(
+          (trip) => trip.userId === currentUser?.uid
+        )
+
         // Get user's visiting trips
         const userData = await getUserDocument(currentUser.uid)
         const visitingTripIds = userData?.visiting || []
-        const visitingTrips = trips.filter((trip) => visitingTripIds.includes(trip.id))
+        const visitingTrips = trips.filter((trip) =>
+          visitingTripIds.includes(trip.id)
+        )
 
         // Sort trips: active trips first, then by creation date
         const sortedUserTrips = userTrips.sort((a, b) => {
@@ -154,7 +158,7 @@ const MyTrips = () => {
               </div>
             ) : (
               <>
-                {(travelData.length > 0 || visitingData.length > 0) ? (
+                {travelData.length > 0 || visitingData.length > 0 ? (
                   <div className="flex w-full flex-col items-center space-y-6">
                     {/* Own trips */}
                     {travelData
@@ -165,7 +169,13 @@ const MyTrips = () => {
                       )
                       .map((trip) => (
                         <div key={trip.id} className="w-full max-w-md">
-                          <div className={trip.statusActive ? 'rounded-xl border-2 border-green-500 p-1' : ''}>
+                          <div
+                            className={
+                              trip.statusActive
+                                ? 'rounded-xl border-2 border-green-500 p-1'
+                                : ''
+                            }
+                          >
                             <TravelCard
                               trip={trip}
                               onSelect={() => handleSelectTrip(trip.id)}
@@ -175,7 +185,7 @@ const MyTrips = () => {
                           </div>
                         </div>
                       ))}
-                    
+
                     {/* Visiting trips */}
                     {visitingData
                       .filter((trip) =>
@@ -184,8 +194,17 @@ const MyTrips = () => {
                           .includes(searchQuery.toLowerCase())
                       )
                       .map((trip) => (
-                        <div key={`visiting-${trip.id}`} className="w-full max-w-md">
-                          <div className={trip.statusActive ? 'rounded-xl border-2 border-blue-500 p-1' : 'rounded-xl border border-blue-300/50 p-1'}>
+                        <div
+                          key={`visiting-${trip.id}`}
+                          className="w-full max-w-md"
+                        >
+                          <div
+                            className={
+                              trip.statusActive
+                                ? 'rounded-xl border-2 border-blue-500 p-1'
+                                : 'rounded-xl border border-blue-300/50 p-1'
+                            }
+                          >
                             <TravelCard
                               trip={trip}
                               onSelect={() => handleSelectTrip(trip.id)}
@@ -194,7 +213,7 @@ const MyTrips = () => {
                             />
                             {/* Visitor indicator */}
                             <div className="mt-1 text-center">
-                              <span className="text-xs text-blue-400 bg-blue-600/20 px-2 py-1 rounded">
+                              <span className="rounded bg-blue-600/20 px-2 py-1 text-xs text-blue-400">
                                 Visiting
                               </span>
                             </div>

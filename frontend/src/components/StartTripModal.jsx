@@ -31,7 +31,7 @@ const StartTripModal = ({ trip, onClose, onSuccess }) => {
     setStarting(true)
     try {
       await updateDoc(doc(db, 'trips', trip.id), {
-        statusActive: true
+        statusActive: true,
       })
       onSuccess()
       onClose()

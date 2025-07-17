@@ -35,7 +35,7 @@ const ShareButton = ({ trip }) => {
 
       {/* Success notification popup */}
       {copied && (
-        <div className="absolute right-0 top-12 z-20 animate-fade-in-up">
+        <div className="animate-fade-in-up absolute right-0 top-12 z-20">
           <div className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white shadow-lg">
             Copied
           </div>

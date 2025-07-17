@@ -136,7 +136,7 @@ export const batchRemoveVisitingTrip = async (userIds, tripId) => {
   if (!userIds || userIds.length === 0 || !tripId) return
 
   try {
-    const removePromises = userIds.map(userId => 
+    const removePromises = userIds.map((userId) =>
       removeVisitingTrip(userId, tripId)
     )
     await Promise.all(removePromises)

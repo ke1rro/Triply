@@ -60,7 +60,7 @@ const TripInvite = () => {
     try {
       // Add user to trip visitors
       await updateDoc(doc(db, 'trips', trip.id), {
-        visitors: arrayUnion(currentUser.uid)
+        visitors: arrayUnion(currentUser.uid),
       })
 
       // Add trip to user's visiting list
@@ -96,11 +96,11 @@ const TripInvite = () => {
           <div className="absolute inset-0 bg-black/40"></div>
           <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20"></div>
         </div>
-        
+
         <div className="relative z-10 flex h-screen w-full flex-col items-center justify-center px-4">
-          <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md text-center">
-            <h1 className="text-2xl font-bold text-red-400 mb-4">Error</h1>
-            <p className="text-gray-300 mb-6">{error}</p>
+          <div className="rounded-2xl bg-black/70 p-8 text-center shadow-2xl backdrop-blur-md">
+            <h1 className="mb-4 text-2xl font-bold text-red-400">Error</h1>
+            <p className="mb-6 text-gray-300">{error}</p>
             <button
               onClick={() => navigate('/home')}
               className="rounded-lg bg-blue-600/80 px-6 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80"
@@ -134,15 +134,17 @@ const TripInvite = () => {
       <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-4 sm:px-6 md:px-8">
         <PageHeader title="Trip Invitation" />
 
-        <div className="flex-1 flex items-center justify-center pb-32">
+        <div className="flex flex-1 items-center justify-center pb-32">
           <div className="mx-auto max-w-md">
-            <div className="rounded-2xl bg-black/70 p-6 shadow-2xl backdrop-blur-md text-center">
-              <h2 className="text-2xl font-bold text-white mb-4">{trip.name}</h2>
-              
-              <p className="text-gray-300 mb-2">
+            <div className="rounded-2xl bg-black/70 p-6 text-center shadow-2xl backdrop-blur-md">
+              <h2 className="mb-4 text-2xl font-bold text-white">
+                {trip.name}
+              </h2>
+
+              <p className="mb-2 text-gray-300">
                 {trip.description || 'Join this amazing trip!'}
               </p>
-              
+
               <div className="mb-6 text-sm text-gray-400">
                 Duration: {trip.days} day{trip.days !== 1 ? 's' : ''}
               </div>
@@ -159,7 +161,9 @@ const TripInvite = () => {
                 </div>
               ) : isAlreadyMember ? (
                 <div className="space-y-4">
-                  <p className="text-green-400">You're already a member of this trip!</p>
+                  <p className="text-green-400">
+                    You're already a member of this trip!
+                  </p>
                   <button
                     onClick={() => navigate('/mytrips')}
                     className="w-full rounded-lg bg-green-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-green-700/80"
@@ -169,7 +173,9 @@ const TripInvite = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <p className="text-white">You've been invited to join this trip!</p>
+                  <p className="text-white">
+                    You've been invited to join this trip!
+                  </p>
                   <button
                     onClick={handleJoinTrip}
                     disabled={joining}

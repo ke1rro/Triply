@@ -11,7 +11,15 @@ import {
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
-import { FiArrowLeft, FiClock, FiHeart, FiStar, FiPlay, FiSquare, FiUsers } from 'react-icons/fi'
+import {
+  FiArrowLeft,
+  FiClock,
+  FiHeart,
+  FiStar,
+  FiPlay,
+  FiSquare,
+  FiUsers,
+} from 'react-icons/fi'
 import {
   addLikedTrip,
   removeLikedTrip,
@@ -156,32 +164,32 @@ const Trip = () => {
 
   const handleEndTrip = async () => {
     if (!window.confirm('Are you sure you want to end this trip?')) return
-    
+
     try {
       const tripRef = doc(db, 'trips', tripviewId)
-      
+
       // Get current trip data to access visitors
       const tripSnap = await getDoc(tripRef)
       if (!tripSnap.exists()) return
-      
+
       const tripData = tripSnap.data()
       const visitors = tripData.visitors || []
 
       // End the trip and clear visitors
       await updateDoc(tripRef, {
         statusActive: false,
-        visitors: [] // Remove all visitors when ending trip
+        visitors: [], // Remove all visitors when ending trip
       })
 
       // Remove trip from all visitors' visiting lists
       if (visitors.length > 0) {
-        const removePromises = visitors.map(visitorId => 
+        const removePromises = visitors.map((visitorId) =>
           removeVisitingTrip(visitorId, tripviewId)
         )
         await Promise.all(removePromises)
       }
 
-      setTrip(prev => ({ ...prev, statusActive: false, visitors: [] }))
+      setTrip((prev) => ({ ...prev, statusActive: false, visitors: [] }))
     } catch (error) {
       console.error('Error ending trip:', error)
       alert('Failed to end trip. Please try again.')
@@ -190,16 +198,16 @@ const Trip = () => {
 
   const handleLeaveTrip = async () => {
     if (!window.confirm('Are you sure you want to leave this trip?')) return
-    
+
     try {
       // Remove user from trip visitors
       await updateDoc(doc(db, 'trips', tripviewId), {
-        visitors: arrayRemove(currentUser.uid)
+        visitors: arrayRemove(currentUser.uid),
       })
 
       // Remove trip from user's visiting list
       await removeVisitingTrip(currentUser.uid, tripviewId)
-      
+
       navigate('/mytrips')
     } catch (error) {
       console.error('Error leaving trip:', error)
@@ -230,11 +238,11 @@ const Trip = () => {
           setTrip(tripData)
           setLocalLikes(data.likes || 0)
           setLocalComments(data.comments || [])
-          
+
           // Check if current user is a visitor
           if (currentUser) {
             setIsVisitor(data.visitors?.includes(currentUser.uid) || false)
-            
+
             if (data.likedBy) {
               setIsLiked(data.likedBy.includes(currentUser.uid))
             }
@@ -404,7 +412,7 @@ const Trip = () => {
           trip={trip}
           onClose={() => setShowStartModal(false)}
           onSuccess={() => {
-            setTrip(prev => ({ ...prev, statusActive: true }))
+            setTrip((prev) => ({ ...prev, statusActive: true }))
           }}
         />
       )}
@@ -446,12 +454,14 @@ const Trip = () => {
           <button
             onClick={() => {
               if (isOwner) {
-                trip.statusActive ? setShowVisitorsModal(true) : setShowEditModal(true)
+                trip.statusActive
+                  ? setShowVisitorsModal(true)
+                  : setShowEditModal(true)
               } else if (isVisitor && trip.statusActive) {
                 setShowVisitorsModal(true)
               }
             }}
-            className="absolute right-4 top-4 z-20 rounded-lg bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700 flex items-center gap-2"
+            className="absolute right-4 top-4 z-20 flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700"
           >
             {isOwner ? (
               trip.statusActive ? (
@@ -463,7 +473,8 @@ const Trip = () => {
                 'Edit'
               )
             ) : (
-              isVisitor && trip.statusActive && (
+              isVisitor &&
+              trip.statusActive && (
                 <>
                   <FiUsers className="h-4 w-4" />
                   View Members
@@ -511,7 +522,7 @@ const Trip = () => {
                     <ShareButton trip={trip} />
                   ) : null}
                 </div>
-                
+
                 <div className="flex h-full items-end bg-black/30 p-4">
                   <div className="text-white">
                     <p className="text-sm opacity-90">
