@@ -551,6 +551,11 @@ const Trip = () => {
         )}
       </div>
 
+      {/* Add Trip Button - Fixed at bottom center */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform">
+        <div className="cursor-pointer rounded-lg border-2 border-gray-700 bg-gray-800 px-8 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:bg-gray-900 hover:shadow-xl">
+          Add this trip
+        </div>
       {/* Action Buttons - Fixed at bottom center */}
       <div className="fixed bottom-6 left-1/2 flex -translate-x-1/2 transform flex-row gap-4">
         {trip.userId === currentUser?.uid ? (
