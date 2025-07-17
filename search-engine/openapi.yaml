@@ -4,7 +4,149 @@ info:
   version: "0.1"
   description: API for searching Points of Interest (POIs) by geolocation, categories, and text query
 
+components:
+  schemas:
+    Category:
+      type: string
+      example: "restaurants"
+      enum:
+        [
+          "restaurants",
+          "bars",
+          "coffee",
+          "gyms",
+          "movies",
+          "museums",
+          "arts",
+          "attractions",
+          "libraries",
+          "sightseeing",
+          "nightlife",
+          "groceries",
+          "stores",
+          "hotels",
+          "atms",
+          "gas",
+          "car_rental",
+          "outdoor_activities",
+        ]
+    PointOfInterest:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "node/43255"
+          description: Unique identifier for the POI from OSM
+        name:
+          type: string
+          example: "National Museum"
+          description: Name of the POI
+        description:
+          type: string
+          example: "A large museum with various exhibits"
+          description: Description of the POI
+        lon:
+          type: number
+          format: float
+          example: 30.5245
+          description: Longitude of the POI
+        lat:
+          type: number
+          format: float
+          example: 50.4504
+          description: Latitude of the POI
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+          example: ["museums", "arts"]
+          description: List of categories for the POI
+        opening_hours:
+          type: string
+          example: "Mo-Fr 09:00-18:00; Sa 10:00-16:00"
+          description: Opening hours in OSM format
+      required:
+        - id
+        - name
+        - lon
+        - lat
+        - categories
+    SearchResult:
+      allOf:
+        - $ref: "#/components/schemas/PointOfInterest"
+        - type: object
+          properties:
+            score:
+              type: number
+              format: float
+              description: Ranking score (0-1)
+              example: 0.85
+            distance:
+              type: number
+              format: float
+              description: Distance from queried location in meters
+              example: 150.0
+            similarity:
+              type: number
+              format: float
+              description: Similarity score for the free-text query (-1 to 1)
+              example: 0.9
+          required:
+            - score
+            - distance
+
 paths:
+  /place:
+    get:
+      summary: Get Point of Interest by ID
+      description: |
+        Retrieves detailed information about a specific Point of Interest (POI) by its unique identifier.
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the POI (e.g., "node/43255")
+      responses:
+        "200":
+          description: Successful retrieval of POI details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  point:
+                    $ref: "#/components/schemas/PointOfInterest"
+        "400":
+          description: Bad request due to missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [invalid_request]
+                  error:
+                    type: string
+                    example: "Missing required parameter: id"
+        "404":
+          description: Point of Interest not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [not_found]
+                  error:
+                    type: string
+                    example: "Point of Interest not found"
   /search:
     get:
       summary: Search for Points of Interest
@@ -37,7 +179,7 @@ paths:
           required: false
           schema:
             type: string
-            example: "museum,restaurant"
+            example: "museums,arts"
           description: Comma-separated list of POI categories to filter the search
         - in: query
           name: q
@@ -59,6 +201,15 @@ paths:
           schema:
             type: integer
           description: Maximum number of results to return, defaults to no limit
+        - in: query
+          name: sort_by
+          required: false
+          schema:
+            type: string
+            enum: [similarity, distance, score]
+          description: |
+            Sort results by similarity score, distance from the queried location, or ranking score.
+            Defaults to no sorting.
       responses:
         "200":
           description: Successful search response
@@ -72,86 +223,8 @@ paths:
                     enum: [ok]
                   points:
                     type: array
-                    description: List of Points of Interest matching the search criteria sorted by relevance
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          example: "node/43255"
-                          description: Unique identifier for the POI from OSM
-                        name:
-                          type: string
-                          example: "National Museum"
-                          description: Name of the POI
-                        description:
-                          type: string
-                          example: "A large museum with various exhibits"
-                          description: Description of the POI
-                        lon:
-                          type: number
-                          format: float
-                          example: 30.5245
-                          description: Longitude of the POI
-                        lat:
-                          type: number
-                          format: float
-                          example: 50.4504
-                          description: Latitude of the POI
-                        categories:
-                          type: array
-                          items:
-                            type: string
-                            example: "restaurants"
-                            enum:
-                              [
-                                "restaurants",
-                                "bars",
-                                "coffee",
-                                "gyms",
-                                "movies",
-                                "museums",
-                                "arts",
-                                "attractions",
-                                "libraries",
-                                "sightseeing",
-                                "nightlife",
-                                "groceries",
-                                "stores",
-                                "hotels",
-                                "atms",
-                                "gas",
-                                "car_rental",
-                                "outdoor_activities",
-                              ]
-                          description: List of categories for the POI
-                        opening_hours:
-                          type: string
-                          example: "Mo-Fr 09:00-18:00; Sa 10:00-16:00"
-                          description: Opening hours in OSM format
-                        score:
-                          type: number
-                          format: float
-                          description: Ranking score (0-1)
-                          example: 0.85
-                        distance:
-                          type: number
-                          format: float
-                          description: Distance from queried location in meters
-                          example: 150.0
-                        similarity:
-                          type: number
-                          format: float
-                          description: Similarity score for the free-text query (-1 to 1)
-                          example: 0.9
-                      required:
-                        - id
-                        - name
-                        - lon
-                        - lat
-                        - categories
-                        - score
-                        - distance
+                      $ref: "#/components/schemas/SearchResult"
         "400":
           description: Bad request due to missing parameters
           content:

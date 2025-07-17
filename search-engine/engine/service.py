@@ -1,4 +1,5 @@
 import logging
+from enum import Enum
 
 import numpy as np
 import pandas as pd
@@ -6,6 +7,12 @@ import redis
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from transliterate import translit
+
+
+class SortBy(str, Enum):
+    SCORE = "score"
+    DISTANCE = "distance"
+    SIMILARITY = "similarity"
 
 
 class PointOfInterest(BaseModel):
@@ -91,7 +98,12 @@ class LookupService:
         result = []
 
         for id, distance in self.redis.georadius(
-            "entities", lon, lat, radius, unit="m", withdist=True, sort="ASC"
+            "entities",
+            lon,
+            lat,
+            radius,
+            unit="m",
+            withdist=True,
         ):
             id = id.decode("utf-8")
             embedding, poi = self.pois[id]
@@ -115,6 +127,9 @@ class LookupService:
         similarity = (similarity + 1) / 2
         return similarity * LookupService.ALPHA + distance * (1 - LookupService.ALPHA)
 
+    def get_place(self, id: str) -> PointOfInterest | None:
+        return self.pois.get(id, (None, None))[1]
+
     def search(
         self,
         lat: float,
@@ -122,6 +137,7 @@ class LookupService:
         radius: float,
         categories: set | None = None,
         query: str | None = None,
+        sort_by: SortBy | None = None,
     ) -> list[SearchResult]:
         query_embedding = query and self.model.encode(
             query, convert_to_numpy=True, show_progress_bar=False
@@ -148,7 +164,20 @@ class LookupService:
                 )
             )
 
-        result.sort(key=lambda poi: poi.score, reverse=True)
+        if sort_by == SortBy.SCORE:
+            key = lambda poi: poi.score
+            reverse = True
+        elif sort_by == SortBy.DISTANCE:
+            key = lambda poi: poi.distance
+            reverse = False
+        elif sort_by == SortBy.SIMILARITY:
+            key = lambda poi: poi.similarity or 0
+            reverse = True
+        else:
+            key = lambda _: 0
+            reverse = True
+
+        result.sort(key=key, reverse=reverse)
 
         logging.info(
             f"Search for request {lat}, {lon}, {radius} with "
