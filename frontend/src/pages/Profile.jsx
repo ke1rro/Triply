@@ -45,7 +45,7 @@ const Profile = () => {
   // Update user stats to use real data
   const userStats = {
     likedTrips: userData?.likedTrips?.length || 0,
-    totalDistance: 15420,
+    joined: userData?.createdAt.toDate(),
   }
 
   const profileTiles = [
@@ -64,6 +64,8 @@ const Profile = () => {
       onClick: () => setShowCreateModal(true),
     },
   ]
+
+  console.log(userStats)
 
   return (
     <div className="relative flex min-h-screen flex-col">
@@ -116,9 +118,18 @@ const Profile = () => {
                   {currentUser?.email || 'Travel Enthusiast'}
                 </p>
 
-                <div className="text-xs text-gray-400">
-                  {userStats.totalDistance.toLocaleString()} km traveled
-                </div>
+                {userStats?.joined != null && (
+                  <div className="text-xs text-gray-400">
+                    Joined{' '}
+                    {String(userStats.joined.getFullYear()).padStart(4, '0')}-
+                    {String(userStats.joined.getMonth() + 1).padStart(2, '0')}-
+                    {String(userStats.joined.getDate()).padStart(2, '0')}
+                  </div>
+                )}
+
+                {userStats?.joined == null && (
+                  <div className="text-xs text-gray-400">Joined ...</div>
+                )}
               </div>
 
               {/* Profile Tiles Grid */}
