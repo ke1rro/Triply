@@ -30,7 +30,7 @@ const Login = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-[90vw] max-w-[400px] mx-auto">
+      <div className="relative z-10 mx-auto w-[90vw] max-w-[400px]">
         {error && (
           <div className="absolute left-1/2 top-4 mb-4 -translate-x-1/2 transform rounded-xl border border-red-400 bg-red-500/90 px-6 py-3 text-white shadow-lg backdrop-blur-sm">
             {error}

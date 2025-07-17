@@ -9,7 +9,7 @@ export default function EventDaysDnD({
   const isSingleDay = days.length === 1
 
   return (
-    <div className="w-full bg-gray-50 p-2 sm:p-6">
+    <div className="w-full p-2 sm:p-6">
       <div
         className={
           isSingleDay

@@ -1,11 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import EventDaysDnD from '../components/EventDaysDnD'
-import { DragDropContext } from '@hello-pangea/dnd'
+import { DragDropContext, Droppable } from '@hello-pangea/dnd'
 import EventAddModal from '../components/EventAddModal'
 import RouteMap from '../components/RouteMap'
 import PageHeader from '../components/PageHeader'
 
 const EventDaysDnDPage = () => {
+  // Drag state management
+  const [isDragging, setIsDragging] = useState(false)
+  const [fadeText, setFadeText] = useState(false)
+  const [buttonText, setButtonText] = useState('Save Changes')
+
+  useEffect(() => {
+    setFadeText(true)
+    const timeout = setTimeout(() => {
+      setButtonText(isDragging ? 'Drop here to delete' : 'Save Changes')
+      setFadeText(false)
+    }, 150) // fade out, then switch label, then fade in
+    return () => clearTimeout(timeout)
+  }, [isDragging])
+
   // Sample data for demonstration with coordinates
   const [days] = useState([1, 2, 3])
   const [eventsByDay, setEventsByDay] = useState({
@@ -120,6 +134,25 @@ const EventDaysDnDPage = () => {
 
     // Dropped outside the list
     if (!destination) return
+
+    // Handle delete - if dropped on delete area
+    if (destination.droppableId === 'delete-area') {
+      const sourceDay = source.droppableId.split('-')[1]
+      const sourceIndex = source.index
+
+      // Remove the event from the source day
+      const updatedSourceEvents = [...eventsByDay[sourceDay]]
+      updatedSourceEvents.splice(sourceIndex, 1)
+
+      // Update times for the modified day
+      const updatedEventsWithTimes = updateEventTimes(updatedSourceEvents)
+
+      setEventsByDay({
+        ...eventsByDay,
+        [sourceDay]: updatedEventsWithTimes,
+      })
+      return
+    }
 
     const sourceDay = source.droppableId.split('-')[1]
     const destinationDay = destination.droppableId.split('-')[1]
@@ -246,44 +279,90 @@ const EventDaysDnDPage = () => {
         {/* Header */}
         <PageHeader title="Manage Your Trip Events" />
 
-        <div className="container mx-auto pb-16">
-          <DragDropContext onDragEnd={handleDragEnd}>
+        <DragDropContext
+          onDragEnd={(result) => {
+            handleDragEnd(result)
+            setIsDragging(false)
+          }}
+          onDragCancel={() => setIsDragging(false)}
+          onDragStart={() => setIsDragging(true)}
+          onDragUpdate={() => {}}
+        >
+          <div className="container mx-auto pb-16">
             <EventDaysDnD
               days={days}
               eventsByDay={eventsByDay}
               onAddEvent={handleAddEvent}
               onEditEvent={handleEditEvent}
             />
-          </DragDropContext>
 
-          {/* Route Map showing all locations */}
-          <div className="animate-fadeIn mx-auto mt-12 max-w-4xl px-2">
-            <div className="mb-4 text-center">
-              <h2 className="text-2xl font-bold text-blue-300 drop-shadow-lg">
-                Your Trip Route
-              </h2>
-              <p className="text-gray-300">
-                View and explore your planned journey
-              </p>
+            {/* Route Map showing all locations */}
+            <div className="animate-fadeIn mx-auto mt-12 max-w-4xl px-2">
+              <div className="mb-4 text-center">
+                <h2 className="text-2xl font-bold text-blue-300 drop-shadow-lg">
+                  Your Trip Route
+                </h2>
+                <p className="text-gray-300">
+                  View and explore your planned journey
+                </p>
+              </div>
+              <RouteMap
+                events={Object.entries(eventsByDay).flatMap(([day, events]) =>
+                  events
+                    .filter(
+                      (event) =>
+                        event.coordinates ||
+                        (event.place &&
+                          event.place.latitude &&
+                          event.place.longitude)
+                    )
+                    .map((event) => ({
+                      ...event,
+                      currentDay: parseInt(day), // Add current day info
+                    }))
+                )}
+              />
             </div>
-            <RouteMap
-              events={Object.entries(eventsByDay).flatMap(([day, events]) =>
-                events
-                  .filter(
-                    (event) =>
-                      event.coordinates ||
-                      (event.place &&
-                        event.place.latitude &&
-                        event.place.longitude)
-                  )
-                  .map((event) => ({
-                    ...event,
-                    currentDay: parseInt(day), // Add current day info
-                  }))
-              )}
-            />
           </div>
-        </div>
+
+          {/* Save Button as DnD drop target */}
+          <Droppable droppableId="delete-area">
+            {(provided, snapshot) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className={`fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 !transform-none items-center justify-center rounded-full px-10 py-4 text-xl font-bold shadow-xl transition-colors duration-300 ${snapshot.isDraggingOver ? 'bg-red-500 text-white' : isDragging ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white'} ${!isDragging && !snapshot.isDraggingOver ? 'cursor-pointer hover:bg-indigo-700' : ''}`}
+                style={{
+                  maxHeight: 60,
+                  width: 260,
+                  transition: 'none',
+                  transform: 'none',
+                  outline: 'none',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                  cursor:
+                    !isDragging && !snapshot.isDraggingOver
+                      ? 'pointer'
+                      : 'default',
+                }}
+                onClick={() => {
+                  if (!isDragging) {
+                    // Save functionality will be implemented later
+                    console.log('Save changes clicked')
+                  }
+                }}
+              >
+                {/* Crossfade text transition */}
+                <span
+                  className={`block text-center transition-opacity duration-300 ${fadeText || snapshot.isDraggingOver ? 'opacity-0' : 'opacity-100'}`}
+                  style={{ minHeight: 24, display: 'inline-block' }}
+                >
+                  {buttonText}
+                </span>
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </div>
 
       {showEventModal && (
