@@ -3,6 +3,7 @@ import EventDaysDnD from '../components/EventDaysDnD'
 import { DragDropContext } from '@hello-pangea/dnd'
 import EventAddModal from '../components/EventAddModal'
 import RouteMap from '../components/RouteMap'
+import PageHeader from '../components/PageHeader'
 
 const EventDaysDnDPage = () => {
   // Sample data for demonstration with coordinates
@@ -146,21 +147,11 @@ const EventDaysDnDPage = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex h-full w-full flex-col px-4 pt-8 sm:px-6 md:px-8">
+      <div className="relative z-10 flex h-full w-full flex-col px-4 pt-4 sm:px-6 md:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <h1 className="text-5xl font-bold text-blue-400 drop-shadow-lg">
-              Triply
-            </h1>
-            <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
-          </div>
-        </div>
+        <PageHeader title="Manage Your Trip Events" />
 
         <div className="container mx-auto pb-16">
-          <p className="mb-6 text-center text-3xl font-bold italic text-white drop-shadow-lg">
-            Manage Your Trip Events
-          </p>
           <DragDropContext onDragEnd={handleDragEnd}>
             <EventDaysDnD
               days={days}

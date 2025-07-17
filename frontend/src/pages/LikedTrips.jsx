@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import TravelCard from '../components/TravelCard'
 import Navbar from '../components/Navbar'
+import PageHeader from '../components/PageHeader'
 import { FiSearch, FiHeart } from 'react-icons/fi'
 import { getUserDocument } from '../lib/userService'
 
@@ -93,19 +94,9 @@ const LikedTrips = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-8 sm:px-6 md:px-8">
-        {/* Header - No black box */}
-        <div className="mb-8 flex items-center justify-center">
-          <div className="flex flex-col items-center">
-            <h1 className="text-5xl font-bold text-blue-400 drop-shadow-lg">
-              Triply
-            </h1>
-            <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
-            <p className="mt-3 text-xl text-white/80 drop-shadow-md">
-              Liked Trips
-            </p>
-          </div>
-        </div>
+      <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-4 sm:px-6 md:px-8">
+        {/* Header */}
+        <PageHeader title="Liked Trips" />
 
         {/* Search Bar */}
         <div className="mb-8">

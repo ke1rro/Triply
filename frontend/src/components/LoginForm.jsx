@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { loginWithEmail, loginWithGoogle } from '../lib/auth'
+import PageHeader from './PageHeader'
 
 const LoginForm = ({ onSuccess, onError }) => {
   const [email, setEmail] = useState('')
@@ -37,24 +38,7 @@ const LoginForm = ({ onSuccess, onError }) => {
   return (
     <div className="w-full max-w-md">
       {/* Logo */}
-      <div className="flex-shrink-0 px-4 pb-6 pt-12 backdrop-blur-sm">
-        {/* Logo */}
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
-            Triply
-          </h1>
-          <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
-        </div>
-
-        {/* Profile Title and Description */}
-        <div className="text-center">
-          <div className="mb-3 flex items-center justify-center gap-3">
-            <p className="text-xl font-bold text-white drop-shadow-md">
-              Ready to start an andventure?
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader title="Ready to start an adventure?" />
 
       {/* Form card with dark glassmorphism */}
       <div className="rounded-2xl bg-black/70 p-8 shadow-2xl backdrop-blur-md">

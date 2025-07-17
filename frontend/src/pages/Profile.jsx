@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi'
 import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
+import PageHeader from '../components/PageHeader'
 import { getUserDocument } from '../lib/userService'
 
 const Profile = () => {
@@ -104,24 +105,7 @@ const Profile = () => {
       {/* Content Container */}
       <div className="relative z-10 flex min-h-screen flex-col">
         {/* Header Section */}
-        <div className="flex-shrink-0 px-4 pb-6 pt-12 backdrop-blur-sm">
-          {/* Logo */}
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
-              Triply
-            </h1>
-            <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
-          </div>
-
-          {/* Profile Title and Description */}
-          <div className="text-center">
-            <div className="mb-3 flex items-center justify-center gap-3">
-              <p className="text-xl font-bold text-white drop-shadow-md">
-                Profile
-              </p>
-            </div>
-          </div>
-        </div>
+        <PageHeader title="Profile" />
 
         {/* Main Content */}
         <div className="flex-1 px-4 pb-20">
