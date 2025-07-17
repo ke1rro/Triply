@@ -8,9 +8,11 @@ import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
 import PageHeader from '../components/PageHeader'
 import { FiSearch, FiNavigation } from 'react-icons/fi'
+import { getUserDocument } from '../lib/userService'
 
 const MyTrips = () => {
   const [travelData, setTravelData] = useState([])
+  const [visitingData, setVisitingData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -47,11 +49,35 @@ const MyTrips = () => {
             userId: data.userId,
             parent_id: data.parent_id,
             published: data.published,
+            statusActive: data.statusActive || false,
+            visitors: data.visitors || [],
           }
         })
-        setTravelData(trips.filter((trip) => trip.userId === currentUser?.uid))
+
+        // Get user's own trips and visiting trips
+        const userTrips = trips.filter(
+          (trip) => trip.userId === currentUser?.uid
+        )
+
+        // Get user's visiting trips
+        const userData = await getUserDocument(currentUser.uid)
+        const visitingTripIds = userData?.visiting || []
+        const visitingTrips = trips.filter((trip) =>
+          visitingTripIds.includes(trip.id)
+        )
+
+        // Sort trips: active trips first, then by creation date
+        const sortedUserTrips = userTrips.sort((a, b) => {
+          if (a.statusActive && !b.statusActive) return -1
+          if (!a.statusActive && b.statusActive) return 1
+          return 0
+        })
+
+        setTravelData(sortedUserTrips)
+        setVisitingData(visitingTrips)
       } catch (err) {
         setTravelData([])
+        setVisitingData([])
       }
       setLoading(false)
     }
@@ -132,8 +158,9 @@ const MyTrips = () => {
               </div>
             ) : (
               <>
-                {travelData.length > 0 ? (
+                {travelData.length > 0 || visitingData.length > 0 ? (
                   <div className="flex w-full flex-col items-center space-y-6">
+                    {/* Own trips */}
                     {travelData
                       .filter((trip) =>
                         trip.name
@@ -142,12 +169,55 @@ const MyTrips = () => {
                       )
                       .map((trip) => (
                         <div key={trip.id} className="w-full max-w-md">
-                          <TravelCard
-                            trip={trip}
-                            onSelect={() => handleSelectTrip(trip.id)}
-                            ModalComponent={undefined}
-                            showLike={false}
-                          />
+                          <div
+                            className={
+                              trip.statusActive
+                                ? 'rounded-xl border-2 border-green-500 p-1'
+                                : ''
+                            }
+                          >
+                            <TravelCard
+                              trip={trip}
+                              onSelect={() => handleSelectTrip(trip.id)}
+                              ModalComponent={undefined}
+                              showLike={false}
+                            />
+                          </div>
+                        </div>
+                      ))}
+
+                    {/* Visiting trips */}
+                    {visitingData
+                      .filter((trip) =>
+                        trip.name
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase())
+                      )
+                      .map((trip) => (
+                        <div
+                          key={`visiting-${trip.id}`}
+                          className="w-full max-w-md"
+                        >
+                          <div
+                            className={
+                              trip.statusActive
+                                ? 'rounded-xl border-2 border-blue-500 p-1'
+                                : 'rounded-xl border border-blue-300/50 p-1'
+                            }
+                          >
+                            <TravelCard
+                              trip={trip}
+                              onSelect={() => handleSelectTrip(trip.id)}
+                              ModalComponent={undefined}
+                              showLike={false}
+                            />
+                            {/* Visitor indicator */}
+                            <div className="mt-1 text-center">
+                              <span className="rounded bg-blue-600/20 px-2 py-1 text-xs text-blue-400">
+                                Visiting
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       ))}
                   </div>

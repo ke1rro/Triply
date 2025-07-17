@@ -8,6 +8,7 @@ import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
 import PageHeader from '../components/PageHeader'
 import { FiSearch, FiNavigation } from 'react-icons/fi'
+import HomeTripList from './HomeTripList'
 
 const Homepage = () => {
   const [travelData, setTravelData] = useState([])
@@ -58,6 +59,7 @@ const Homepage = () => {
           }
         })
         .filter((trip) => trip.published === true) // Only show published trips
+        .sort((a, b) => (b.likes || 0) - (a.likes || 0)) // Sort by likes descending
 
       setTravelData(trips)
     } catch (error) {
@@ -141,14 +143,19 @@ const Homepage = () => {
               <>
                 {filteredTravels.length > 0 ? (
                   <div className="flex w-full flex-col items-center space-y-6">
-                    {filteredTravels.map((travel) => (
-                      <div key={travel.id} className="w-full max-w-md">
-                        <TravelCard
-                          trip={travel}
-                          ModalComponent={TravelModalWithCopy}
-                        />
-                      </div>
-                    ))}
+                    <HomeTripList
+                      trips={filteredTravels}
+                      onLike={(tripId, newLikes) => {
+                        setTravelData((prev) => {
+                          const updated = prev.map((t) =>
+                            t.id === tripId ? { ...t, likes: newLikes } : t
+                          )
+                          return [...updated].sort(
+                            (a, b) => (b.likes || 0) - (a.likes || 0)
+                          )
+                        })
+                      }}
+                    />
                   </div>
                 ) : (
                   <div className="py-8 text-center text-gray-300">

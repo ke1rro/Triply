@@ -17,6 +17,7 @@ import Profile from './pages/Profile'
 import MyTrips from './pages/MyTrips'
 import EventDaysDnDPage from './pages/EventDaysDnDPage'
 import LikedTrips from './pages/LikedTrips'
+import TripInvite from './pages/TripInvite'
 import './index.css'
 
 // Make sure the root element is properly targeted
@@ -52,6 +53,7 @@ root.render(
               </ProtectedRoute>
             }
           />
+          <Route path="/invite/:tripId" element={<TripInvite />} />
           <Route
             path="/mytrips"
             element={
@@ -85,7 +87,6 @@ root.render(
             }
           />
           <Route path="/" element={<Navigate to="/login" replace />} />
-          {/* Add a catch-all route */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </AuthProvider>

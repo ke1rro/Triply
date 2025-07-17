@@ -23,6 +23,7 @@ export const createUserDocument = async (user) => {
       displayName: user.displayName || '',
       photoURL: user.photoURL || '',
       likedTrips: [],
+      visiting: [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     }
@@ -97,6 +98,50 @@ export const removeLikedTrip = async (userId, tripId) => {
     })
   } catch (error) {
     console.error('Error removing liked trip:', error)
+    throw error
+  }
+}
+
+export const addVisitingTrip = async (userId, tripId) => {
+  if (!userId || !tripId) return
+
+  try {
+    const userRef = doc(db, 'users', userId)
+    await updateDoc(userRef, {
+      visiting: arrayUnion(tripId),
+      updatedAt: serverTimestamp(),
+    })
+  } catch (error) {
+    console.error('Error adding visiting trip:', error)
+    throw error
+  }
+}
+
+export const removeVisitingTrip = async (userId, tripId) => {
+  if (!userId || !tripId) return
+
+  try {
+    const userRef = doc(db, 'users', userId)
+    await updateDoc(userRef, {
+      visiting: arrayRemove(tripId),
+      updatedAt: serverTimestamp(),
+    })
+  } catch (error) {
+    console.error('Error removing visiting trip:', error)
+    throw error
+  }
+}
+
+export const batchRemoveVisitingTrip = async (userIds, tripId) => {
+  if (!userIds || userIds.length === 0 || !tripId) return
+
+  try {
+    const removePromises = userIds.map((userId) =>
+      removeVisitingTrip(userId, tripId)
+    )
+    await Promise.all(removePromises)
+  } catch (error) {
+    console.error('Error batch removing visiting trips:', error)
     throw error
   }
 }
