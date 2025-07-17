@@ -131,3 +131,17 @@ export const removeVisitingTrip = async (userId, tripId) => {
     throw error
   }
 }
+
+export const batchRemoveVisitingTrip = async (userIds, tripId) => {
+  if (!userIds || userIds.length === 0 || !tripId) return
+
+  try {
+    const removePromises = userIds.map(userId => 
+      removeVisitingTrip(userId, tripId)
+    )
+    await Promise.all(removePromises)
+  } catch (error) {
+    console.error('Error batch removing visiting trips:', error)
+    throw error
+  }
+}

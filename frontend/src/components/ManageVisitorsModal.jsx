@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { FiCopy, FiCheck, FiUsers } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
+import { removeVisitingTrip } from '../lib/userService'
 
 const ManageVisitorsModal = ({ trip, onClose }) => {
   const { currentUser } = useAuth()
   const [visitors, setVisitors] = useState([])
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [removingVisitor, setRemovingVisitor] = useState(null)
 
   const inviteUrl = `${window.location.origin}/invite/${trip.id}`
 
@@ -59,6 +61,29 @@ const ManageVisitorsModal = ({ trip, onClose }) => {
       document.body.removeChild(textArea)
       setCopied(true)
       setTimeout(() => setCopied(false), 3000)
+    }
+  }
+
+  const handleRemoveVisitor = async (visitorId) => {
+    if (!window.confirm('Are you sure you want to remove this member from the trip?')) return
+    
+    setRemovingVisitor(visitorId)
+    try {
+      // Remove visitor from trip
+      await updateDoc(doc(db, 'trips', trip.id), {
+        visitors: arrayRemove(visitorId)
+      })
+
+      // Remove trip from visitor's visiting list
+      await removeVisitingTrip(visitorId, trip.id)
+
+      // Update local state
+      setVisitors(prev => prev.filter(visitor => visitor.id !== visitorId))
+    } catch (error) {
+      console.error('Error removing visitor:', error)
+      alert('Failed to remove member. Please try again.')
+    } finally {
+      setRemovingVisitor(null)
     }
   }
 
@@ -119,12 +144,25 @@ const ManageVisitorsModal = ({ trip, onClose }) => {
                   className="rounded-lg bg-white/5 p-3 backdrop-blur-sm"
                 >
                   <div className="flex items-center justify-between">
-                    <div>
+                    <div className="flex-1">
                       <div className="font-medium text-white">{visitor.name}</div>
                       <div className="text-sm text-gray-400">{visitor.email}</div>
                     </div>
-                    <div className="text-xs text-green-400 bg-green-600/20 px-2 py-1 rounded">
-                      Member
+                    <div className="flex items-center gap-2">
+                      <div className="text-xs text-green-400 bg-green-600/20 px-2 py-1 rounded">
+                        Member
+                      </div>
+                      {/* Remove button - only for owner */}
+                      {isOwner && (
+                        <button
+                          onClick={() => handleRemoveVisitor(visitor.id)}
+                          disabled={removingVisitor === visitor.id}
+                          className="flex h-6 w-6 items-center justify-center rounded-full bg-red-600/80 text-white text-xs transition-colors hover:bg-red-700/80 disabled:opacity-50"
+                          title="Remove member"
+                        >
+                          {removingVisitor === visitor.id ? '...' : '×'}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

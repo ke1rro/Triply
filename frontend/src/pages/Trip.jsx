@@ -158,10 +158,30 @@ const Trip = () => {
     if (!window.confirm('Are you sure you want to end this trip?')) return
     
     try {
-      await updateDoc(doc(db, 'trips', tripviewId), {
-        statusActive: false
+      const tripRef = doc(db, 'trips', tripviewId)
+      
+      // Get current trip data to access visitors
+      const tripSnap = await getDoc(tripRef)
+      if (!tripSnap.exists()) return
+      
+      const tripData = tripSnap.data()
+      const visitors = tripData.visitors || []
+
+      // End the trip and clear visitors
+      await updateDoc(tripRef, {
+        statusActive: false,
+        visitors: [] // Remove all visitors when ending trip
       })
-      setTrip(prev => ({ ...prev, statusActive: false }))
+
+      // Remove trip from all visitors' visiting lists
+      if (visitors.length > 0) {
+        const removePromises = visitors.map(visitorId => 
+          removeVisitingTrip(visitorId, tripviewId)
+        )
+        await Promise.all(removePromises)
+      }
+
+      setTrip(prev => ({ ...prev, statusActive: false, visitors: [] }))
     } catch (error) {
       console.error('Error ending trip:', error)
       alert('Failed to end trip. Please try again.')
@@ -469,7 +489,7 @@ const Trip = () => {
                     : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
                 }}
               >
-                {/* Start/Share Button - Top Right (only for owner) */}
+                {/* Start/Share Button - Top Right (only for owner or non-visitors) */}
                 <div className="absolute right-4 top-4">
                   {isOwner ? (
                     trip.statusActive ? (
@@ -487,9 +507,9 @@ const Trip = () => {
                         <FiPlay className="h-5 w-5" />
                       </div>
                     )
-                  ) : (
+                  ) : !isVisitor ? (
                     <ShareButton trip={trip} />
-                  )}
+                  ) : null}
                 </div>
                 
                 <div className="flex h-full items-end bg-black/30 p-4">
