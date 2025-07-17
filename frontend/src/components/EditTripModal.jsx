@@ -8,7 +8,9 @@ import TravelCard from './TravelCard'
 export default function EditTripModal({ trip, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     title: trip.name || '',
-    locations: trip.Locations ? trip.Locations.map(l => l.name).join(', ') : '',
+    locations: trip.Locations
+      ? trip.Locations.map((l) => l.name).join(', ')
+      : '',
     description: trip.description || '',
     days: trip.days || '',
   })
@@ -35,7 +37,7 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleFileSelect = (e) => {
@@ -60,7 +62,7 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
   const isFormValid =
     formData.title.trim().length > 0 &&
     formData.locations.trim().length > 0 &&
-    formData.locations.split(',').some(loc => loc.trim().length > 0) &&
+    formData.locations.split(',').some((loc) => loc.trim().length > 0) &&
     String(formData.days).trim().length > 0 &&
     Number.isInteger(Number(formData.days)) &&
     Number(formData.days) > 0
@@ -68,7 +70,10 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
   const previewTrip = {
     name: formData.title || 'Trip Preview',
     locations: formData.locations
-      ? formData.locations.split(',').map(loc => loc.trim()).filter(loc => loc.length > 0)
+      ? formData.locations
+          .split(',')
+          .map((loc) => loc.trim())
+          .filter((loc) => loc.length > 0)
       : ['Location 1', 'Location 2'],
     days: parseInt(formData.days) || 0,
     averageRating: trip.averageRating || 0,
@@ -87,14 +92,18 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
       setError('At least one location is required')
       return
     }
-    if (!String(formData.days).trim() || !Number.isInteger(Number(formData.days)) || Number(formData.days) <= 0) {
+    if (
+      !String(formData.days).trim() ||
+      !Number.isInteger(Number(formData.days)) ||
+      Number(formData.days) <= 0
+    ) {
       setError('Please enter a valid number of days (must be at least 1)')
       return
     }
     const locationArray = formData.locations
       .split(',')
-      .map(l => l.trim())
-      .filter(l => l)
+      .map((l) => l.trim())
+      .filter((l) => l)
     if (locationArray.length === 0) {
       setError('Please enter valid location names')
       return
@@ -104,7 +113,11 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
       // Prepare locations array (keep existing coordinates if possible)
       const locationsWithCoordinates = locationArray.map((name) => {
         const existingLocation = trip.Locations?.find((l) => l.name === name)
-        if (existingLocation && existingLocation.location && existingLocation.location.length === 2) {
+        if (
+          existingLocation &&
+          existingLocation.location &&
+          existingLocation.location.length === 2
+        ) {
           return {
             name,
             location: existingLocation.location,
@@ -145,7 +158,7 @@ export default function EditTripModal({ trip, onClose, onSuccess }) {
     >
       <div
         className="max-h-[90vh] w-screen max-w-4xl overflow-y-auto rounded-2xl bg-black/80 p-6 shadow-2xl backdrop-blur-md"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header with title and close button */}
         <div className="mb-6 flex items-start justify-between">

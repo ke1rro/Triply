@@ -13,36 +13,76 @@ const EventDaysDnDPage = () => {
       {
         id: '1-1',
         name: 'Visit Museum of Modern Art',
-        time: '10:00 AM',
+        time: '09:00',
         coordinates: { lat: 37.7857, lng: -122.4011 }, // San Francisco MoMA
+        place: {
+          id: 'moma-sf',
+          name: 'Museum of Modern Art',
+          latitude: 37.7857,
+          longitude: -122.4011,
+          categories: ['museum'],
+          isCustom: false,
+        },
       },
       {
         id: '1-2',
         name: 'Lunch at Ferry Building',
-        time: '1:00 PM',
+        time: '11:00',
         coordinates: { lat: 37.7955, lng: -122.3937 }, // SF Ferry Building
+        place: {
+          id: 'ferry-building',
+          name: 'Ferry Building',
+          latitude: 37.7955,
+          longitude: -122.3937,
+          categories: ['restaurant'],
+          isCustom: false,
+        },
       },
     ],
     2: [
       {
         id: '2-1',
         name: 'Golden Gate Park',
-        time: '9:00 AM',
+        time: '09:00',
         coordinates: { lat: 37.7694, lng: -122.4862 }, // Golden Gate Park
+        place: {
+          id: 'golden-gate-park',
+          name: 'Golden Gate Park',
+          latitude: 37.7694,
+          longitude: -122.4862,
+          categories: ['park'],
+          isCustom: false,
+        },
       },
       {
         id: '2-2',
         name: 'Shopping at Union Square',
-        time: '3:00 PM',
+        time: '11:00',
         coordinates: { lat: 37.7881, lng: -122.4075 }, // Union Square
+        place: {
+          id: 'union-square',
+          name: 'Union Square',
+          latitude: 37.7881,
+          longitude: -122.4075,
+          categories: ['shopping'],
+          isCustom: false,
+        },
       },
     ],
     3: [
       {
         id: '3-1',
         name: 'Alcatraz Island Tour',
-        time: '11:00 AM',
+        time: '09:00',
         coordinates: { lat: 37.827, lng: -122.423 }, // Alcatraz Island
+        place: {
+          id: 'alcatraz',
+          name: 'Alcatraz Island',
+          latitude: 37.827,
+          longitude: -122.423,
+          categories: ['tourist-attraction'],
+          isCustom: false,
+        },
       },
     ],
   })
@@ -52,6 +92,28 @@ const EventDaysDnDPage = () => {
   const [editMode, setEditMode] = useState('add')
   const [editingEventIdx, setEditingEventIdx] = useState(null)
   const [currentEvent, setCurrentEvent] = useState({})
+
+  // Helper function to automatically update event times based on their position
+  const updateEventTimes = (events) => {
+    if (events.length === 0) return events
+
+    return events.map((event, index) => {
+      // Calculate time based on position: start at 9:00 AM, add 2 hours between events
+      const startHour = 9
+      const hoursBetweenEvents = 2
+      const totalHours = startHour + index * hoursBetweenEvents
+
+      // Handle hours > 24 by wrapping to next day
+      const hours = totalHours % 24
+      const formattedHours = hours.toString().padStart(2, '0')
+      const newTime = `${formattedHours}:00`
+
+      return {
+        ...event,
+        time: newTime,
+      }
+    })
+  }
 
   const handleDragEnd = (result) => {
     const { source, destination } = result
@@ -68,9 +130,12 @@ const EventDaysDnDPage = () => {
       const [movedEvent] = newEvents.splice(source.index, 1)
       newEvents.splice(destination.index, 0, movedEvent)
 
+      // Update times based on new order
+      const updatedEvents = updateEventTimes(newEvents)
+
       setEventsByDay({
         ...eventsByDay,
-        [sourceDay]: newEvents,
+        [sourceDay]: updatedEvents,
       })
     } else {
       // If dropped in a different day
@@ -80,10 +145,14 @@ const EventDaysDnDPage = () => {
 
       destEvents.splice(destination.index, 0, movedEvent)
 
+      // Update times for both days
+      const updatedSourceEvents = updateEventTimes(sourceEvents)
+      const updatedDestEvents = updateEventTimes(destEvents)
+
       setEventsByDay({
         ...eventsByDay,
-        [sourceDay]: sourceEvents,
-        [destinationDay]: destEvents,
+        [sourceDay]: updatedSourceEvents,
+        [destinationDay]: updatedDestEvents,
       })
     }
   }
@@ -105,21 +174,47 @@ const EventDaysDnDPage = () => {
 
   const handleEventSubmit = (eventData) => {
     if (editMode === 'add') {
+      // Extract coordinates from place data if available
+      const coordinates = eventData.place
+        ? { lat: eventData.place.latitude, lng: eventData.place.longitude }
+        : null
+
+      // Auto-generate time if not provided
+      let eventTime = eventData.time
+      if (!eventTime) {
+        const existingEvents = eventsByDay[currentDay] || []
+        const startHour = 9
+        const hoursBetweenEvents = 2
+        const newEventIndex = existingEvents.length
+        const totalHours = startHour + newEventIndex * hoursBetweenEvents
+        const hours = totalHours % 24
+        eventTime = `${hours.toString().padStart(2, '0')}:00`
+      }
+
       const newEvent = {
         id: `${currentDay}-${Date.now()}`,
         ...eventData,
+        time: eventTime,
+        coordinates,
       }
+
+      const updatedEvents = [...(eventsByDay[currentDay] || []), newEvent]
 
       setEventsByDay({
         ...eventsByDay,
-        [currentDay]: [...(eventsByDay[currentDay] || []), newEvent],
+        [currentDay]: updatedEvents,
       })
     } else {
-      // Edit mode
+      // Edit mode - also update coordinates
+      const coordinates = eventData.place
+        ? { lat: eventData.place.latitude, lng: eventData.place.longitude }
+        : eventsByDay[currentDay][editingEventIdx].coordinates
+
       const updatedEvents = [...eventsByDay[currentDay]]
       updatedEvents[editingEventIdx] = {
         ...updatedEvents[editingEventIdx],
         ...eventData,
+        coordinates,
       }
 
       setEventsByDay({
@@ -174,7 +269,13 @@ const EventDaysDnDPage = () => {
             <RouteMap
               events={Object.values(eventsByDay)
                 .flat()
-                .filter((event) => event.coordinates)}
+                .filter(
+                  (event) =>
+                    event.coordinates ||
+                    (event.place &&
+                      event.place.latitude &&
+                      event.place.longitude)
+                )}
             />
           </div>
         </div>

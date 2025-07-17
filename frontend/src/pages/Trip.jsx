@@ -37,7 +37,7 @@ const Trip = () => {
   const [error, setError] = useState('')
   const [userLikedTrips, setUserLikedTrips] = useState([])
   const [copying, setCopying] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false)
 
   // Handler for Add this trip
   const handleAddThisTrip = async () => {
@@ -117,7 +117,7 @@ const Trip = () => {
 
   // Edit trip handler
   const handleEditTrip = () => {
-    setShowEditModal(true);
+    setShowEditModal(true)
   }
 
   // Publish trip handler
@@ -313,16 +313,16 @@ const Trip = () => {
         <EditTripModal
           trip={trip}
           onClose={() => setShowEditModal(false)}
-          onSuccess={updatedTrip => {
-            setTrip(updatedTrip);
-            setShowEditModal(false);
+          onSuccess={(updatedTrip) => {
+            setTrip(updatedTrip)
+            setShowEditModal(false)
             // Optionally, reload image if changed
             if (updatedTrip.fileName !== trip.fileName) {
-              const storage = getStorage();
-              const imageRef = ref(storage, updatedTrip.fileName);
+              const storage = getStorage()
+              const imageRef = ref(storage, updatedTrip.fileName)
               getDownloadURL(imageRef)
-                .then(url => setImageUrl(url))
-                .catch(() => setImageUrl(null));
+                .then((url) => setImageUrl(url))
+                .catch(() => setImageUrl(null))
             }
           }}
         />
