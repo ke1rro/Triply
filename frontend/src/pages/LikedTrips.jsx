@@ -4,88 +4,77 @@ import { db } from '../lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import TravelCard from '../components/TravelCard'
-import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
-import { FiSearch, FiNavigation } from 'react-icons/fi'
+import { FiSearch, FiHeart } from 'react-icons/fi'
+import { getUserDocument } from '../lib/userService'
 
-const MyTrips = () => {
+const LikedTrips = () => {
   const [travelData, setTravelData] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [activeTab, setActiveTab] = useState('mytrips')
   const navigate = useNavigate()
   const { currentUser } = useAuth()
 
   useEffect(() => {
-    const fetchTravelData = async () => {
+    const fetchLikedTrips = async () => {
+      if (!currentUser) return
+
       try {
+        // First get user's liked trip IDs
+        const userData = await getUserDocument(currentUser.uid)
+        const likedTripIds = userData?.likedTrips || []
+
+        if (likedTripIds.length === 0) {
+          setTravelData([])
+          setLoading(false)
+          return
+        }
+
+        // Then fetch all trips and filter by liked IDs
         const querySnapshot = await getDocs(collection(db, 'trips'))
-        const trips = querySnapshot.docs.map((doc) => {
-          const data = doc.data()
-          return {
-            id: doc.id,
-            name: data.name || 'Untitled Trip',
-            description: data.description || '',
-            days: data.days || 0,
-            likes: data.likes || 0,
-            fileName: data.fileName || null,
-            locations: data.Locations
-              ? data.Locations.map((loc) => loc.name).slice(0, 5)
-              : [],
-            Events: data.Events || data.events || [],
-            comments: data.comments || [],
-            averageRating:
-              data.comments && data.comments.length > 0
-                ? data.comments.reduce(
-                    (sum, comment) => sum + (comment.rating || 0),
-                    0
-                  ) / data.comments.length
-                : 0,
-            createdAt: data.createdAt,
-            userId: data.userId,
-            parent_id: data.parent_id,
-            published: data.published,
-          }
-        })
-        setTravelData(trips.filter((trip) => trip.userId === currentUser?.uid))
+        const trips = querySnapshot.docs
+          .map((doc) => {
+            const data = doc.data()
+            return {
+              id: doc.id,
+              name: data.name || 'Untitled Trip',
+              description: data.description || '',
+              days: data.days || 0,
+              likes: data.likes || 0,
+              fileName: data.fileName || null,
+              locations: data.Locations
+                ? data.Locations.map((loc) => loc.name).slice(0, 5)
+                : [],
+              Events: data.Events || data.events || [],
+              comments: data.comments || [],
+              averageRating:
+                data.comments && data.comments.length > 0
+                  ? data.comments.reduce(
+                      (sum, comment) => sum + (comment.rating || 0),
+                      0
+                    ) / data.comments.length
+                  : 0,
+              createdAt: data.createdAt,
+              userId: data.userId,
+              parent_id: data.parent_id,
+              published: data.published,
+            }
+          })
+          .filter((trip) => likedTripIds.includes(trip.id))
+
+        setTravelData(trips)
       } catch (err) {
+        console.error('Error fetching liked trips:', err)
         setTravelData([])
       }
       setLoading(false)
     }
-    if (currentUser) fetchTravelData()
+
+    fetchLikedTrips()
   }, [currentUser])
 
   const handleSelectTrip = (tripId) => {
     navigate(`/tripview/${tripId}`)
-  }
-
-  const handleCreateSuccess = (newTripData) => {
-    // Add the new trip to the local state immediately
-    if (newTripData) {
-      const formattedTrip = {
-        id: newTripData.id,
-        name: newTripData.name || 'Untitled Trip',
-        description: newTripData.description || '',
-        days: newTripData.days || 0,
-        likes: 0,
-        fileName: newTripData.fileName || null,
-        locations: newTripData.Locations
-          ? newTripData.Locations.map((loc) => loc.name).slice(0, 5)
-          : [],
-        Events: newTripData.Events || [],
-        comments: [],
-        averageRating: 0,
-        createdAt: newTripData.createdAt,
-        userId: newTripData.userId,
-        parent_id: newTripData.parent_id,
-        published: newTripData.published || false,
-      }
-
-      // Add to the beginning of the array so it appears at the top
-      setTravelData((prev) => [formattedTrip, ...prev])
-    }
   }
 
   return (
@@ -106,22 +95,15 @@ const MyTrips = () => {
       {/* Content */}
       <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-8 sm:px-6 md:px-8">
         {/* Header - No black box */}
-        <div className="flex-shrink-0 px-4 pb-6 pt-12 backdrop-blur-sm">
-          {/* Logo */}
-          <div className="mb-8 text-center">
-            <h1 className="text-4xl font-black text-blue-400 drop-shadow-2xl">
+        <div className="mb-8 flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <h1 className="text-5xl font-bold text-blue-400 drop-shadow-lg">
               Triply
             </h1>
-            <div className="mx-auto mt-2 h-0.5 w-12 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
-          </div>
-
-          {/* Profile Title and Description */}
-          <div className="text-center">
-            <div className="mb-3 flex items-center justify-center gap-3">
-              <p className="text-xl font-bold text-white drop-shadow-md">
-                My Trips
-              </p>
-            </div>
+            <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-blue-400 to-teal-400"></div>
+            <p className="mt-3 text-xl text-white/80 drop-shadow-md">
+              Liked Trips
+            </p>
           </div>
         </div>
 
@@ -130,7 +112,7 @@ const MyTrips = () => {
           <div className="flex items-center gap-3">
             <input
               type="text"
-              placeholder="Search my trips..."
+              placeholder="Search liked trips..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full flex-1 rounded-xl border border-gray-300/30 bg-white/10 px-5 py-4 text-lg text-white placeholder-gray-300 backdrop-blur-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -144,7 +126,7 @@ const MyTrips = () => {
           <div className="h-full space-y-4">
             {loading ? (
               <div className="py-8 text-center text-gray-300">
-                Loading trips...
+                Loading liked trips...
               </div>
             ) : (
               <>
@@ -162,7 +144,7 @@ const MyTrips = () => {
                             trip={trip}
                             onSelect={() => handleSelectTrip(trip.id)}
                             ModalComponent={undefined}
-                            showLike={false}
+                            showLike={true}
                           />
                         </div>
                       ))}
@@ -170,8 +152,8 @@ const MyTrips = () => {
                 ) : (
                   <div className="py-8 text-center text-gray-300">
                     {searchQuery
-                      ? 'No trips found matching your search.'
-                      : 'No trips available.'}
+                      ? 'No liked trips found matching your search.'
+                      : 'No liked trips yet. Start exploring and like trips you love!'}
                   </div>
                 )}
               </>
@@ -182,22 +164,13 @@ const MyTrips = () => {
 
       {/* Navigation */}
       <Navbar
-        activeTab="mytrips"
-        onAddClick={() => setShowCreateModal(true)}
+        activeTab="liked"
+        onAddClick={() => {}}
         showBottomNav={true}
         showHeaderNav={false}
       />
-
-      {/* Create Trip Modal */}
-      {showCreateModal && (
-        <CreateTripModal
-          open={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={handleCreateSuccess}
-        />
-      )}
     </div>
   )
 }
 
-export default MyTrips
+export default LikedTrips

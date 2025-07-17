@@ -10,8 +10,13 @@ import {
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
+import {
+  addLikedTrip,
+  removeLikedTrip,
+  getUserDocument,
+} from '../lib/userService'
 
-export default function TravelCard({ trip }) {
+export default function TravelCard({ trip, onSelect }) {
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
   const [localLikes, setLocalLikes] = useState(trip.likes || 0)
@@ -20,12 +25,27 @@ export default function TravelCard({ trip }) {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
 
-  // Check if user has already liked this trip
+  // Check if user has already liked this trip from user document
   useState(() => {
-    if (currentUser && trip.likedBy) {
-      setIsLiked(trip.likedBy.includes(currentUser.uid))
+    const checkUserLikedTrips = async () => {
+      if (currentUser) {
+        try {
+          const userData = await getUserDocument(currentUser.uid)
+          if (userData && userData.likedTrips) {
+            setIsLiked(userData.likedTrips.includes(trip.id))
+          }
+        } catch (error) {
+          console.error('Error fetching user liked trips:', error)
+          // Fallback to trip.likedBy if user service fails
+          if (trip.likedBy) {
+            setIsLiked(trip.likedBy.includes(currentUser.uid))
+          }
+        }
+      }
     }
-  }, [currentUser, trip.likedBy])
+
+    checkUserLikedTrips()
+  }, [currentUser, trip.id, trip.likedBy])
 
   // Load image from Firebase Storage when component mounts
   useState(() => {
@@ -59,19 +79,21 @@ export default function TravelCard({ trip }) {
       const tripRef = doc(db, 'trips', trip.id)
 
       if (isLiked) {
-        // Unlike: decrease likes and remove user from likedBy array
+        // Unlike: update both trip and user documents
         await updateDoc(tripRef, {
           likes: increment(-1),
           likedBy: arrayRemove(currentUser.uid),
         })
+        await removeLikedTrip(currentUser.uid, trip.id)
         setLocalLikes((prev) => prev - 1)
         setIsLiked(false)
       } else {
-        // Like: increase likes and add user to likedBy array
+        // Like: update both trip and user documents
         await updateDoc(tripRef, {
           likes: increment(1),
           likedBy: arrayUnion(currentUser.uid),
         })
+        await addLikedTrip(currentUser.uid, trip.id)
         setLocalLikes((prev) => prev + 1)
         setIsLiked(true)
       }
@@ -104,7 +126,7 @@ export default function TravelCard({ trip }) {
 
   return (
     <div
-      onClick={handleCardClick}
+      onClick={onSelect ? onSelect : handleCardClick}
       className="active:scale-98 group relative h-36 w-full cursor-pointer overflow-hidden rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl"
     >
       {/* Background image that scales on hover */}
