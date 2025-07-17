@@ -45,6 +45,8 @@ export default function TravelModalWithCopy({ trip, onClose, onCopied }) {
         createdAt: serverTimestamp(),
         likes: 0,
         comments: [],
+        visitors: [],
+        statusActive: false,
         Events: Array.isArray(trip.Events)
           ? JSON.parse(JSON.stringify(trip.Events))
           : Array.isArray(trip.events)

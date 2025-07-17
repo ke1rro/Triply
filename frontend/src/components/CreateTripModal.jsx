@@ -132,6 +132,8 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         days: parseInt(formData.days) || 0,
         likes: 0,
         likedBy: [],
+        visitors: [],
+        statusActive: false,
         fileName: fileName,
         userId: currentUser?.uid || '',
         published: false,
@@ -391,7 +393,7 @@ function PreviewTravelCard({ trip, imageUrl }) {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md text-white">
+            <div className="flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium text-white drop-shadow-md">
               <span>🤍</span>
               <span>0</span>
             </div>

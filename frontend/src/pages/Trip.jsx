@@ -11,15 +11,20 @@ import {
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 import { db } from '../lib/firebase'
 import { useAuth } from '../context/AuthContext'
-import { FiArrowLeft, FiClock, FiHeart, FiStar } from 'react-icons/fi'
+import { FiArrowLeft, FiClock, FiHeart, FiStar, FiPlay, FiSquare, FiUsers } from 'react-icons/fi'
 import {
   addLikedTrip,
   removeLikedTrip,
   getUserDocument,
+  addVisitingTrip,
+  removeVisitingTrip,
 } from '../lib/userService'
 import EditTripModal from '../components/EditTripModal'
 import PageHeader from '../components/PageHeader'
 import Navbar from '../components/Navbar'
+import ShareButton from '../components/ShareButton'
+import StartTripModal from '../components/StartTripModal'
+import ManageVisitorsModal from '../components/ManageVisitorsModal'
 
 const Trip = () => {
   const { tripviewId } = useParams()
@@ -40,6 +45,9 @@ const Trip = () => {
   const [userLikedTrips, setUserLikedTrips] = useState([])
   const [copying, setCopying] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [showStartModal, setShowStartModal] = useState(false)
+  const [showVisitorsModal, setShowVisitorsModal] = useState(false)
+  const [isVisitor, setIsVisitor] = useState(false)
 
   // Handler for Add this trip
   const handleAddThisTrip = async () => {
@@ -146,6 +154,39 @@ const Trip = () => {
     }
   }
 
+  const handleEndTrip = async () => {
+    if (!window.confirm('Are you sure you want to end this trip?')) return
+    
+    try {
+      await updateDoc(doc(db, 'trips', tripviewId), {
+        statusActive: false
+      })
+      setTrip(prev => ({ ...prev, statusActive: false }))
+    } catch (error) {
+      console.error('Error ending trip:', error)
+      alert('Failed to end trip. Please try again.')
+    }
+  }
+
+  const handleLeaveTrip = async () => {
+    if (!window.confirm('Are you sure you want to leave this trip?')) return
+    
+    try {
+      // Remove user from trip visitors
+      await updateDoc(doc(db, 'trips', tripviewId), {
+        visitors: arrayRemove(currentUser.uid)
+      })
+
+      // Remove trip from user's visiting list
+      await removeVisitingTrip(currentUser.uid, tripviewId)
+      
+      navigate('/mytrips')
+    } catch (error) {
+      console.error('Error leaving trip:', error)
+      alert('Failed to leave trip. Please try again.')
+    }
+  }
+
   useEffect(() => {
     const fetchTrip = async () => {
       try {
@@ -169,9 +210,14 @@ const Trip = () => {
           setTrip(tripData)
           setLocalLikes(data.likes || 0)
           setLocalComments(data.comments || [])
-
-          if (currentUser && data.likedBy) {
-            setIsLiked(data.likedBy.includes(currentUser.uid))
+          
+          // Check if current user is a visitor
+          if (currentUser) {
+            setIsVisitor(data.visitors?.includes(currentUser.uid) || false)
+            
+            if (data.likedBy) {
+              setIsLiked(data.likedBy.includes(currentUser.uid))
+            }
           }
 
           // Load image
@@ -308,6 +354,8 @@ const Trip = () => {
     )
   }
 
+  const isOwner = trip?.userId === currentUser?.uid
+
   return (
     <div className="relative flex min-h-screen flex-col">
       {/* Edit Modal */}
@@ -327,6 +375,25 @@ const Trip = () => {
                 .catch(() => setImageUrl(null))
             }
           }}
+        />
+      )}
+
+      {/* Start Trip Modal */}
+      {showStartModal && (
+        <StartTripModal
+          trip={trip}
+          onClose={() => setShowStartModal(false)}
+          onSuccess={() => {
+            setTrip(prev => ({ ...prev, statusActive: true }))
+          }}
+        />
+      )}
+
+      {/* Manage Visitors Modal */}
+      {showVisitorsModal && (
+        <ManageVisitorsModal
+          trip={trip}
+          onClose={() => setShowVisitorsModal(false)}
         />
       )}
 
@@ -354,13 +421,35 @@ const Trip = () => {
           <FiArrowLeft className="h-6 w-6" />
         </button>
 
-        {/* Edit Button (if owner) - Fixed at top right */}
-        {currentUser && trip.userId === currentUser.uid && (
+        {/* Edit/Visitors/View Members Button (if owner or visitor) - Fixed at top right */}
+        {currentUser && (isOwner || isVisitor) && (
           <button
-            onClick={() => setShowEditModal(true)}
-            className="absolute right-4 top-4 z-20 rounded-lg bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700"
+            onClick={() => {
+              if (isOwner) {
+                trip.statusActive ? setShowVisitorsModal(true) : setShowEditModal(true)
+              } else if (isVisitor && trip.statusActive) {
+                setShowVisitorsModal(true)
+              }
+            }}
+            className="absolute right-4 top-4 z-20 rounded-lg bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700 flex items-center gap-2"
           >
-            Edit
+            {isOwner ? (
+              trip.statusActive ? (
+                <>
+                  <FiUsers className="h-4 w-4" />
+                  Members
+                </>
+              ) : (
+                'Edit'
+              )
+            ) : (
+              isVisitor && trip.statusActive && (
+                <>
+                  <FiUsers className="h-4 w-4" />
+                  View Members
+                </>
+              )
+            )}
           </button>
         )}
 
@@ -373,13 +462,36 @@ const Trip = () => {
             <div className="overflow-hidden rounded-2xl bg-black/70 shadow-2xl backdrop-blur-md">
               {/* Trip Image Header */}
               <div
-                className="h-32 bg-cover bg-center"
+                className="relative h-32 bg-cover bg-center"
                 style={{
                   backgroundImage: imageUrl
                     ? `url(${imageUrl})`
                     : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
                 }}
               >
+                {/* Start/Share Button - Top Right (only for owner) */}
+                <div className="absolute right-4 top-4">
+                  {isOwner ? (
+                    trip.statusActive ? (
+                      <div
+                        onClick={handleEndTrip}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-red-600/80 text-white transition-all duration-200 hover:bg-red-700/80"
+                      >
+                        <FiSquare className="h-5 w-5" />
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => setShowStartModal(true)}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-green-600/80 text-white transition-all duration-200 hover:bg-green-700/80"
+                      >
+                        <FiPlay className="h-5 w-5" />
+                      </div>
+                    )
+                  ) : (
+                    <ShareButton trip={trip} />
+                  )}
+                </div>
+                
                 <div className="flex h-full items-end bg-black/30 p-4">
                   <div className="text-white">
                     <p className="text-sm opacity-90">
@@ -408,12 +520,13 @@ const Trip = () => {
                     </span>
                     <span className="text-xs text-gray-400">Reviews</span>
                   </div>
-                  <div 
-                    className="flex flex-col items-center cursor-pointer"
-                    onClick={handleLike}
-                  >
-                    <FiHeart className={`mb-1 h-5 w-5 ${isLiked ? 'fill-current text-red-500' : 'text-blue-400'}`} />
-                    <span className={`text-sm font-semibold ${isLiked ? 'text-red-500' : 'text-white'}`}>
+                  <div className="flex flex-col items-center">
+                    <FiHeart
+                      className={`mb-1 h-5 w-5 ${isLiked ? 'fill-current text-red-500' : 'text-blue-400'}`}
+                    />
+                    <span
+                      className={`text-sm font-semibold ${isLiked ? 'text-red-500' : 'text-white'}`}
+                    >
                       {localLikes}
                     </span>
                     <span className="text-xs text-gray-400">Likes</span>
@@ -452,7 +565,9 @@ const Trip = () => {
                     <div className="space-y-4">
                       {/* About Section */}
                       <div>
-                        <h3 className="mb-2 text-lg font-semibold text-blue-400">About</h3>
+                        <h3 className="mb-2 text-lg font-semibold text-blue-400">
+                          About
+                        </h3>
                         <p className="text-sm leading-relaxed text-gray-300">
                           {trip.description || 'No description available.'}
                         </p>
@@ -476,9 +591,14 @@ const Trip = () => {
                       {showCommentForm && (
                         <div className="rounded-lg border border-blue-400/30 bg-white/5 p-4">
                           {error && (
-                            <div className="mb-3 text-sm text-red-300">{error}</div>
+                            <div className="mb-3 text-sm text-red-300">
+                              {error}
+                            </div>
                           )}
-                          <form onSubmit={handleCommentSubmit} className="space-y-3">
+                          <form
+                            onSubmit={handleCommentSubmit}
+                            className="space-y-3"
+                          >
                             <div>
                               <label className="mb-1 block text-sm font-medium text-blue-300">
                                 Rating:
@@ -550,7 +670,9 @@ const Trip = () => {
                                   {formatRating(comment.rating || 0)}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-300">{comment.body}</p>
+                              <p className="text-sm text-gray-300">
+                                {comment.body}
+                              </p>
                             </div>
                           ))
                         ) : (
@@ -565,7 +687,7 @@ const Trip = () => {
 
                 {/* Action Buttons */}
                 <div className="mt-6 space-y-3">
-                  {trip.userId === currentUser?.uid ? (
+                  {isOwner ? (
                     <div className="flex gap-2">
                       <button
                         className="flex-1 rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80"
@@ -576,9 +698,16 @@ const Trip = () => {
                       <button
                         className="flex-1 rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80"
                         onClick={async () => {
-                          if (!window.confirm('Are you sure you want to delete this trip?')) return
+                          if (
+                            !window.confirm(
+                              'Are you sure you want to delete this trip?'
+                            )
+                          )
+                            return
                           try {
-                            const { doc, deleteDoc } = await import('firebase/firestore')
+                            const { doc, deleteDoc } = await import(
+                              'firebase/firestore'
+                            )
                             await deleteDoc(doc(db, 'trips', trip.id))
                             navigate('/mytrips')
                           } catch (e) {
@@ -597,9 +726,16 @@ const Trip = () => {
                           }`}
                           onClick={async () => {
                             try {
-                              const { doc, updateDoc } = await import('firebase/firestore')
-                              await updateDoc(doc(db, 'trips', trip.id), { published: !trip.published })
-                              setTrip(prev => ({ ...prev, published: !prev.published }))
+                              const { doc, updateDoc } = await import(
+                                'firebase/firestore'
+                              )
+                              await updateDoc(doc(db, 'trips', trip.id), {
+                                published: !trip.published,
+                              })
+                              setTrip((prev) => ({
+                                ...prev,
+                                published: !prev.published,
+                              }))
                             } catch (e) {
                               alert('Failed to update publish state.')
                             }
@@ -609,6 +745,13 @@ const Trip = () => {
                         </button>
                       )}
                     </div>
+                  ) : isVisitor ? (
+                    <button
+                      className="w-full rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80"
+                      onClick={handleLeaveTrip}
+                    >
+                      Leave Trip
+                    </button>
                   ) : (
                     <button
                       className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 disabled:cursor-not-allowed disabled:opacity-60"
@@ -627,16 +770,22 @@ const Trip = () => {
                               ? window.firebase.firestore().collection('trips')
                               : null
                           // But we use Firestore v9 modular API:
-                          const { collection, getDocs, addDoc, serverTimestamp } = await import(
-                            'firebase/firestore'
-                          )
+                          const {
+                            collection,
+                            getDocs,
+                            addDoc,
+                            serverTimestamp,
+                          } = await import('firebase/firestore')
                           let existingCopyId = null
-                          const querySnapshot = await getDocs(collection(db, 'trips'))
+                          const querySnapshot = await getDocs(
+                            collection(db, 'trips')
+                          )
                           querySnapshot.forEach((doc) => {
                             const data = doc.data()
                             if (
                               data.userId === currentUser.uid &&
-                              (data.parent_id === trip.id || data.parent_id === trip.dataName)
+                              (data.parent_id === trip.id ||
+                                data.parent_id === trip.dataName)
                             ) {
                               existingCopyId = doc.id
                             }
@@ -664,7 +813,10 @@ const Trip = () => {
                           }
                           delete newTrip.id
                           delete newTrip.dataName
-                          const docRef = await addDoc(collection(db, 'trips'), newTrip)
+                          const docRef = await addDoc(
+                            collection(db, 'trips'),
+                            newTrip
+                          )
                           navigate('/mytrips')
                         } catch (e) {
                           alert('Failed to copy trip. Please try again.')

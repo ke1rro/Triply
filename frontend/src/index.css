@@ -218,6 +218,21 @@ button:focus-visible {
   animation: pulse 2s infinite ease-in-out;
 }
 
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
+}
+
 /* Custom styling for the map */
 .leaflet-container {
   background: rgba(14, 30, 37, 0.72) !important;

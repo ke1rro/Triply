@@ -23,6 +23,7 @@ export const createUserDocument = async (user) => {
       displayName: user.displayName || '',
       photoURL: user.photoURL || '',
       likedTrips: [],
+      visiting: [],
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     }
@@ -97,6 +98,36 @@ export const removeLikedTrip = async (userId, tripId) => {
     })
   } catch (error) {
     console.error('Error removing liked trip:', error)
+    throw error
+  }
+}
+
+export const addVisitingTrip = async (userId, tripId) => {
+  if (!userId || !tripId) return
+
+  try {
+    const userRef = doc(db, 'users', userId)
+    await updateDoc(userRef, {
+      visiting: arrayUnion(tripId),
+      updatedAt: serverTimestamp(),
+    })
+  } catch (error) {
+    console.error('Error adding visiting trip:', error)
+    throw error
+  }
+}
+
+export const removeVisitingTrip = async (userId, tripId) => {
+  if (!userId || !tripId) return
+
+  try {
+    const userRef = doc(db, 'users', userId)
+    await updateDoc(userRef, {
+      visiting: arrayRemove(tripId),
+      updatedAt: serverTimestamp(),
+    })
+  } catch (error) {
+    console.error('Error removing visiting trip:', error)
     throw error
   }
 }
