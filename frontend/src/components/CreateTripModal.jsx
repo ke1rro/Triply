@@ -86,7 +86,11 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       return
     }
 
-    if (!String(formData.days).trim() || !Number.isInteger(Number(formData.days)) || Number(formData.days) <= 0) {
+    if (
+      !String(formData.days).trim() ||
+      !Number.isInteger(Number(formData.days)) ||
+      Number(formData.days) <= 0
+    ) {
       setError('Please enter a valid number of days (must be at least 1)')
       return
     }
@@ -288,7 +292,6 @@ export default function CreateTripModal({ onClose, onSuccess }) {
                 className="w-full resize-none rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
               />
             </div>
-
 
             {/* Photo Upload */}
             <div>

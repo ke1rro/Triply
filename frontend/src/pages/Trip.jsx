@@ -119,7 +119,7 @@ const Trip = () => {
 
   // Edit trip handler
   const handleEditTrip = () => {
-    setShowEditModal(true);
+    setShowEditModal(true)
   }
 
   // Publish trip handler
@@ -315,7 +315,7 @@ const Trip = () => {
         <EditTripModal
           trip={trip}
           onClose={() => setShowEditModal(false)}
-          onSuccess={updatedTrip => {
+          onSuccess={(updatedTrip) => {
             setTrip(updatedTrip)
             setShowEditModal(false)
             // Optionally, reload image if changed
@@ -323,7 +323,7 @@ const Trip = () => {
               const storage = getStorage()
               const imageRef = ref(storage, updatedTrip.fileName)
               getDownloadURL(imageRef)
-                .then(url => setImageUrl(url))
+                .then((url) => setImageUrl(url))
                 .catch(() => setImageUrl(null))
             }
           }}

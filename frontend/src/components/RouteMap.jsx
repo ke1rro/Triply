@@ -53,22 +53,40 @@ export default function RouteMap({ events = [] }) {
     // Process event data and extract coordinates
     const processedLocations = events.map((event, index) => {
       // Use provided coordinates if available, or fall back to default location
-      const lat =
-        event.coordinates?.lat || mapCenter.lat + (Math.random() - 0.5) * 0.05
-      const lng =
-        event.coordinates?.lng || mapCenter.lng + (Math.random() - 0.5) * 0.05
+      let lat, lng
 
-      // Determine marker color based on event day
+      // Check for coordinates from MapPicker (place data)
+      if (event.place && event.place.latitude && event.place.longitude) {
+        lat = event.place.latitude
+        lng = event.place.longitude
+      }
+      // Check for existing coordinates format
+      else if (
+        event.coordinates &&
+        event.coordinates.lat &&
+        event.coordinates.lng
+      ) {
+        lat = event.coordinates.lat
+        lng = event.coordinates.lng
+      }
+      // Fallback to random coordinates around map center
+      else {
+        lat = mapCenter.lat + (Math.random() - 0.5) * 0.05
+        lng = mapCenter.lng + (Math.random() - 0.5) * 0.05
+      }
+
+      // Determine marker color based on current event day
       let color = 'blue'
-      if (event.id.startsWith('1-')) color = 'green'
-      if (event.id.startsWith('2-')) color = 'orange'
-      if (event.id.startsWith('3-')) color = 'red'
+      const currentDay = event.currentDay || parseInt(event.id.split('-')[0]) // Use currentDay if available, fallback to ID
+      if (currentDay === 1) color = 'green'
+      if (currentDay === 2) color = 'orange'
+      if (currentDay === 3) color = 'red'
 
       return {
         id: event.id,
         name: event.name,
         time: event.time,
-        day: event.id.split('-')[0],
+        day: currentDay.toString(),
         position: [lat, lng],
         icon: createCustomIcon(color),
         // OpenRouteService needs [longitude, latitude] format
