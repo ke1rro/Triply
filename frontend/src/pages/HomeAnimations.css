@@ -1,0 +1,22 @@
+.trip-list-animate-enter {
+  opacity: 0;
+  transform: translateY(40px) scale(0.96);
+}
+.trip-list-animate-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 400ms,
+    transform 400ms;
+}
+.trip-list-animate-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.trip-list-animate-exit-active {
+  opacity: 0;
+  transform: translateY(-40px) scale(0.96);
+  transition:
+    opacity 400ms,
+    transform 400ms;
+}

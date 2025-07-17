@@ -16,7 +16,13 @@ import {
   getUserDocument,
 } from '../lib/userService'
 
-export default function TravelCard({ trip, onSelect }) {
+export default function TravelCard({
+  trip,
+  onSelect,
+  showEdit = false,
+  onEdit,
+  onLike,
+}) {
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
   const [localLikes, setLocalLikes] = useState(trip.likes || 0)
@@ -85,7 +91,11 @@ export default function TravelCard({ trip, onSelect }) {
           likedBy: arrayRemove(currentUser.uid),
         })
         await removeLikedTrip(currentUser.uid, trip.id)
-        setLocalLikes((prev) => prev - 1)
+        setLocalLikes((prev) => {
+          const newLikes = prev - 1
+          if (onLike) onLike(trip.id, newLikes)
+          return newLikes
+        })
         setIsLiked(false)
       } else {
         // Like: update both trip and user documents
@@ -94,7 +104,11 @@ export default function TravelCard({ trip, onSelect }) {
           likedBy: arrayUnion(currentUser.uid),
         })
         await addLikedTrip(currentUser.uid, trip.id)
-        setLocalLikes((prev) => prev + 1)
+        setLocalLikes((prev) => {
+          const newLikes = prev + 1
+          if (onLike) onLike(trip.id, newLikes)
+          return newLikes
+        })
         setIsLiked(true)
       }
     } catch (error) {
