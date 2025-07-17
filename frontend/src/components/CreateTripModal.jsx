@@ -86,6 +86,11 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       return
     }
 
+    if (!String(formData.days).trim() || !Number.isInteger(Number(formData.days)) || Number(formData.days) <= 0) {
+      setError('Please enter a valid number of days (must be at least 1)')
+      return
+    }
+
     // Validate that locations contain actual content after parsing
     const locationArray = formData.locations
       .split(',')
@@ -156,7 +161,10 @@ export default function CreateTripModal({ onClose, onSuccess }) {
   const isFormValid =
     formData.title.trim().length > 0 &&
     formData.locations.trim().length > 0 &&
-    formData.locations.split(',').some((loc) => loc.trim().length > 0)
+    formData.locations.split(',').some((loc) => loc.trim().length > 0) &&
+    String(formData.days).trim().length > 0 &&
+    Number.isInteger(Number(formData.days)) &&
+    Number(formData.days) > 0
 
   const previewTrip = {
     name: formData.title || 'Trip Preview',
@@ -246,6 +254,26 @@ export default function CreateTripModal({ onClose, onSuccess }) {
               </p>
             </div>
 
+            {/* Days */}
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-300">
+                Duration (Days) *
+              </label>
+              <input
+                type="number"
+                name="days"
+                value={formData.days}
+                onChange={handleInputChange}
+                placeholder="Enter number of days..."
+                min="1"
+                required
+                className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              />
+              <p className="mt-1 text-xs text-gray-400">
+                How many days will this trip take?
+              </p>
+            </div>
+
             {/* Description */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-300">
@@ -261,24 +289,6 @@ export default function CreateTripModal({ onClose, onSuccess }) {
               />
             </div>
 
-            {/* Days */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-300">
-                Duration (Days)
-              </label>
-              <input
-                type="number"
-                name="days"
-                value={formData.days}
-                onChange={handleInputChange}
-                placeholder="Enter number of days..."
-                min="0"
-                className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
-              />
-              <p className="mt-1 text-xs text-gray-400">
-                How many days will this trip take?
-              </p>
-            </div>
 
             {/* Photo Upload */}
             <div>

@@ -17,6 +17,7 @@ import {
   removeLikedTrip,
   getUserDocument,
 } from '../lib/userService'
+import EditTripModal from '../components/EditTripModal'
 
 const Trip = () => {
   const { tripviewId } = useParams()
@@ -36,6 +37,7 @@ const Trip = () => {
   const [error, setError] = useState('')
   const [userLikedTrips, setUserLikedTrips] = useState([])
   const [copying, setCopying] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Handler for Add this trip
   const handleAddThisTrip = async () => {
@@ -115,7 +117,7 @@ const Trip = () => {
 
   // Edit trip handler
   const handleEditTrip = () => {
-    navigate(`/trip/${trip.id}/edit`)
+    setShowEditModal(true);
   }
 
   // Publish trip handler
@@ -306,6 +308,25 @@ const Trip = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Edit Modal */}
+      {showEditModal && (
+        <EditTripModal
+          trip={trip}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={updatedTrip => {
+            setTrip(updatedTrip);
+            setShowEditModal(false);
+            // Optionally, reload image if changed
+            if (updatedTrip.fileName !== trip.fileName) {
+              const storage = getStorage();
+              const imageRef = ref(storage, updatedTrip.fileName);
+              getDownloadURL(imageRef)
+                .then(url => setImageUrl(url))
+                .catch(() => setImageUrl(null));
+            }
+          }}
+        />
+      )}
       {/* Hero Section with Background Image */}
       <div
         className="relative h-80"
@@ -322,6 +343,15 @@ const Trip = () => {
         >
           <FiArrowLeft className="h-6 w-6" />
         </button>
+        {/* Edit Button (if owner) */}
+        {currentUser && trip.userId === currentUser.uid && (
+          <button
+            onClick={handleEditTrip}
+            className="absolute right-4 top-4 z-10 rounded-lg bg-blue-600 px-4 py-2 text-white shadow hover:bg-blue-700"
+          >
+            Edit
+          </button>
+        )}
 
         {/* Trip Info Overlay */}
         <div className="absolute bottom-6 left-6 text-white">
