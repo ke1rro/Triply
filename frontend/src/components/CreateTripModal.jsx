@@ -345,20 +345,15 @@ function PreviewTravelCard({ trip, imageUrl }) {
     }
   }
 
-  const formatRating = (rating) => {
-    if (rating === 0) return 'No ratings'
-    return `★ ${rating.toFixed(1)}`
-  }
-
   const backgroundImage = imageUrl
     ? `url(${imageUrl})`
     : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)'
 
   return (
     <div className="group relative h-36 w-full overflow-hidden rounded-xl shadow-lg">
-      {/* Background image */}
+      {/* Background image that scales on hover */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 transition-transform duration-300 group-hover:scale-105"
         style={{
           backgroundImage: backgroundImage,
           backgroundSize: 'cover',
@@ -366,34 +361,37 @@ function PreviewTravelCard({ trip, imageUrl }) {
         }}
       />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 rounded-xl bg-black/30" />
+      {/* Overlay for better text readability */}
+      <div className="absolute inset-0 rounded-xl bg-black/30 transition-all duration-300 hover:bg-black/40" />
 
       {/* Content */}
       <div className="relative flex h-full flex-col justify-between p-4 text-white">
-        {/* Title */}
+        {/* Title - top left */}
         <div className="flex-shrink-0">
           <h2 className="line-clamp-1 text-xl font-bold drop-shadow-lg">
             {trip.name}
           </h2>
         </div>
 
-        {/* Locations */}
+        {/* Locations - middle */}
         <div className="flex flex-1 items-center">
           <p className="line-clamp-2 text-base leading-tight drop-shadow-md">
             {formatLocations(trip.locations)}
           </p>
         </div>
 
-        {/* Duration and Rating */}
+        {/* Duration and Preview indicator - bottom */}
         <div className="flex items-end justify-between">
           <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
             <span>
               {trip.days} day{trip.days !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md">
-            <span>{formatRating(trip.averageRating)}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md text-white">
+              <span>🤍</span>
+              <span>0</span>
+            </div>
           </div>
         </div>
       </div>
