@@ -777,12 +777,20 @@ const Trip = () => {
                       )}
                     </div>
                   ) : isVisitor ? (
-                    <button
-                      className="w-full rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80"
-                      onClick={handleLeaveTrip}
-                    >
-                      Leave Trip
-                    </button>
+                    <>
+                      <button
+                        className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 mb-2"
+                        onClick={() => navigate(`/trip/${trip.id}`)}
+                      >
+                        View Plan
+                      </button>
+                      <button
+                        className="w-full rounded-lg bg-red-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-red-700/80"
+                        onClick={handleLeaveTrip}
+                      >
+                        Leave Trip
+                      </button>
+                    </>
                   ) : (
                     <button
                       className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 disabled:cursor-not-allowed disabled:opacity-60"

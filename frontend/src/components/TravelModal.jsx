@@ -133,14 +133,6 @@ export default function TravelModal({ trip, onClose }) {
             <p className="text-white">❤️ {trip.likes}</p>
           </div>
           <div>
-            <span className="font-medium text-blue-300">Visitors:</span>
-            <p className="text-white">👥 {trip.visitors?.length || 0}</p>
-          </div>
-        </div>
-
-        {/* Additional stats row */}
-        <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
-          <div>
             <span className="font-medium text-blue-300">Reviews:</span>
             <p className="text-white">
               {trip.comments?.length || 0} review
