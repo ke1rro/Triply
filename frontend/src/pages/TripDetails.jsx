@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import EventDaysDnD from '../components/EventDaysDnD'
@@ -9,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 
 export default function TripDetails() {
+  const { currentUser } = useAuth();
   const [isDragging, setIsDragging] = useState(false) // Only declared once at the top
   const [fadeText, setFadeText] = useState(false)
   const [buttonText, setButtonText] = useState('Save & Return')
@@ -62,7 +64,13 @@ export default function TripDetails() {
   if (error) return <div className="p-8 text-red-600">{error}</div>
   if (!trip) return null
 
+  // Read-only mode for visitors (not owner)
+  const isOwner = trip.userId === currentUser?.uid;
+  const isVisitor = !isOwner && trip.visitors && trip.visitors.includes(currentUser?.uid);
+  const readOnly = isVisitor;
+
   function handleEditEvent(day, idxInDay) {
+    if (readOnly) return;
     // Find the correct event index in the flat Events array
     const eventsForDay = (trip.Events || []).filter((e) => (e.day || 1) === day)
     const event = eventsForDay[idxInDay]
@@ -86,6 +94,7 @@ export default function TripDetails() {
 
   // Handle DnD between days
   async function handleDaysDnD(result) {
+    if (readOnly) return;
     if (!result.destination) return
     const sourceDay = parseInt(result.source.droppableId.replace('day-', ''))
     const sourceIdx = result.source.index
@@ -139,12 +148,37 @@ export default function TripDetails() {
     } else {
       newEvents.splice(before, 0, moved)
     }
-    const sorted = sortEventsByDayAndTime(newEvents)
-    setTrip((prev) => ({ ...prev, Events: sorted }))
+    // Auto-sort only sourceDay and destDay by time
+    const groupByDay = (evts) => {
+      const grouped = {};
+      for (const e of evts) {
+        const day = e.day || 1;
+        if (!grouped[day]) grouped[day] = [];
+        grouped[day].push(e);
+      }
+      return grouped;
+    };
+    const grouped = groupByDay(newEvents);
+    [sourceDay, destDay].forEach((day) => {
+      if (grouped[day]) {
+        grouped[day].sort((a, b) => {
+          if (!a.time) return 1;
+          if (!b.time) return -1;
+          return a.time.localeCompare(b.time);
+        });
+      }
+    });
+    // Flatten back to array, preserving order for other days
+    const days = Object.keys(grouped).sort((a, b) => Number(a) - Number(b));
+    const reordered = [];
+    for (const day of days) {
+      reordered.push(...grouped[day]);
+    }
+    setTrip((prev) => ({ ...prev, Events: reordered }));
     try {
-      await updateDoc(doc(db, 'trips', tripId), { Events: sorted })
+      await updateDoc(doc(db, 'trips', tripId), { Events: reordered });
     } catch (e) {
-      console.error('Failed to save reordered events', e)
+      console.error('Failed to save reordered events', e);
     }
   }
 
@@ -172,6 +206,7 @@ export default function TripDetails() {
   }
 
   function handleAddEvent(day) {
+    if (readOnly) return;
     setAddModalDay(day)
     setAddModalOpen(true)
   }
@@ -221,74 +256,88 @@ export default function TripDetails() {
       <div className="relative z-10 flex h-full w-full flex-col px-4 pt-4 sm:px-6 md:px-8">
         {/* Header */}
         <PageHeader title={trip.name || 'Trip Details'} />
-        <DragDropContext
-          onDragEnd={(result) => {
-            handleDaysDnD(result)
-            setIsDragging(false)
-          }}
-          onDragCancel={() => setIsDragging(false)}
-          onDragStart={() => setIsDragging(true)}
-          onDragUpdate={() => {}}
-        >
+        {readOnly ? (
           <div className="container mx-auto pb-16">
             <EventDaysDnD
               days={days}
               eventsByDay={eventsByDay}
-              onAddEvent={handleAddEvent}
-              onEditEvent={handleEditEvent}
+              readOnly={true}
             />
           </div>
-          {/* Save Button as DnD drop target */}
-          <Droppable droppableId="delete-area">
-            {(provided, snapshot) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className={`fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 !transform-none items-center justify-center rounded-full px-10 py-4 text-xl font-bold shadow-xl transition-colors duration-300 ${snapshot.isDraggingOver ? 'bg-red-500 text-white' : isDragging ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white'} ${!isDragging && !snapshot.isDraggingOver ? 'cursor-pointer hover:bg-indigo-700' : ''}`}
-                style={{
-                  maxHeight: 60,
-                  width: 260,
-                  transition: 'none',
-                  transform: 'none',
-                  outline: 'none',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
-                  cursor:
-                    !isDragging && !snapshot.isDraggingOver
-                      ? 'pointer'
-                      : 'default',
-                }}
-                onClick={() => {
-                  if (!isDragging) navigate('/mytrips')
-                }}
-              >
-                {/* Crossfade text transition */}
-                <span
-                  className={`block text-center transition-opacity duration-300 ${fadeText || snapshot.isDraggingOver ? 'opacity-0' : 'opacity-100'}`}
-                  style={{ minHeight: 24, display: 'inline-block' }}
+        ) : (
+          <DragDropContext
+            onDragEnd={(result) => {
+              handleDaysDnD(result)
+              setIsDragging(false)
+            }}
+            onDragCancel={() => setIsDragging(false)}
+            onDragStart={() => setIsDragging(true)}
+            onDragUpdate={() => {}}
+          >
+            <div className="container mx-auto pb-16">
+              <EventDaysDnD
+                days={days}
+                eventsByDay={eventsByDay}
+                onAddEvent={handleAddEvent}
+                onEditEvent={handleEditEvent}
+                readOnly={false}
+              />
+            </div>
+            {/* Save Button as DnD drop target */}
+            <Droppable droppableId="delete-area">
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  className={`fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 !transform-none items-center justify-center rounded-full px-10 py-4 text-xl font-bold shadow-xl transition-colors duration-300 ${snapshot.isDraggingOver ? 'bg-red-500 text-white' : isDragging ? 'bg-red-500 text-white' : 'bg-indigo-600 text-white'} ${!isDragging && !snapshot.isDraggingOver ? 'cursor-pointer hover:bg-indigo-700' : ''}`}
+                  style={{
+                    maxHeight: 60,
+                    width: 260,
+                    transition: 'none',
+                    transform: 'none',
+                    outline: 'none',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                    cursor:
+                      !isDragging && !snapshot.isDraggingOver
+                        ? 'pointer'
+                        : 'default',
+                  }}
+                  onClick={() => {
+                    if (!isDragging) navigate('/mytrips')
+                  }}
                 >
-                  {buttonText}
-                </span>
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+                  {/* Crossfade text transition */}
+                  <span
+                    className={`block text-center transition-opacity duration-300 ${fadeText || snapshot.isDraggingOver ? 'opacity-0' : 'opacity-100'}`}
+                    style={{ minHeight: 24, display: 'inline-block' }}
+                  >
+                    {buttonText}
+                  </span>
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        )}
+
         {/* Add Event Modal */}
         <EventAddModal
-          open={addModalOpen}
+          open={addModalOpen && !readOnly}
           onClose={() => setAddModalOpen(false)}
           onSubmit={handleAddEventSubmit}
           day={addModalDay}
           initialEvent={{}}
+          readOnly={readOnly}
         />
         {/* Edit Event Modal */}
         <EventAddModal
-          open={editModalOpen}
+          open={editModalOpen && !readOnly}
           onClose={() => setEditModalOpen(false)}
           onSubmit={handleEditEventSubmit}
           day={editModalDay}
           mode="edit"
           initialEvent={editEventData || {}}
+          readOnly={readOnly}
         />
       </div>
     </div>
