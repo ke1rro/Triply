@@ -16,7 +16,7 @@ import {
   getUserDocument,
 } from '../lib/userService'
 
-export default function TravelCard({ trip, onSelect }) {
+export default function TravelCard({ trip, onSelect, showEdit = false, onEdit }) {
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
   const [localLikes, setLocalLikes] = useState(trip.likes || 0)
@@ -166,22 +166,34 @@ export default function TravelCard({ trip, onSelect }) {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleLike}
-              disabled={!currentUser || isLiking}
-              className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md transition-all duration-200 ${
-                currentUser
-                  ? 'hover:bg-black/40 active:scale-95'
-                  : 'cursor-default'
-              } ${isLiked ? 'text-red-400' : 'text-white'}`}
-            >
-              <span
-                className={`transition-all duration-200 ${isLiking ? 'scale-110' : ''}`}
+            {showEdit ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (onEdit) onEdit(trip.id)
+                }}
+                className="flex items-center gap-1 rounded-lg bg-blue-600/80 px-3 py-1 text-sm font-medium text-white drop-shadow-md transition-all duration-200 hover:bg-blue-700/80 active:scale-95"
               >
-                {isLiked ? '❤️' : '🤍'}
-              </span>
-              <span>{localLikes}</span>
-            </button>
+                ✏️ Edit
+              </button>
+            ) : (
+              <button
+                onClick={handleLike}
+                disabled={!currentUser || isLiking}
+                className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md transition-all duration-200 ${
+                  currentUser
+                    ? 'hover:bg-black/40 active:scale-95'
+                    : 'cursor-default'
+                } ${isLiked ? 'text-red-400' : 'text-white'}`}
+              >
+                <span
+                  className={`transition-all duration-200 ${isLiking ? 'scale-110' : ''}`}
+                >
+                  {isLiked ? '❤️' : '🤍'}
+                </span>
+                <span>{localLikes}</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
