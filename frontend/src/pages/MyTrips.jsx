@@ -144,9 +144,9 @@ const MyTrips = () => {
                         <div key={trip.id} className="w-full max-w-md">
                           <TravelCard
                             trip={trip}
-                            onSelect={() => handleSelectTrip(trip.id)}
-                            ModalComponent={undefined}
-                            showLike={false}
+                            onSelect={() => navigate(`/trip/${trip.id}`)}
+                            showEdit={true}
+                            onEdit={(id) => navigate(`/tripview/${id}`)}
                           />
                         </div>
                       ))}
