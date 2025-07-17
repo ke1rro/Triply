@@ -158,9 +158,9 @@ const EventDaysDnDPage = () => {
         </div>
 
         <div className="container mx-auto pb-16">
-          <h1 className="mb-6 text-center text-3xl font-semibold italic text-white drop-shadow-lg">
+          <p className="mb-6 text-center text-3xl font-bold italic text-white drop-shadow-lg">
             Manage Your Trip Events
-          </h1>
+          </p>
           <DragDropContext onDragEnd={handleDragEnd}>
             <EventDaysDnD
               days={days}
