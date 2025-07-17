@@ -91,8 +91,8 @@ const Homepage = () => {
   }
 
   const handleCreateSuccess = () => {
-    // Refresh the travel data after successful creation
-    fetchTravelData()
+    // Navigate to MyTrips page after successful creation
+    navigate('/mytrips')
   }
 
   return (

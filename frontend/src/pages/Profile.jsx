@@ -170,7 +170,13 @@ const Profile = () => {
 
       {/* Create Trip Modal */}
       {showCreateModal && (
-        <CreateTripModal onClose={() => setShowCreateModal(false)} />
+        <CreateTripModal 
+          onClose={() => setShowCreateModal(false)} 
+          onSuccess={() => {
+            setShowCreateModal(false)
+            navigate('/mytrips')
+          }}
+        />
       )}
     </div>
   )
