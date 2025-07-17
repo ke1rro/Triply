@@ -2,15 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../lib/auth'
 import { useAuth } from '../context/AuthContext'
-import {
-  FiMapPin,
-  FiHeart,
-  FiClock,
-  FiPlus,
-  FiSettings,
-  FiLogOut,
-  FiUser,
-} from 'react-icons/fi'
+import { FiHeart, FiPlus, FiLogOut, FiUser } from 'react-icons/fi'
 import CreateTripModal from '../components/CreateTripModal'
 import Navbar from '../components/Navbar'
 import PageHeader from '../components/PageHeader'
@@ -52,33 +44,17 @@ const Profile = () => {
 
   // Update user stats to use real data
   const userStats = {
-    tripsCompleted: 12, // This could be calculated from user's trips
     likedTrips: userData?.likedTrips?.length || 0,
-    activeSessions: 2, // This could be calculated from active trips
     totalDistance: 15420,
   }
 
   const profileTiles = [
-    {
-      title: 'Trip History',
-      subtitle: `${userStats.tripsCompleted} completed trips`,
-      icon: <FiMapPin className="h-6 w-6" />,
-      color: 'from-blue-400 to-blue-600',
-      onClick: () => console.log('Trip History clicked'),
-    },
     {
       title: 'Liked Trips',
       subtitle: `${userStats.likedTrips} liked adventures`,
       icon: <FiHeart className="h-6 w-6" />,
       color: 'from-rose-400 to-rose-600',
       onClick: () => navigate('/liked'),
-    },
-    {
-      title: 'Active Sessions',
-      subtitle: `${userStats.activeSessions} ongoing trips`,
-      icon: <FiClock className="h-6 w-6" />,
-      color: 'from-amber-400 to-amber-600',
-      onClick: () => console.log('Active Sessions clicked'),
     },
     {
       title: 'Create Trip',
@@ -90,25 +66,28 @@ const Profile = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Background */}
+    <div className="relative flex min-h-screen flex-col">
+      {/* Background image with overlay - full screen */}
       <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 h-lvh bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 via-transparent to-green-900/30"></div>
+        {/* Dark overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-green-900/20"></div>
       </div>
 
-      {/* Content Container */}
-      <div className="relative z-10 flex min-h-screen flex-col">
-        {/* Header Section */}
+      {/* Content */}
+      <div className="relative z-10 flex h-screen w-full flex-col px-4 pt-4 sm:px-6 md:px-8">
+        {/* Header */}
         <PageHeader title="Profile" />
 
         {/* Main Content */}
-        <div className="flex-1 px-4 pb-20">
+        <div className="flex-1 pb-32">
           <div className="mx-auto max-w-md">
             <div className="rounded-2xl bg-black/70 p-6 shadow-2xl backdrop-blur-md">
               {/* Avatar and User Info */}
@@ -168,14 +147,6 @@ const Profile = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <button
-                  onClick={() => console.log('Settings clicked')}
-                  className="flex w-full items-center justify-center gap-3 rounded-xl bg-white/10 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                >
-                  <FiSettings className="h-5 w-5" />
-                  Settings
-                </button>
-
                 <button
                   onClick={handleLogout}
                   disabled={loading}
