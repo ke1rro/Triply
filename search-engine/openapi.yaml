@@ -1,0 +1,167 @@
+openapi: 3.0.4
+info:
+  title: TriplySearchEngine API
+  version: "0.1"
+  description: API for searching Points of Interest (POIs) by geolocation, categories, and text query
+
+paths:
+  /search:
+    get:
+      summary: Search for Points of Interest
+      description: |
+        Performs a geospatial and semantic search for points of interest based on latitude, longitude, radius, optional categories, and a free-text query
+      parameters:
+        - in: query
+          name: lat
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Latitude of the user's location
+        - in: query
+          name: lon
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Longitude of the user's location
+        - in: query
+          name: radius
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Search radius in meters
+        - in: query
+          name: categories
+          required: false
+          schema:
+            type: string
+            example: "museum,restaurant"
+          description: Comma-separated list of POI categories to filter the search
+        - in: query
+          name: q
+          required: false
+          schema:
+            type: string
+            example: "McDonalds"
+          description: Optional free-text query for semantic similarity
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination, defaults to 0
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+          description: Maximum number of results to return, defaults to no limit
+      responses:
+        "200":
+          description: Successful search response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                  points:
+                    type: array
+                    description: List of Points of Interest matching the search criteria sorted by relevance
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "node/43255"
+                          description: Unique identifier for the POI from OSM
+                        name:
+                          type: string
+                          example: "National Museum"
+                          description: Name of the POI
+                        description:
+                          type: string
+                          example: "A large museum with various exhibits"
+                          description: Description of the POI
+                        lon:
+                          type: number
+                          format: float
+                          example: 30.5245
+                          description: Longitude of the POI
+                        lat:
+                          type: number
+                          format: float
+                          example: 50.4504
+                          description: Latitude of the POI
+                        categories:
+                          type: array
+                          items:
+                            type: string
+                            example: "restaurants"
+                            enum:
+                              [
+                                "restaurants",
+                                "bars",
+                                "coffee",
+                                "gyms",
+                                "movies",
+                                "museums",
+                                "arts",
+                                "attractions",
+                                "libraries",
+                                "sightseeing",
+                                "nightlife",
+                                "groceries",
+                                "stores",
+                                "hotels",
+                                "atms",
+                                "gas",
+                                "car_rental",
+                                "outdoor_activities",
+                              ]
+                          description: List of categories for the POI
+                        opening_hours:
+                          type: string
+                          example: "Mo-Fr 09:00-18:00; Sa 10:00-16:00"
+                          description: Opening hours in OSM format
+                        score:
+                          type: number
+                          format: float
+                          description: Ranking score (0-1)
+                          example: 0.85
+                        distance:
+                          type: number
+                          format: float
+                          description: Distance from queried location in meters
+                          example: 150.0
+                        similarity:
+                          type: number
+                          format: float
+                          description: Similarity score for the free-text query (-1 to 1)
+                          example: 0.9
+                      required:
+                        - id
+                        - name
+                        - lon
+                        - lat
+                        - categories
+                        - score
+                        - distance
+        "400":
+          description: Bad request due to missing parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [invalid_request]
+                  error:
+                    type: string
+                    example: "Missing required parameters: lat, lon, radius"
