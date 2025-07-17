@@ -39,18 +39,23 @@ const Trip = () => {
 
   // Handler for Add this trip
   const handleAddThisTrip = async () => {
-    if (!trip || !currentUser) return;
+    if (!trip || !currentUser) return
     // If user owns the trip, go to trip details
     if (trip.userId === currentUser.uid) {
       navigate(`/trip/${trip.id || tripviewId}`)
-      return;
+      return
     }
     setCopying(true)
     try {
       // Check if user already has a copy
-      const tripsRef = window.firebase && window.firebase.firestore ? window.firebase.firestore().collection('trips') : null;
+      const tripsRef =
+        window.firebase && window.firebase.firestore
+          ? window.firebase.firestore().collection('trips')
+          : null
       // But we use Firestore v9 modular API:
-      const { collection, getDocs, addDoc, serverTimestamp } = await import('firebase/firestore')
+      const { collection, getDocs, addDoc, serverTimestamp } = await import(
+        'firebase/firestore'
+      )
       let existingCopyId = null
       const querySnapshot = await getDocs(collection(db, 'trips'))
       querySnapshot.forEach((doc) => {
@@ -96,8 +101,8 @@ const Trip = () => {
 
   // Delete trip handler
   const handleDeleteTrip = async () => {
-    if (!trip || !currentUser) return;
-    if (!window.confirm('Are you sure you want to delete this trip?')) return;
+    if (!trip || !currentUser) return
+    if (!window.confirm('Are you sure you want to delete this trip?')) return
     try {
       const { doc, deleteDoc } = await import('firebase/firestore')
       await deleteDoc(doc(db, 'trips', trip.id))
@@ -115,7 +120,7 @@ const Trip = () => {
 
   // Publish trip handler
   const handlePublishTrip = async () => {
-    if (!trip || !currentUser) return;
+    if (!trip || !currentUser) return
     try {
       const { doc, updateDoc } = await import('firebase/firestore')
       await updateDoc(doc(db, 'trips', trip.id), { published: true })
@@ -127,7 +132,7 @@ const Trip = () => {
 
   // Unpublish trip handler
   const handleUnpublishTrip = async () => {
-    if (!trip || !currentUser) return;
+    if (!trip || !currentUser) return
     try {
       const { doc, updateDoc } = await import('firebase/firestore')
       await updateDoc(doc(db, 'trips', trip.id), { published: false })
@@ -301,7 +306,6 @@ const Trip = () => {
 
   return (
     <div className="min-h-screen bg-white">
-
       {/* Hero Section with Background Image */}
       <div
         className="relative h-80"
@@ -548,7 +552,7 @@ const Trip = () => {
       </div>
 
       {/* Action Buttons - Fixed at bottom center */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 transform flex flex-row gap-4">
+      <div className="fixed bottom-6 left-1/2 flex -translate-x-1/2 transform flex-row gap-4">
         {trip.userId === currentUser?.uid ? (
           <React.Fragment>
             <button
@@ -563,8 +567,8 @@ const Trip = () => {
             >
               Delete
             </button>
-            {(!trip.parent_id || trip.parent_id === 'original') && (
-              trip.published ? (
+            {(!trip.parent_id || trip.parent_id === 'original') &&
+              (trip.published ? (
                 <button
                   className="rounded-full bg-red-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-red-700 hover:shadow-xl"
                   onClick={handleUnpublishTrip}
@@ -578,22 +582,20 @@ const Trip = () => {
                 >
                   Publish
                 </button>
-              )
-            )}
+              ))}
           </React.Fragment>
         ) : (
           <button
-            className="rounded-full bg-blue-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-blue-700 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+            className="rounded-full bg-blue-600 px-8 py-3 font-medium text-white shadow-lg transition duration-200 hover:bg-blue-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
             onClick={handleAddThisTrip}
             disabled={copying}
           >
             {copying ? 'Copying...' : 'Copy this trip'}
           </button>
         )}
+      </div>
     </div>
-    </div>
-  );
+  )
 }
-
 
 export default Trip
