@@ -39,8 +39,7 @@ jobs:
       - name: Upload build output
         uses: actions/upload-pages-artifact@v3
         with:
-            path: dist/
-        working-directory: frontend
+            path: frontend/dist/
   deploy:
     needs: build
     runs-on: ubuntu-latest
