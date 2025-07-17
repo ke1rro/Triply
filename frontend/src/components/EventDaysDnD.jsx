@@ -53,16 +53,18 @@ export default function EventDaysDnD({
                       </div>
                     ))
                   ) : (
-                    <div className="text-sm italic text-gray-400">No events</div>
+                    <div className="text-sm italic text-gray-400">
+                      No events
+                    </div>
                   )}
                 </div>
               </div>
-            );
+            )
           } else {
             return (
               <Droppable key={day} droppableId={`day-${day}`}>
                 {(provided, snapshot) => {
-                  const isDraggingOver = snapshot.isDraggingOver;
+                  const isDraggingOver = snapshot.isDraggingOver
                   return (
                     <div
                       className={
@@ -102,7 +104,7 @@ export default function EventDaysDnD({
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
-                                  className={`mb-3 rounded-lg bg-indigo-50 px-4 py-3 shadow cursor-pointer ${snapshot.isDragging ? 'ring-2 ring-indigo-400' : ''}`}
+                                  className={`mb-3 cursor-pointer rounded-lg bg-indigo-50 px-4 py-3 shadow ${snapshot.isDragging ? 'ring-2 ring-indigo-400' : ''}`}
                                   onClick={() => onEditEvent(day, idx)}
                                 >
                                   <div className="flex items-center justify-between">
@@ -128,10 +130,10 @@ export default function EventDaysDnD({
                         {provided.placeholder}
                       </div>
                     </div>
-                  );
+                  )
                 }}
               </Droppable>
-            );
+            )
           }
         })}
       </div>

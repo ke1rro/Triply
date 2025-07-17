@@ -17,4 +17,3 @@ export default function HomeTripList({ trips, onLike }) {
     </div>
   )
 }
-

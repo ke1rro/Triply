@@ -779,7 +779,7 @@ const Trip = () => {
                   ) : isVisitor ? (
                     <>
                       <button
-                        className="w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80 mb-2"
+                        className="mb-2 w-full rounded-lg bg-blue-600/80 px-4 py-3 font-medium text-white backdrop-blur-sm transition duration-200 hover:bg-blue-700/80"
                         onClick={() => navigate(`/trip/${trip.id}`)}
                       >
                         View Plan

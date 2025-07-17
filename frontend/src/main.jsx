@@ -15,7 +15,6 @@ import TripDetails from './pages/TripDetails'
 import Trip from './pages/Trip'
 import Profile from './pages/Profile'
 import MyTrips from './pages/MyTrips'
-import EventDaysDnDPage from './pages/EventDaysDnDPage'
 import LikedTrips from './pages/LikedTrips'
 import TripInvite from './pages/TripInvite'
 import './index.css'
@@ -78,14 +77,14 @@ root.render(
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/eventdays"
             element={
               <ProtectedRoute>
                 <EventDaysDnDPage />
               </ProtectedRoute>
             }
-          />
+          /> */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>

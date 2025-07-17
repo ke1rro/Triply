@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 
 export default function TripDetails() {
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuth()
   const [isDragging, setIsDragging] = useState(false) // Only declared once at the top
   const [fadeText, setFadeText] = useState(false)
   const [buttonText, setButtonText] = useState('Save & Return')
@@ -65,12 +65,13 @@ export default function TripDetails() {
   if (!trip) return null
 
   // Read-only mode for visitors (not owner)
-  const isOwner = trip.userId === currentUser?.uid;
-  const isVisitor = !isOwner && trip.visitors && trip.visitors.includes(currentUser?.uid);
-  const readOnly = isVisitor;
+  const isOwner = trip.userId === currentUser?.uid
+  const isVisitor =
+    !isOwner && trip.visitors && trip.visitors.includes(currentUser?.uid)
+  const readOnly = isVisitor
 
   function handleEditEvent(day, idxInDay) {
-    if (readOnly) return;
+    if (readOnly) return
     // Find the correct event index in the flat Events array
     const eventsForDay = (trip.Events || []).filter((e) => (e.day || 1) === day)
     const event = eventsForDay[idxInDay]
@@ -94,7 +95,7 @@ export default function TripDetails() {
 
   // Handle DnD between days
   async function handleDaysDnD(result) {
-    if (readOnly) return;
+    if (readOnly) return
     if (!result.destination) return
     const sourceDay = parseInt(result.source.droppableId.replace('day-', ''))
     const sourceIdx = result.source.index
@@ -150,35 +151,35 @@ export default function TripDetails() {
     }
     // Auto-sort only sourceDay and destDay by time
     const groupByDay = (evts) => {
-      const grouped = {};
+      const grouped = {}
       for (const e of evts) {
-        const day = e.day || 1;
-        if (!grouped[day]) grouped[day] = [];
-        grouped[day].push(e);
+        const day = e.day || 1
+        if (!grouped[day]) grouped[day] = []
+        grouped[day].push(e)
       }
-      return grouped;
-    };
-    const grouped = groupByDay(newEvents);
-    [sourceDay, destDay].forEach((day) => {
+      return grouped
+    }
+    const grouped = groupByDay(newEvents)
+    ;[sourceDay, destDay].forEach((day) => {
       if (grouped[day]) {
         grouped[day].sort((a, b) => {
-          if (!a.time) return 1;
-          if (!b.time) return -1;
-          return a.time.localeCompare(b.time);
-        });
+          if (!a.time) return 1
+          if (!b.time) return -1
+          return a.time.localeCompare(b.time)
+        })
       }
-    });
+    })
     // Flatten back to array, preserving order for other days
-    const days = Object.keys(grouped).sort((a, b) => Number(a) - Number(b));
-    const reordered = [];
+    const days = Object.keys(grouped).sort((a, b) => Number(a) - Number(b))
+    const reordered = []
     for (const day of days) {
-      reordered.push(...grouped[day]);
+      reordered.push(...grouped[day])
     }
-    setTrip((prev) => ({ ...prev, Events: reordered }));
+    setTrip((prev) => ({ ...prev, Events: reordered }))
     try {
-      await updateDoc(doc(db, 'trips', tripId), { Events: reordered });
+      await updateDoc(doc(db, 'trips', tripId), { Events: reordered })
     } catch (e) {
-      console.error('Failed to save reordered events', e);
+      console.error('Failed to save reordered events', e)
     }
   }
 
@@ -206,7 +207,7 @@ export default function TripDetails() {
   }
 
   function handleAddEvent(day) {
-    if (readOnly) return;
+    if (readOnly) return
     setAddModalDay(day)
     setAddModalOpen(true)
   }

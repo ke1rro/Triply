@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import MapPicker from './MapPicker'
+import { useState, useEffect } from 'react'
 
 export default function EventAddModal({
   open,
@@ -112,12 +111,49 @@ export default function EventAddModal({
             <label className="mb-1 block text-sm font-medium text-gray-300">
               Pick Location
             </label>
-            <MapPicker
+            {/* <MapPicker
               onSelect={(place) => {
                 setSelectedPlace(place)
                 if (place) setLocation(place.name)
               }}
               selectedPlace={selectedPlace}
+            /> */}
+            <input
+              type="text"
+              className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              value={location}
+              onChange={(e) => {
+                setLocation(e.target.value)
+                if (e.target.value) {
+                  setSelectedPlace({
+                    ...selectedPlace,
+                    name: e.target.value,
+                  })
+                } else {
+                  setSelectedPlace(null)
+                }
+              }}
+              placeholder="Enter location name"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-gray-300">
+              Notes (Optional)
+            </label>
+            <textarea
+              className="w-full rounded-lg border border-gray-300/30 bg-white/10 px-4 py-2 text-white placeholder-gray-400 backdrop-blur-sm focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50"
+              value={notes}
+              onChange={(e) => {
+                setNotes(e.target.value)
+                if (selectedPlace) {
+                  setSelectedPlace({
+                    ...selectedPlace,
+                    notes: e.target.value,
+                  })
+                }
+              }}
+              placeholder="Add any additional notes"
+              rows="3"
             />
           </div>
 
