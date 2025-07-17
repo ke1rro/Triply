@@ -17,6 +17,7 @@ import {
 } from '../lib/userService'
 
 export default function TravelCard({ trip, onSelect, showEdit = false, onEdit, onLike }) {
+
   const [imageUrl, setImageUrl] = useState(null)
   const [imageError, setImageError] = useState(false)
   const [localLikes, setLocalLikes] = useState(trip.likes || 0)
