@@ -12,7 +12,11 @@ import Login from './pages/Login'
 import SignUp from './pages/SignUp'
 import Home from './pages/Home'
 import TripDetails from './pages/TripDetails'
+import Trip from './pages/Trip'
 import Profile from './pages/Profile'
+import MyTrips from './pages/MyTrips'
+import EventDaysDnDPage from './pages/EventDaysDnDPage'
+import LikedTrips from './pages/LikedTrips'
 import './index.css'
 
 // Make sure the root element is properly targeted
@@ -41,10 +45,42 @@ root.render(
             }
           />
           <Route
+            path="/tripview/:tripviewId"
+            element={
+              <ProtectedRoute>
+                <Trip />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mytrips"
+            element={
+              <ProtectedRoute>
+                <MyTrips />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/liked"
+            element={
+              <ProtectedRoute>
+                <LikedTrips />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/eventdays"
+            element={
+              <ProtectedRoute>
+                <EventDaysDnDPage />
               </ProtectedRoute>
             }
           />

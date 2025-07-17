@@ -1,12 +1,9 @@
-import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  FiSearch,
   FiUser,
   FiNavigation,
   FiHome,
   FiPlus,
-  FiHeart,
   FiArrowLeft,
 } from 'react-icons/fi'
 
@@ -28,16 +25,15 @@ const Navbar = ({
   const handleProfileClick = () => {
     navigate('/profile')
   }
-  const handleLikesClick = () => {
-    console.log('Likes clicked')
-    // Add future functionality for liked trips
+  const handleMyTripsClick = () => {
+    navigate('/mytrips')
   }
 
   const handleBackClick = () => {
     if (onBack) {
       onBack()
     } else {
-      navigate('/home')
+      navigate(-1)
     }
   }
 
@@ -45,15 +41,17 @@ const Navbar = ({
     <>
       {/* Header Navigation */}
       {showHeaderNav && (
-        <div className="mb-6 flex items-center justify-between">
-          <FiArrowLeft
-            className="h-8 w-8 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
-            onClick={handleBackClick}
-          />
-          <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-            {headerTitle}
-          </h1>
-          <div className="h-8 w-8"></div> {/* Spacer for centering */}
+        <div className="fixed left-0 right-0 top-0 z-20 p-4">
+          <div className="flex items-center justify-between">
+            <FiArrowLeft
+              className="h-8 w-8 cursor-pointer text-white drop-shadow-sm transition-all duration-300 hover:scale-110 hover:text-blue-400 active:scale-95"
+              onClick={handleBackClick}
+            />
+            <h1 className="text-2xl font-bold text-white drop-shadow-lg">
+              {headerTitle}
+            </h1>
+            <div className="h-8 w-8"></div> {/* Spacer for centering */}
+          </div>
         </div>
       )}
 
@@ -73,11 +71,11 @@ const Navbar = ({
                   }`}
                 />
 
-                {/* Likes */}
-                <FiHeart
-                  onClick={handleLikesClick}
+                {/* My Trips */}
+                <FiNavigation
+                  onClick={handleMyTripsClick}
                   className={`h-7 w-7 cursor-pointer transition-colors duration-300 ${
-                    activeTab === 'likes'
+                    activeTab === 'mytrips'
                       ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`}

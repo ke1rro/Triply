@@ -122,17 +122,26 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         comments: [],
         days: parseInt(formData.days) || 0,
         likes: 0,
-        likedBy: [], // Initialize empty array for user IDs who liked this trip
+        likedBy: [],
         fileName: fileName,
         userId: currentUser?.uid || '',
-        published: false, // Default to unpublished
+        published: false,
         createdAt: serverTimestamp(),
+
+        parent_id: 'original',
       }
 
-      await addDoc(collection(db, 'trips'), tripData)
+      const docRef = await addDoc(collection(db, 'trips'), tripData)
+
+      // Create the complete trip object with the new ID
+      const createdTrip = {
+        id: docRef.id,
+        ...tripData,
+        createdAt: new Date(), // Use current date since serverTimestamp() isn't immediately available
+      }
 
       if (onSuccess) {
-        onSuccess()
+        onSuccess(createdTrip)
       }
       onClose()
     } catch (error) {
@@ -144,13 +153,11 @@ export default function CreateTripModal({ onClose, onSuccess }) {
     }
   }
 
-  // Check if form is valid for submit button state
   const isFormValid =
     formData.title.trim().length > 0 &&
     formData.locations.trim().length > 0 &&
     formData.locations.split(',').some((loc) => loc.trim().length > 0)
 
-  // Create preview trip data for TravelCard
   const previewTrip = {
     name: formData.title || 'Trip Preview',
     locations: formData.locations
@@ -161,7 +168,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
       : ['Location 1', 'Location 2'],
     days: parseInt(formData.days) || 0,
     averageRating: 0,
-    fileName: null, // We'll use previewUrl for preview
+    fileName: null,
   }
 
   return (

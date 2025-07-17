@@ -9,7 +9,7 @@ export default function EventDaysDnD({
   const isSingleDay = days.length === 1
 
   return (
-    <div className="w-full bg-gray-50 p-2 sm:p-6">
+    <div className="w-full rounded-xl bg-black/60 p-4 shadow-lg backdrop-blur-md sm:p-6">
       <div
         className={
           isSingleDay
@@ -36,7 +36,7 @@ export default function EventDaysDnD({
                   <div className="mb-2 flex items-center justify-between">
                     <div className="text-lg font-bold">Day {day}</div>
                     <button
-                      className="rounded-full bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow transition-colors hover:bg-indigo-600"
+                      className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition-colors hover:bg-blue-700"
                       type="button"
                       onClick={() => onAddEvent(day)}
                     >
