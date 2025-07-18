@@ -34,7 +34,7 @@ jobs:
         run: npm install
         working-directory: frontend
       - name: Build project
-        run: npm run build
+        run: npx vite build --base=/Triply/
         working-directory: frontend
       - name: Copy index.html to 404.html
         run: cp index.html 404.html
