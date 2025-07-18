@@ -12,7 +12,7 @@ const ManageVisitorsModal = ({ trip, onClose }) => {
   const [copied, setCopied] = useState(false)
   const [removingVisitor, setRemovingVisitor] = useState(null)
 
-  const inviteUrl = `${window.location.origin}/invite/${trip.id}`
+  const inviteUrl = `${window.location.origin}${import.meta.env.BASE_URL}invite/${trip.id}`
 
   useEffect(() => {
     const fetchVisitors = async () => {

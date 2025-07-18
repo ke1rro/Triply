@@ -155,7 +155,7 @@ export default function CreateTripModal({ onClose, onSuccess }) {
         onSuccess(createdTrip)
       } else {
         // Fallback navigation if no onSuccess handler provided
-        window.location.href = `/tripview/${docRef.id}`
+        window.location.href = `${import.meta.env.BASE_URL}tripview/${docRef.id}`
       }
     } catch (error) {
       console.error('Error creating trip:', error)

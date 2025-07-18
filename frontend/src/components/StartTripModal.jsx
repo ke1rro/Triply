@@ -8,7 +8,7 @@ const StartTripModal = ({ trip, onClose, onSuccess }) => {
   const [copied, setCopied] = useState(false)
   const [starting, setStarting] = useState(false)
 
-  const inviteUrl = `${window.location.origin}/invite/${trip.id}`
+  const inviteUrl = `${window.location.origin}${import.meta.env.BASE_URL}invite/${trip.id}`
 
   const handleCopyInviteLink = async () => {
     try {

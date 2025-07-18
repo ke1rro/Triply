@@ -4,7 +4,7 @@ import { FiShare2 } from 'react-icons/fi'
 const ShareButton = ({ trip }) => {
   const [copied, setCopied] = useState(false)
 
-  const shareUrl = `${window.location.origin}/tripview/${trip.id}`
+  const shareUrl = `${window.location.origin}${import.meta.env.BASE_URL}tripview/${trip.id}`
 
   const handleCopyLink = async () => {
     try {
