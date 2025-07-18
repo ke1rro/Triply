@@ -184,13 +184,13 @@ export default function TravelCard({
               type="button"
               onClick={handleLike}
               disabled={isLiking || !currentUser}
-              className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md transition-colors duration-200 focus:outline-none ${isLiked ? 'text-red-400' : 'text-white'} ${isLiking ? 'opacity-60 cursor-not-allowed' : 'hover:bg-black/30 active:scale-95'}`}
+              className={`flex items-center gap-1 rounded-lg bg-black/20 px-3 py-1 text-sm font-medium drop-shadow-md transition-colors duration-200 focus:outline-none ${isLiked ? 'text-red-400' : 'text-white'} ${isLiking ? 'cursor-not-allowed opacity-60' : 'hover:bg-black/30 active:scale-95'}`}
               tabIndex={0}
               aria-label={isLiked ? 'Unlike trip' : 'Like trip'}
-              onMouseDown={e => e.stopPropagation()}
-              onTouchStart={e => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
             >
-              <span style={{fontSize: '1.2em'}}>{isLiked ? '❤️' : '🤍'}</span>
+              <span style={{ fontSize: '1.2em' }}>{isLiked ? '❤️' : '🤍'}</span>
               <span>{localLikes}</span>
             </button>
           </div>

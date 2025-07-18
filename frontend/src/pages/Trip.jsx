@@ -470,10 +470,7 @@ const Trip = () => {
                 'Edit'
               )
             ) : (
-              isVisitor &&
-              trip.statusActive && (
-                <FiUsers className="h-4 w-4" />
-              )
+              isVisitor && trip.statusActive && <FiUsers className="h-4 w-4" />
             )}
           </button>
         )}
