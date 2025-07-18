@@ -90,9 +90,10 @@ const Homepage = () => {
     setShowCreateModal(true)
   }
 
-  const handleCreateSuccess = () => {
-    // Navigate to MyTrips page after successful creation
-    navigate('/mytrips')
+  const handleCreateSuccess = (createdTrip) => {
+    if (createdTrip && createdTrip.id) {
+      navigate(`/tripview/${createdTrip.id}`)
+    }
   }
 
   return (

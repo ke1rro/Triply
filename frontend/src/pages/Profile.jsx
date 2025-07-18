@@ -183,9 +183,13 @@ const Profile = () => {
       {showCreateModal && (
         <CreateTripModal
           onClose={() => setShowCreateModal(false)}
-          onSuccess={() => {
+          onSuccess={(createdTrip) => {
             setShowCreateModal(false)
-            navigate('/mytrips')
+            if (createdTrip && createdTrip.id) {
+              navigate(`/tripview/${createdTrip.id}`)
+            } else {
+              navigate('/mytrips')
+            }
           }}
         />
       )}

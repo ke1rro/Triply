@@ -83,15 +83,9 @@ const StartTripModal = ({ trip, onClose, onSuccess }) => {
                 className="flex items-center gap-2 rounded-lg bg-blue-600/80 px-3 py-2 text-sm text-white transition duration-200 hover:bg-blue-700/80"
               >
                 {copied ? (
-                  <>
-                    <FiCheck className="h-4 w-4" />
-                    Copied!
-                  </>
+                  <FiCheck className="h-4 w-4" />
                 ) : (
-                  <>
-                    <FiCopy className="h-4 w-4" />
-                    Copy
-                  </>
+                  <FiCopy className="h-4 w-4" />
                 )}
               </button>
             </div>

@@ -465,20 +465,14 @@ const Trip = () => {
           >
             {isOwner ? (
               trip.statusActive ? (
-                <>
-                  <FiUsers className="h-4 w-4" />
-                  Members
-                </>
+                <FiUsers className="h-4 w-4" />
               ) : (
                 'Edit'
               )
             ) : (
               isVisitor &&
               trip.statusActive && (
-                <>
-                  <FiUsers className="h-4 w-4" />
-                  View Members
-                </>
+                <FiUsers className="h-4 w-4" />
               )
             )}
           </button>

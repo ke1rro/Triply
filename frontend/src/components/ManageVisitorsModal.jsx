@@ -209,12 +209,10 @@ const ManageVisitorsModal = ({ trip, onClose }) => {
                   {copied ? (
                     <>
                       <FiCheck className="h-4 w-4" />
-                      Copied!
                     </>
                   ) : (
                     <>
                       <FiCopy className="h-4 w-4" />
-                      Copy Link
                     </>
                   )}
                 </button>

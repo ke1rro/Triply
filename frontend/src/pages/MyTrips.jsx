@@ -89,6 +89,10 @@ const MyTrips = () => {
   }
 
   const handleCreateSuccess = (newTripData) => {
+    if (newTripData && newTripData.id) {
+      navigate(`/tripview/${newTripData.id}`)
+      return
+    }
     // Add the new trip to the local state immediately
     if (newTripData) {
       const formattedTrip = {

@@ -153,8 +153,10 @@ export default function CreateTripModal({ onClose, onSuccess }) {
 
       if (onSuccess) {
         onSuccess(createdTrip)
+      } else {
+        // Fallback navigation if no onSuccess handler provided
+        window.location.href = `/tripview/${docRef.id}`
       }
-      onClose()
     } catch (error) {
       console.error('Error creating trip:', error)
       setError('Failed to create trip. Please try again.')
