@@ -106,19 +106,6 @@ button:focus-visible {
   background: rgba(156, 163, 175, 0.8);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-
 /* Mobile-specific styles */
 @media (max-width: 768px) {
   body {
