@@ -1,47 +1,52 @@
-# Project Structure
+<div align="center">
 
-```bash
-frontend/
-│
-├── public/
-├── src/
-│   ├── components/     # UI-elements, reusable components
-│   ├── pages/          # Page-based routing
-│   ├── lib/            # firebase.js and other libraries`
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-│
-├── .env
-├── .gitignore
-├── prettier.config.cjs
-├── postcss.config.cjs
-├── tailwind.config.js
-└── package.json
-```
+# Triply
 
-## Project Setup
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com/)
+[![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
-1. Get Firebase credentials and create a `.env` file in the root directory based on `.env_example`.
+</div>
 
-    1.1. Project overview -> project settings -> General -> Your apps -> Firebase SDK snippet -> Config
+## 📖 Overview
 
-2. Install dependencies:
+**Triply** is a modern, full-stack web application that transforms the way people plan and share their travel experiences. Built with cutting-edge technologies, our platform enables seamless collaborative trip planning with interactive maps, real-time collaboration, and a vibrant community of travelers.
 
-```bash
-cd frontend
-npm install
-```
+## ✨ Key Features
 
-3. Start the development server:
+### 🗺️ Trip Management
 
-```bash
-npm run dev
-```
+- **Create & Customize Trips** - Build detailed travel itineraries with multiple locations and rich descriptions
+- **Visual Trip Cards** - Browse trips with stunning image previews and engagement metrics
+- **Multi-day Planning** - Organize activities with intuitive drag-and-drop scheduling
+- **Trip Sharing** - Share adventures via invite links and collaborate in real-time
 
-### Prettier usage
+### 👥 Social Features
 
-```bash
-npm run format
-npm run format:check
-```
+- **Like System** - Save and discover favorite community trips
+- **User Profiles** - Showcase your travel history and connect with fellow explorers
+- **Collaborative Planning** - Invite friends to contribute to your trip planning
+- **Community Discovery** - Explore and get inspired by trips from around the world
+
+## 🖼️ Screenshots
+
+### Login Page
+
+![alt text](.github/imgs/login.png)
+
+### Home Page
+
+![alt text](.github/imgs/home.png)
+
+### Profile Page
+
+![alt text](.github/imgs/profile.png)
+
+### Trip Details
+
+![alt text](.github/imgs/trip.png)
+
+### Edit Page
+
+![alt text](.github/imgs/edit.png)
